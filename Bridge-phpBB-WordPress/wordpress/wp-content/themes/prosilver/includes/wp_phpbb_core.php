@@ -45,7 +45,7 @@ class phpbb
 	 */
 	public static function initialise()
 	{
-		global $wpdb, $wp_user;
+		global $wpdb;
 		$wpdb = phpbb_get_wp_db();
 		
 		global $auth, $config, $db, $template, $user, $cache;
@@ -64,6 +64,17 @@ class phpbb
 			self::$auth->acl(self::$user->data);
 			self::$user->setup();
 		}
+		self::wp_phpbb_sanitize_userid();
+	}
+
+	/**
+	 * Update phpbb user data with wp user data
+	 * 	Andupdate wp user data with phpbb user data
+	 *
+	 */
+	public static function wp_phpbb_sanitize_userid()
+	{
+		global $wp_user;
 
 		$userid = self::wp_get_userid();
 
@@ -83,30 +94,6 @@ class phpbb
 		self::$user->data['wp_user'] = self::wp_get_userdata($userid);
 
 	//	return self::$user->session_id;
-	}
-
-	public static function wp_get_userdata($user_id)
-	{
-		global $wpdb;
-
-		$user = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->users WHERE ID = %d LIMIT 1", $user_id ) );
-
-		if (!empty($user))
-		{
-			foreach($user as $id => $meta)
-			{
-				$wpuser[$id] = $meta;
-			}
-		}
-		else
-		{
-			$wpuser = array(
-				'user_nicename'	=>  '',
-				'ID'			=> 0,
-			);
-		}
-
-		return $wpuser;
 	}
 
 	public static function wp_get_userid()
@@ -147,6 +134,60 @@ class phpbb
 		return $userid;
 	}
 
+	public static function wp_update_user($userid)
+	{
+		$userdata['ID'] = $userid;
+		$userdata['user_url'] = self::$user->data['user_website'];
+		$userdata['user_email'] = self::$user->data['user_email'];
+		$userdata['nickname'] = self::$user->data['username'];
+		$userdata['jabber'] = self::$user->data['user_jabber'];
+		$userdata['aim'] = self::$user->data['user_aim'];
+		$userdata['yim'] = self::$user->data['user_yim'];
+
+		wp_update_user($userdata);
+	}
+
+	/**
+	 * Get all available usuer data from wordpress tables
+	 *
+	 * @param integer $user_id
+	 * @return array
+	 */
+	public static function wp_get_userdata($user_id)
+	{
+		global $wpdb;
+		
+		$user_id = (int) $user_id;
+		$wpuser = array();
+
+		$users = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->users WHERE ID = %d LIMIT 1", $user_id ) );
+		if (!empty($users))
+		{
+			foreach($users as $id => $value)
+			{
+				$wpuser[$id] = $value;
+			}
+		}
+		else
+		{
+			$wpuser = array(
+				'user_nicename'	=>  '',
+				'ID'			=> 0,
+			);
+		}
+
+		$usermeta = $wpdb->get_results( $wpdb->prepare("SELECT meta_key, meta_value FROM $wpdb->usermeta WHERE user_id = %d ", $user_id));
+		if (!empty($usermeta))
+		{
+			foreach($usermeta as $key => $value)
+			{
+				$wpuser[$value->meta_key] = $value->meta_value;
+			}
+		}
+
+		return $wpuser;
+	}
+
 	public static function phpbb_get_username($count = 0)
 	{
 		$new_username = ereg_replace("[^A-Za-z0-9]", "", self::$user->data['username']);
@@ -164,19 +205,6 @@ class phpbb
 		}
 
 		return $new_username;
-	}
-
-	public static function wp_update_user($userid)
-	{
-		$userdata['ID'] = $userid;
-		$userdata['user_url'] = self::$user->data['user_website'];
-		$userdata['user_email'] = self::$user->data['user_email'];
-		$userdata['nickname'] = self::$user->data['username'];
-		$userdata['jabber'] = self::$user->data['user_jabber'];
-		$userdata['aim'] = self::$user->data['user_aim'];
-		$userdata['yim'] = self::$user->data['user_yim'];
-
-		wp_update_user($userdata);
 	}
 
 	/**
@@ -214,7 +242,7 @@ class phpbb
 			'PHPBB_IN_BLOG'		=> true,
 			'PHPBB_IN_PASTEBIN'	=> false,
 			'SCRIPT_NAME'		=> 'blog',
-			'BLOG_LEFT_COLUMN'	=> 250,
+			'BLOG_LEFT_COLUMN'	=> BLOG_LEFT_COLUMN_WIDTH,
 
 		//	'U_WEB'				=> append_sid($web_path),
 			'U_INDEX'			=> append_sid($web_path),
@@ -285,7 +313,7 @@ class phpbb
 		$blog_header .= '<link rel="stylesheet" href="' . $blog_path . '/wp-admin/css/colors-classic.css" type="text/css" media="screen" />' . "\n";
 		$blog_header .= '<link rel="stylesheet" href="' . get_bloginfo('stylesheet_directory') . '/style.css" type="text/css" media="screen" />' . "\n";
 
-		$blog_header .= '<script type="text/javascript" src="' . get_bloginfo('stylesheet_directory') . '/javascript.js"></script>' . "\n";
+		$blog_header .= '<script type="text/javascript" src="' . get_bloginfo('stylesheet_directory') . '/js/javascript.js"></script>' . "\n";
 
 		// jQuery
 		if (is_single())
@@ -293,7 +321,7 @@ class phpbb
 		//	$blog_header .= '<script type="text/javascript" src="'. $blog_path .'/wp-includes/js/jquery/jquery.js"></script>' . "\n";
 			$blog_header .= '<script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>' . "\n";
 		//	$blog_header .= '<script type="text/javascript" src="http://dev.jquery.com/view/trunk/plugins/validate/jquery.validate.js"></script>' . "\n";
-			$blog_header .= '<script type="text/javascript" src="'. $blog_path .'/wp-content/themes/prosilver/jquery.validate.js"></script>' . "\n";
+			$blog_header .= '<script type="text/javascript" src=" '. get_bloginfo('stylesheet_directory') .'/js/jquery.validate.js"></script>' . "\n";
 		}
 
 		return $blog_header;
@@ -422,9 +450,6 @@ class phpbb
 			return '';
 		}
 
-//		// enhance phpbb user data with WP user data
-//		self::$user->data['wp_user'] = self::wp_get_userdata($userid);
-
 		if (!function_exists('get_user_avatar'))
 		{
 			include(PHPBB_ROOT_PATH . 'includes/functions_display.' . PHP_EXT);
@@ -461,7 +486,7 @@ class phpbb
 		
 		if ($is_commen)
 		{
-			$row['user_avatar_width'] = $row['user_avatar_height'] = 32;
+			$row['user_avatar_width'] = $row['user_avatar_height'] = COMMENT_AVATAR_WIDTH;
 		}
 
 		$user_cache = array(
@@ -558,7 +583,7 @@ class phpbb
 
 		//	'ONLINE_IMG'			=> ($poster_id == ANONYMOUS || !self::$config['load_onlinetrack']) ? '' : (($user_cache['online']) ? self::$user->img('icon_user_online', 'ONLINE') : self::$user->img('icon_user_offline', 'OFFLINE')),
 		//	'S_ONLINE'				=> ($poster_id == ANONYMOUS || !self::$config['load_onlinetrack']) ? false : (($user_cache['online']) ? true : false),
-			'POSTER_AVATAR'			=> ($user_cache['avatar'] !== false) ? (($user_cache['avatar']) ? $user_cache['avatar'] : get_avatar($wp_poster_id, 32 )) : '',
+			'POSTER_AVATAR'			=> ($user_cache['avatar'] !== false) ? (($user_cache['avatar']) ? $user_cache['avatar'] : get_avatar($wp_poster_id, COMMENT_AVATAR_WIDTH)) : '',
 			'RANK_TITLE'			=> $user_cache['rank_title'],
 			'RANK_IMG'				=> $user_cache['rank_image'],
 			'RANK_IMG_SRC'			=> $user_cache['rank_image_src'],

@@ -9,7 +9,7 @@
  * 
  */
 
-require_once('wp_phpbb_plugin.php'); 
+require_once('includes/wp_phpbb_plugin.php'); 
 
 phpbb::page_header(phpbb::$user->lang['INDEX']);
 
@@ -64,7 +64,16 @@ if (have_posts())
 
 	$post_ID = request_var('p', $post->ID);
 
-	$comments = get_approved_comments($post_ID);
+//	$comments = get_approved_comments($post_ID);	
+	if (current_user_can('manage_options'))
+	{
+		$comments = get_comments(array('post_id' => $post_ID, 'order' => 'ASC'));
+	}
+	else
+	{
+		$comments = get_comments(array('post_id' => $post_ID, 'status' => 'approve', 'order' => 'ASC'));
+	}
+
 	if ($comments)
 	{
 		foreach ($comments as $comment)
@@ -82,6 +91,7 @@ if (have_posts())
 				'U_POST_EDIT'		=> get_edit_comment_link($comment_id),
 				'MINI_POST_IMG'		=> $user->img('icon_post_target', 'POST'),
 				'S_POST_UNAPPROVED'	=> ($comment->comment_approved == '0') ? true : false,
+				'S_POST_ACTIONS'	=> ($comment->comment_approved == '0') ? wp_dashboard_comments($comment) : false,
 				'MESSAGE'			=> wp_comment_text($comment_id),
 			);
 

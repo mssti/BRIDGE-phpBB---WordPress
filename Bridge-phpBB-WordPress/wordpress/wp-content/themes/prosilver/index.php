@@ -9,7 +9,7 @@
  * 
  */
 
-require_once('wp_phpbb_plugin.php'); 
+require_once('includes/wp_phpbb_plugin.php'); 
 
 phpbb::page_header(phpbb::$user->lang['INDEX']);
 

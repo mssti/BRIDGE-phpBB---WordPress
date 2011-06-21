@@ -74,6 +74,23 @@ Tags: blue, phpbb, full width, two columns
 	border: 1px solid #DDDDDD;
 }
 
+.section-blog ul.profile-icons li.approve-icon,
+.section-blog ul.profile-icons li.unapprove-icon,
+.section-blog ul.profile-icons li.spam-icon,
+.section-blog ul.profile-icons li.trash-icon {
+	margin-top: 3px; 
+}
+.section-blog ul.profile-icons li.approve-icon span,
+.section-blog ul.profile-icons li.unapprove-icon span,
+.section-blog ul.profile-icons li.spam-icon span,
+.section-blog ul.profile-icons li.trash-icon span {
+	display: inline;
+	margin-top: 3px; 
+}
+
+.section-blog blockquote {
+  background-image: none;
+}
 /** Sideber **/
 .section-blog #sidebar h3 {
 	border-bottom: 1px solid #EEEEEE;
@@ -125,7 +142,6 @@ Tags: blue, phpbb, full width, two columns
 .section-blog #commentform .form-allowed-tags code {
 	font-size: 11px;
 }
-
 
 /** Footer **/
 .section-blog a#site-generator {

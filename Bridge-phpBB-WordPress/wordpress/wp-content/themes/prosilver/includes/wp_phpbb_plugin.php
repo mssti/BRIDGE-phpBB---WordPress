@@ -17,15 +17,15 @@ define('WP_PHPBB_BRIDGE_ROOT', TEMPLATEPATH . '/');
 define('PHP_EXT', substr(strrchr(__FILE__, '.'), 1));
 define('WP_TABLE_PREFIX', $table_prefix);
 
+// Make this variable global before initialize phpbb
 $wp_user = wp_get_current_user();
 
-require(WP_PHPBB_BRIDGE_ROOT . 'wp_phpbb_constants.' . PHP_EXT);
-
-// Make that phpBB itself understands out paths
-$phpbb_root_path = PHPBB_ROOT_PATH;
-$phpEx = PHP_EXT;
-
-require(WP_PHPBB_BRIDGE_ROOT . 'wp_phpbb_common.' . PHP_EXT);
+// Include the initial functions to phpBB
+if (!file_exists(WP_PHPBB_BRIDGE_ROOT . 'includes/wp_phpbb_common.' . PHP_EXT))
+{
+	die('<p>No phpBB installation found. Check the "WP phpBB Bidge" configuration file.</p>');
+}
+require(WP_PHPBB_BRIDGE_ROOT . 'includes/wp_phpbb_common.' . PHP_EXT);
 
 // wp_phpbb_check_redirect();
 // add_action('login_head', 'wp_phpbb_check_redirect');
@@ -341,6 +341,58 @@ function wp_comments_number( $zero = false, $one = false, $more = false, $deprec
 		$output = ( false === $one ) ? __('1 Comment') : $one;
 
 	return apply_filters('comments_number', $output, $number);
+}
+
+function wp_dashboard_comments($comment)
+{
+	$actions_string = '';
+	if (current_user_can('edit_comment', $comment->comment_ID))
+	{
+		// preorder it: Approve | Reply | Edit | Spam | Trash
+		$actions = array(
+			'approve' => '',
+			'unapprove' => '',
+//			'reply' => '',
+//			'edit' => '',
+			'spam' => '',
+			'trash' => '',
+			'delete' => ''
+		);
+
+		$del_nonce = esc_html( '_wpnonce=' . wp_create_nonce( "delete-comment_$comment->comment_ID" ) );
+		$approve_nonce = esc_html( '_wpnonce=' . wp_create_nonce( "approve-comment_$comment->comment_ID" ) );
+
+		$approve_url = esc_url(get_option('home') . "/wp-admin/comment.php?action=approvecomment&p=$comment->comment_post_ID&c=$comment->comment_ID&$approve_nonce");
+		$unapprove_url = esc_url(get_option('home') . "/wp-admin/comment.php?action=unapprovecomment&p=$comment->comment_post_ID&c=$comment->comment_ID&$approve_nonce");
+//		$edir_url = esc_url(get_option('home') . "comment.php?action=editcomment&amp;c={$comment->comment_ID}");
+		$spam_url = esc_url(get_option('home') . "/wp-admin/comment.php?action=spamcomment&p=$comment->comment_post_ID&c=$comment->comment_ID&$del_nonce");
+		$trash_url = esc_url(get_option('home') . "/wp-admin/comment.php?action=trashcomment&p=$comment->comment_post_ID&c=$comment->comment_ID&$del_nonce");
+		$delete_url = esc_url(get_option('home') . "/wp-admin/comment.php?action=deletecomment&p=$comment->comment_post_ID&c=$comment->comment_ID&$del_nonce");
+
+		$actions['approve'] = "<a href='$approve_url' title='" . esc_attr__( 'Approve this comment' ) . "'><span>" . __( 'Approve' ) . '</span></a>';
+		$actions['unapprove'] = "<a href='$unapprove_url'  title='" . esc_attr__( 'Unapprove this comment' ) . "'><span>" . __( 'Unapprove' ) . '</span></a>';
+//		$actions['edit'] = "<a href='$edir_url' title='" . esc_attr__('Edit comment') . "'><span>". __('Edit') . '</a>';
+//		$actions['reply'] = '<a onclick="commentReply.open(\''.$comment->comment_ID.'\',\''.$comment->comment_post_ID.'\');return false;" title="'.esc_attr__('Reply to this comment').'" href="#">' . __('Reply') . '</span></a>';
+		$actions['spam'] = "<a href='$spam_url' title='" . esc_attr__( 'Mark this comment as spam' ) . "'><span>" . /* translators: mark as spam link */  _x( 'Spam', 'verb' ) . '</span></a>';
+		if (!EMPTY_TRASH_DAYS)
+		{
+			$actions['delete'] = "<a href='$delete_url'title='" . esc_attr__( 'Delete Permanently' ) . "'><span>" . __('Delete Permanently') . '</span></a>';
+		}
+		else
+		{
+			$actions['trash'] = "<a href='$trash_url' title='" . esc_attr__( 'Move this comment to the trash' ) . "'><span>" . _x('Trash', 'verb') . '</span></a>';
+		}
+
+		$actions = apply_filters( 'comment_row_actions', array_filter($actions), $comment );
+
+		foreach ($actions as $action => $link)
+		{
+		//	$actions_string .= "<span class='$action'>$sep$link</span>";
+			$actions_string .= '<li class="' . strtolower($action) . '-icon">' .$link . '</li>';
+		}
+	}
+	
+	return $actions_string;
 }
 
 ?>
