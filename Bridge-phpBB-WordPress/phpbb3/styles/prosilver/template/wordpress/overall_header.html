@@ -1,0 +1,23 @@
+			<ul class="linklist navlinks">
+				<!-- IF U_WEB --><li class="icon-home"><a href="{U_WEB}" title="{L_WP_TITLE_WEB_EXPLAIN}" >{L_WP_TITLE_WEB}</a></li><!-- ENDIF -->
+				<!-- IF U_INDEX --><li class="icon-home"><a href="{U_INDEX}" title="{L_WP_TITLE_FORUM_EXPLAIN}" >{L_WP_TITLE_FORUM}</a></li><!-- ENDIF -->
+				<!-- IF U_BLOG --><li class="icon-home"><a href="{U_BLOG}" title="{L_WP_TITLE_BLOG_EXPLAIN}" >{L_WP_TITLE_BLOG}</a></li><!-- ENDIF -->
+				<!-- IF U_WP_ACP -->{U_WP_ACP}<!-- ENDIF -->
+				<!-- IF not S_IS_BOT -->
+					<li class="icon-logout rightside">{U_LOGOUT}</li>
+					<!-- IF G_USER_LOGGED_IN -->
+					<li class="icon-register rightside">{U_LOGIN}</li>
+					<!-- ENDIF -->
+				<!-- ENDIF -->
+			</ul>
+			<!-- IF S_CLOCK -->
+			<ul class="linklist leftside">
+				<li class="clock">{CURRENT_DATE} <span id="the_clock">{CURRENT_TIME}<script type='text/javascript'> get_the_clock(); </script></span></li>
+			</ul>
+			<!-- ENDIF -->
+			<!-- IF not S_IS_BOT -->
+			<ul class="linklist rightside">
+				<li>WP => {WP_USER_NAME} ({WP_USER_ID})</li>
+				<li>PHPBB => {PHPBB_USER_NAME} ({PHPBB_USER_ID})</li>
+			</ul>
+			<!-- ENDIF -->
