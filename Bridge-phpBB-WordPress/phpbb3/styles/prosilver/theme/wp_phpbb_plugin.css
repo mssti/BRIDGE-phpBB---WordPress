@@ -1,0 +1,22 @@
+/* Moderator icons */
+ul.profile-icons li.wp-trash-icon			{ width: {IMG_ICON_POST_DELETE_WIDTH}px; height: {IMG_ICON_POST_DELETE_HEIGHT}px; }
+.wp-trash-icon, .wp-trash-icon a			{ background: url("{IMG_ICON_POST_DELETE_SRC}") top left no-repeat; }
+
+ul.profile-icons li.wp-spam-icon			{ width: {IMG_ICON_POST_REPORT_WIDTH}px; height: {IMG_ICON_POST_REPORT_HEIGHT}px; }
+.wp-spam-icon, .wp-spam-icon a				{ background: url("{IMG_ICON_POST_REPORT_SRC}") top left no-repeat; }
+
+ul.profile-icons li.wp-approve-icon			{ width: {IMG_ICON_USER_WARN_WIDTH}px; height: {IMG_ICON_USER_WARN_HEIGHT}px; }
+/**
+.wp-approve-icon, .wp-approve-icon a		{ background: url("{IMG_ICON_USER_WARN_SRC}") top left no-repeat; }
+**/
+.wp-approve-icon, .wp-approve-icon a		{ background: url("{T_IMAGESET_PATH}/icon_rate_good.gif") top left no-repeat; }
+
+ul.profile-icons li.wp-unapprove-icon		{ width: {IMG_ICON_POST_INFO_WIDTH}px; height: {IMG_ICON_POST_INFO_HEIGHT}px; }
+/*
+.wp-unapprove-icon, .wp-unapprove-icon a	{ background: url("{IMG_ICON_POST_INFO_SRC}") top left no-repeat; }
+*/
+.wp-unapprove-icon, .wp-unapprove-icon a	{ background: url("{T_IMAGESET_PATH}/icon_rate_bad.gif") top left no-repeat; }
+
+ul.profile-icons li.wp-approve-icon, ul.profile-icons li.wp-unapprove-icon {
+	margin: 0;
+}

@@ -144,6 +144,17 @@ if (!function_exists('make_clickable'))
 			</edit>
 		</open>
 
+		<open src="styles/prosilver/theme/stylesheet.css">
+			<edit>
+				<find><![CDATA[@import url("colours.css");]]></find>
+				<action type="before-add"><![CDATA[/* MOD : WordPress - phpBB Integration Mod - START */
+@import url("wp_phpbb_plugin.css");
+/* MOD : WordPress - phpBB Integration Mod - END */
+]]></action>
+			</edit>
+		</open>
+
+
 		<diy-instructions lang="en"><![CDATA[IMPORTANT ! 
 
 #####################################################################
@@ -158,17 +169,25 @@ A) Refresh the templates :
 	A.4) in the next screen, click on "Yes" ( Repeat last 2 steps to each instaled style ).
 
 #####################################################################
+B) Refresh the theme :
+
+	B.1) Navigate to "Styles" Tab.
+	B.2) Under "Style components " click on "Theme".
+	B.3) Under "Actions" click on "Refresh".
+	B.4) in the next screen, click on "Yes" ( Repeat last 2 steps to each instaled style ).
+
+#####################################################################
 Log on to the wordpress Administration Dashboard
 
 #####################################################################
-B) Install the theme :
+C) Install the theme :
 
-	B.1) Navigate to Appareance -> Themes 
-	B.2) Under Available Themes, look for Prosilver 
-	D.3) Click on "Activate"
+	C.1) Navigate to Appareance -> Themes 
+	C.2) Under Available Themes, look for Prosilver 
+	C.3) Click on "Activate"
 
 #####################################################################
-C) Enjoy it !.]]>
+D) Enjoy it !.]]>
 		</diy-instructions>
 	</action-group>
 </mod>
