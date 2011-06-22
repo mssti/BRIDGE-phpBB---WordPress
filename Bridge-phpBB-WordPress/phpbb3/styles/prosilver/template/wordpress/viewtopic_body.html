@@ -3,7 +3,7 @@
 	<br />
 	<div id="content" class="widecolumn">
 	<!-- BEGIN postrow -->
-		<div class="post<!-- IF postrow.S_FIRST_ROW --> bg3<!-- ELSE --><!-- IF postrow.POST_ID is odd --> bg2<!-- ELSE --> bg1<!-- ENDIF --><!-- ENDIF --><!-- IF (postrow.S_POST_UNAPPROVED or postrow.S_POST_REPORTED) --> reported<!-- ENDIF -->" id="post-{postrow.POST_ID}">
+		<div class="post<!-- IF postrow.S_FIRST_ROW --> bg3<!-- ELSE --><!-- IF postrow.POST_ID is odd --> bg2<!-- ELSE --> bg1<!-- ENDIF --><!-- ENDIF --><!-- IF (postrow.S_POST_UNAPPROVED or postrow.S_POST_REPORTED) --> reported<!-- ENDIF -->" id="<!-- IF postrow.S_COMMENT -->comment-{postrow.POST_ID}<!-- ELSE -->post-{postrow.POST_ID}<!-- ENDIF -->">
 			<div class="inner"><span class="corners-top"><span></span></span>
 				<div class="postbody">
 					<!-- IF not S_IS_BOT -->

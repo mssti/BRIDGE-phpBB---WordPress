@@ -87,7 +87,7 @@ class phpbb
 		{
 			wp_set_current_user($userid);
 			wp_set_auth_cookie($userid, true, false);
-			self::wp_update_user($userid, $user);
+			self::wp_update_user($userid);
 		}
 
 		// enhance phpbb user data with WP user data
@@ -310,7 +310,7 @@ class phpbb
 		$blog_header .= '<link rel="pingback" href="' . get_bloginfo('pingback_url') . '" />' . "\n";
 		$blog_header .= '<link rel="alternate" type="application/rss+xml" title="' . get_bloginfo('name') . ' - RSS Feed' . '" href="' . get_bloginfo('rss2_url') . '" />' . "\n";
 
-		$blog_header .= '<link rel="stylesheet" href="' . $blog_path . '/wp-admin/css/colors-classic.css" type="text/css" media="screen" />' . "\n";
+	//	$blog_header .= '<link rel="stylesheet" href="' . $blog_path . '/wp-admin/css/colors-classic.css" type="text/css" media="screen" />' . "\n";
 		$blog_header .= '<link rel="stylesheet" href="' . get_bloginfo('stylesheet_directory') . '/style.css" type="text/css" media="screen" />' . "\n";
 
 		$blog_header .= '<script type="text/javascript" src="' . get_bloginfo('stylesheet_directory') . '/js/javascript.js"></script>' . "\n";
@@ -334,7 +334,7 @@ class phpbb
 	{
 		$wp_list_pages = $wp_get_archives = $wp_list_categories = $wp_tag_cloud = '';
 
-		// Author information is disabled per default. Uncomment and fill in your details if you want to use it.
+		// Author information 
 		$post_ID = request_var('p', 0);
 		if (is_single() && $post_ID)
 		{
@@ -342,10 +342,10 @@ class phpbb
 			self::phpbb_the_autor_full($post->post_author, true, false);
 		}
 
-		$wp_list_pages = wp_list_pages(array('title_li' => '', 'echo' => 0));
-		$wp_get_archives = wp_get_archives(array('type=monthly', 'echo' => 0));
-		$wp_list_categories = wp_list_categories(array('title_li' => '', 'echo' => 0));
-		$wp_tag_cloud = wp_tag_cloud(array('separator' => ", ", 'echo' => 0));
+		$wp_list_pages = (defined('LIST_PAGES') && LIST_PAGES) ? wp_list_pages(array('title_li' => '', 'echo' => 0)) : '';
+		$wp_get_archives = (defined('LIST_ARCHIVES') && LIST_ARCHIVES) ? wp_get_archives(array('type=monthly', 'echo' => 0)) : '';
+		$wp_list_categories = (defined('LIST_CATEGORIES') && LIST_CATEGORIES) ? wp_list_categories(array('title_li' => '', 'echo' => 0)) : '';
+		$wp_tag_cloud = (defined('LIST_TAGCLOUD') && LIST_CATEGORIES) ? wp_tag_cloud(array('separator' => ", ", 'echo' => 0)) : '';
 
 		$is_404 = $is_category = $is_day = $is_month = $is_year = $is_search = $is_paged = '';
 		if (is_404() || is_category() || is_day() || is_month() || is_year() || is_search() || is_paged())
@@ -419,6 +419,108 @@ class phpbb
 			'SIDEBAR_WP_TAG_CLOUD'			=> "<li>$wp_tag_cloud</li>",
 		));
 	}
+
+	/**
+	 * Allows you to display a list of recent topics within a specific forum id's.
+	 *
+	 */
+	public static function phpbb_recet_topics()
+	{
+		$defaults = array(
+			'title'				=> 'Latest posts',
+			'forums'			=> 0,	// array(1)	// array(1,2)
+			'total'				=> 10,
+			'showForum'			=> true,
+			'showUsername'		=> true,
+			'showTotalViews'	=> true,
+			'showTotalPosts'	=> true,
+		);
+
+		if (!is_array($defaults['forums']))
+		{
+			$defaults['forums'] = array($defaults['forums']);
+		}
+		if ($defaults['forums'][0] == 0)
+		{
+			$defaults['forums'] = self::$auth->acl_getf('f_read', true);
+		}
+
+		$sql_array = array(
+			'SELECT'	=> 'f.forum_id, f.forum_name,
+							t.topic_id, t.forum_id, t.topic_title, t.topic_poster, t.topic_first_poster_name, t.topic_first_poster_colour, t.topic_last_post_id, t.topic_last_poster_id, t.topic_last_poster_name, t.topic_last_poster_colour, 
+							t.topic_views, t.topic_replies, t.topic_replies_real, t.topic_time, t.topic_last_post_time, t.topic_status, t.topic_type, t.poll_start, 
+							u.username, u.user_colour',
+			'FROM'		=> array(
+				TOPICS_TABLE => 't',
+			),
+			'LEFT_JOIN' => array(
+				array(
+					'FROM' => array(FORUMS_TABLE => 'f'),
+					'ON' => 't.forum_id = f.forum_id',
+				),
+				array(
+					'FROM' => array(USERS_TABLE => 'u'),
+					'ON' => 't.topic_poster = u.user_id',
+				),
+			),
+			'WHERE' => self::$db->sql_in_set('t.forum_id', array_keys($defaults['forums'])) . '
+				AND t.topic_status <> ' . ITEM_MOVED . '
+				AND t.topic_approved = 1
+					OR t.forum_id = 0', //OR t.forum_id = 0, esta linea es para que muestre tambien los globales ya que el id del foro de estos es 0
+			'ORDER_BY' => 't.topic_type DESC, t.topic_last_post_time DESC',
+		);
+
+		$sql = self::$db->sql_build_query('SELECT', $sql_array);
+		$result = self::$db->sql_query_limit($sql, (int) $defaults['total']);
+
+		while ($row = self::$db->sql_fetchrow($result))
+		{
+			$topic_list[] = $row;
+		}
+
+		self::$db->sql_freeresult($result);
+
+		// Output the topics
+		for ($i = 0, $end = sizeof($topic_list); $i < $end; ++$i)
+		{
+			$topic_data =& $topic_list[$i];
+		/**
+			$topic_forum_id = (int) $topic_data['forum_id'];
+
+			// Replies
+			$replies = (self::$auth->acl_get('m_approve', $topic_forum_id)) ? $topic_data['topic_replies_real'] : $topic_data['topic_replies'];
+
+			$unread_topic = false;
+			// Get folder img, topic status/type related information
+			$folder_img = $folder_alt = $topic_type = '';
+			topic_status($topic_data, $replies, $unread_topic, $folder_img, $folder_alt, $topic_type);
+		**/
+			// Dump vars into template
+			self::$template->assign_block_vars('recettopicsrow', array(
+				'TOPIC_TITLE' 	=> $topic_data['topic_title'],
+				'U_VIEW_TOPIC'	=> self::append_sid("viewtopic", array('f' => $topic_data['forum_id'], 't' => $topic_data['topic_id'])),
+
+				'FORUM_NAME' 	=> ($defaults['showForum']) ? $topic_data['forum_name'] : '',
+				'U_VIEW_FORUM'	=> self::append_sid("viewforum", array('f' => $topic_data['forum_id'])),
+
+			//	'TOPIC_FOLDER_IMG_SRC'	=> self::$user->img($folder_img, $folder_alt, false, '', 'src'),
+				'REPLIES'		=> ($defaults['showTotalPosts']) ? $topic_data['topic_replies'] : '',
+				'VIEWS'			=> ($defaults['showTotalViews']) ? $topic_data['topic_views'] : '',
+
+				'TOPIC_AUTHOR_FULL'		=> ($defaults['showTotalPosts']) ? get_username_string('full', $topic_data['topic_poster'], $topic_data['topic_first_poster_name'], $topic_data['topic_first_poster_colour']) : '',
+				'FIRST_POST_TIME'		=> self::$user->format_date($topic_data['topic_time']),
+
+				'U_LAST_POST'			=> self::append_sid("viewtopic", array('f' => $topic_data['forum_id'], 't' => $topic_data['topic_id'], 'p'=> $topic_data['topic_last_post_id'] . '#p' . $topic_data['topic_last_post_id'])),
+				'LAST_POST_AUTHOR_FULL'	=> get_username_string('full', $topic_data['topic_last_poster_id'], $topic_data['topic_last_poster_name'], $topic_data['topic_last_poster_colour']),
+				'LAST_POST_TIME'		=> self::$user->format_date($topic_data['topic_last_post_time']),
+			));
+		}
+
+		self::$template->assign_vars(array(
+			'S_RECENT_TOPICS' => sizeof($topic_list),
+			'LAST_POST_IMG'	=> self::$user->img('icon_topic_latest', 'VIEW_LATEST_POST'),
+		));
+ 	}
 
 	/**
 	 * Page footer function handling the phpBB tasks
@@ -621,15 +723,15 @@ class phpbb
 	/**
 	 * Page footer function handling the phpBB tasks
 	 */
-	public static function page_footer($run_cron = true)
+	public static function page_footer($run_cron = true, $template_body = false)
 	{
 		self::$template->assign_vars(array(
 			'BLOG_FOOTER'	=> self::wp_page_footer(),
 		));
 
 		self::$template->set_filenames(array(
-			'body' => 'wordpress/index_body.html')
-		);
+			'body' => ($template_body !== false) ? $template_body : 'wordpress/index_body.html',
+		));
 
 		// Do the phpBB page footer at least
 		page_footer();
@@ -660,7 +762,13 @@ class phpbb
 	*/
 	function login_box($redirect = '', $l_explain = '', $l_success = '', $admin = false, $s_display = true)
 	{
-		self::_include('captcha/captcha_factory', 'phpbb_captcha_factory');
+		global $phpbb_root_path, $phpEx;
+
+		if (!class_exists('phpbb_captcha_factory'))
+		{
+			include($phpbb_root_path . 'includes/captcha/captcha_factory.' . $phpEx);
+		}
+	//	self::_include('captcha/captcha_factory', 'phpbb_captcha_factory');
 		self::$user->add_lang('ucp');
 
 		$err = '';
@@ -745,21 +853,16 @@ class phpbb
 			// The result parameter is always an array, holding the relevant information...
 			if ($result['status'] == LOGIN_SUCCESS)
 			{
-				$redirect = request_var('redirect', '');
+			//	$filename = strtolower(basename($_SERVER['SCRIPT_FILENAME']));
+			//	$redirect = request_var('redirect', '');
 
-				if ($redirect)
+				if ($redirect == '')
 				{
-					$redirect = titania_url::unbuild_url($redirect);
-
-					$base = $append = false;
-					titania_url::split_base_params($base, $append, $redirect);
-
-					redirect(titania_url::build_url($base, $append));
+					$redirect = request_var('redirect', get_option('home'));
+					$redirect = request_var('redirect_to', $redirect);
 				}
-				else
-				{
-					redirect(titania_url::build_url(titania_url::$current_page, titania_url::$params));
-				}
+
+				redirect($redirect);
 			}
 
 			// Something failed, determine what...
@@ -788,7 +891,7 @@ class phpbb
 
 					self::$template->assign_display('captcha', 'CAPTCHA', false);
 
-					titania::set_custom_template();
+				//	titania::set_custom_template();
 
 					$err = self::$user->lang[$result['error_msg']];
 				break;
@@ -836,7 +939,7 @@ class phpbb
 
 		$s_hidden_fields = build_hidden_fields($s_hidden_fields);
 
-		titania::page_header('LOGIN');
+		self::page_header('LOGIN');
 
 		self::$template->assign_vars(array(
 			'LOGIN_ERROR'		=> $err,
@@ -857,7 +960,7 @@ class phpbb
 			'PASSWORD_CREDENTIAL'	=> ($admin) ? 'password_' . $credential : 'password',
 		));
 
-		titania::page_footer(true, 'login_body.html');
+		self::page_footer(true, 'login_body.html');
 	}
 
 	/**

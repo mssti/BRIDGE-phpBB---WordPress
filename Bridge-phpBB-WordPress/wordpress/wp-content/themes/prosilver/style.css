@@ -73,7 +73,7 @@ Tags: blue, phpbb, full width, two columns
 	background-color: #F8F8F8;
 	border: 1px solid #DDDDDD;
 }
-
+/**
 .section-blog ul.profile-icons li.approve-icon,
 .section-blog ul.profile-icons li.unapprove-icon,
 .section-blog ul.profile-icons li.spam-icon,
@@ -87,7 +87,7 @@ Tags: blue, phpbb, full width, two columns
 	display: inline;
 	margin-top: 3px; 
 }
-
+**/
 .section-blog blockquote {
   background-image: none;
 }

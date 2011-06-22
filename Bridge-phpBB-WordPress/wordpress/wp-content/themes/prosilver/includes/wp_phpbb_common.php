@@ -75,8 +75,25 @@ phpbb::$user->add_lang(array('posting', 'mods/wp_phpbb_plugin'));
 // For the moment the ID of you forum where to use permissions ( like $auth->acl_get('f_reply') )
 define('PERMISSION_FORUM_ID', 2);
 
-define('BLOG_LEFT_COLUMN_WIDTH', 250);
+// The left column width, in pixels
+define('BLOG_LEFT_COLUMN_WIDTH', 300);
 
+// The width size of avatars in comments, in pixels
 define('COMMENT_AVATAR_WIDTH', 32);
+
+// Dispaly a block with latest topics in left sidebar
+define('RECENT_TOPICS', true);
+
+// Dispaly a block with a list of pages in left sidebar
+define('LIST_PAGES', true);
+
+// Dispaly a block with a list of archives in left sidebar
+define('LIST_ARCHIVES', true);
+
+// Dispaly a block with a list of categories in left sidebar
+define('LIST_CATEGORIES', true);
+
+// Dispaly a block with tag clouds in left sidebar
+define('LIST_TAGCLOUD', true);
 
 ?>

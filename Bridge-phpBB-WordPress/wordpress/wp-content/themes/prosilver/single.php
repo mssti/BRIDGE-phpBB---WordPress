@@ -90,6 +90,7 @@ if (have_posts())
 				'POST_DATE'			=> phpbb::$user->format_date($post_date_time, false, true),
 				'U_POST_EDIT'		=> get_edit_comment_link($comment_id),
 				'MINI_POST_IMG'		=> $user->img('icon_post_target', 'POST'),
+				'U_MINI_POST'		=> apply_filters('the_permalink', get_permalink()) . "#p$comment_id",
 				'S_POST_UNAPPROVED'	=> ($comment->comment_approved == '0') ? true : false,
 				'S_POST_ACTIONS'	=> ($comment->comment_approved == '0') ? wp_dashboard_comments($comment) : false,
 				'MESSAGE'			=> wp_comment_text($comment_id),
@@ -146,7 +147,7 @@ if (have_posts())
 		'COMMENT_MESSAGE'		=> $comment_content,
 		'COMMENT_TO_POST_ID'	=> $post_ID,
 		'REQUIRED_FIELDS'		=> get_option('require_name_email'),
-		
+
 		'LA_USERNAME_REQUIRED_NOTE'			=> addslashes(sprintf(phpbb::$user->lang['WP_USERNAME_REQUIRED_NOTE'], phpbb::$user->lang['USERNAME'])),
 		'LA_EMAIL_REQUIRED_NOTE'			=> addslashes(sprintf(phpbb::$user->lang['WP_EMAIL_REQUIRED_NOTE'], phpbb::$user->lang['EMAIL_ADDRESS'])),
 		'LA_EMAIL_REQUIRED_MINLENGTH'		=> addslashes(sprintf(phpbb::$user->lang['WP_EMAIL_REQUIRED_MINLENGTH'], phpbb::$user->lang['EMAIL_ADDRESS'])),
@@ -155,7 +156,6 @@ if (have_posts())
 		'LA_MESSAGE_REQUIRED_NOTE'			=> addslashes(sprintf(phpbb::$user->lang['WP_MESSAGE_REQUIRED_NOTE'], phpbb::$user->lang['MESSAGE_BODY'])),
 		'LA_MESSAGE_REQUIRED_MINLENGTH'		=> addslashes(sprintf(phpbb::$user->lang['WP_MESSAGE_REQUIRED_MINLENGTH'], phpbb::$user->lang['MESSAGE_BODY'])),
 
-	
 		'L_COMMENT_ALLOWED_TAGS'=> sprintf(phpbb::$user->lang['WP_ALLOWED_TAGS'], ' <code>' . allowed_tags() . '</code>'),
 
 		'POST_REPLIES'		=> wp_comments_number(phpbb::$user->lang['WP_NO_COMMENTS'], phpbb::$user->lang['WP_ONE_COMMENT'], phpbb::$user->lang['WP_COMMENTS']) . sprintf(phpbb::$user->lang['WP_COMMENTS_TO'], $topic_title),

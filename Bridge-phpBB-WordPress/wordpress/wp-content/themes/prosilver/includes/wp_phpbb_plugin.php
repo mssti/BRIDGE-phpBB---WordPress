@@ -27,45 +27,26 @@ if (!file_exists(WP_PHPBB_BRIDGE_ROOT . 'includes/wp_phpbb_common.' . PHP_EXT))
 }
 require(WP_PHPBB_BRIDGE_ROOT . 'includes/wp_phpbb_common.' . PHP_EXT);
 
-// wp_phpbb_check_redirect();
-// add_action('login_head', 'wp_phpbb_check_redirect');
+// $filename = strtolower(basename($_SERVER['SCRIPT_FILENAME']));
+$action = request_var('action', '');
+$redirect = request_var('redirect', get_option('home'));
+$redirect_to = request_var('redirect_to', $redirect);
 
-function wp_phpbb_check_redirect()
+switch ($action)
 {
-	$filename = strtolower(basename($_SERVER['SCRIPT_FILENAME']));
+	case 'login':
+		phpbb::login_box($redirect_to);
+	break;
 
-	$redirect_to = request_var('redirect_to', get_option('home'));
-	$action = request_var('action', '');
+	case 'logout':
+		if (phpbb::$user->data['user_id'] != ANONYMOUS)
+		{
+			phpbb::$user->session_kill();
+			phpbb::$user->session_begin();
+		}
 
-print_r("filename=($filename) :: action=($action) :: redirect_to=($redirect_to)<br />");
-
-	/**
-	* Loguot
-	* wp    : http://localhost:8080/phpbb/quickinstall/boards/wp_phpbb_bridge/wordpress/wp-login.php?action=logout&redirect_to=http%3A%2F%2Flocalhost%3A8080%2Fphpbb%2Fquickinstall%2Fboards%2Fwp_phpbb_bridge%2Fwordpress%2F%3Fp%3D1&_wpnonce=c0c662c156
-	* phpbb : http://localhost:8080/phpbb/quickinstall/boards/wp_phpbb_bridge/foro/ucp.php?mode=logout&sid=fef7db584ace96bb76e712e9690666aa
-	**/
-	if ($filename == 'wp-login.php' && $action == 'logout')
-	{
-		wp_redirect(PHPBB_ROOT_PATH . 'ucp' . PHP_EXT . "?mode=logout&sid=" . phpbb::$user->session_id);
-	}
-	/**
-	* Login
-	* wp    : 
-	* phpbb : 
-	**/
-	else if ($filename == "wp-login.php" && !is_user_logged_in())
-	{
-		wp_redirect(PHPBB_ROOT_PATH . 'ucp' . PHP_EXT . "?mode=login&redirect=" . $redirect_to);
-	}
-	/**
-	* Register
-	* wp    : 
-	* phpbb : http://localhost:8080/phpbb/quickinstall/boards/wp_phpbb_bridge/foro/ucp.php?mode=register
-	**/
-	else if ($filename == 'wp-signup.php' && !is_user_logged_in())
-	{
-		wp_redirect(PHPBB_ROOT_PATH . 'ucp' . PHP_EXT . "?mode=register&redirect=" . $redirect_to);
-	}    
+		redirect($redirect_to);
+	break;
 }
 
 /**
@@ -105,15 +86,22 @@ function is_odd($number)
 
 function wp_get_register()
 {
+	$link = '';
+
 	if (!is_user_logged_in())
 	{
 		if (get_option('users_can_register'))
 		{
-			$link = '<a href="' . get_option('siteurl') . '/wp-login.php?action=register">' . __('Register') . '</a>';
+		//	$link = '<a href="' . get_option('siteurl') . '/wp-login.php?action=register">' . __('Register') . '</a>';
+			$link = '<a href="' . get_option('siteurl') . '/?action=register">' . __('Register') . '</a>';
 		}
 		else
 		{
-			$link = '';
+			if (phpbb::$config['require_activation'] != USER_ACTIVATION_DISABLE)
+			{
+			//	phpbb::append_sid("ucp", 'mode=register');
+				$link = '<a href="' . get_option('siteurl') . '/?action=register">' . __('Log in') . '</a>';
+			}
 		}
 	}
 	else
@@ -128,12 +116,15 @@ function wp_get_loginout()
 {
 	if (!is_user_logged_in())
 	{
-		$link = '<a href="' . get_option('siteurl') . '/wp-login.php">' . __('Log in') . '</a>';
+	//	$link = '<a href="' . get_option('siteurl') . '/wp-login.php">' . __('Log in') . '</a>';
+		$link = '<a href="' . get_option('siteurl') . '/?action=login">' . __('Log in') . '</a>';
 	}
 	else
 	{
-		$link = '<a href="' . get_option('siteurl') . '/wp-login.php?action=logout">' . __('Log out') . '</a>';
+	//	$link = '<a href="' . get_option('siteurl') . '/wp-login.php?action=logout">' . __('Log out') . '</a>';
+		$link = '<a href="' . get_option('siteurl') . '/?action=logout">' . __('Log out') . '</a>';
 	}
+
 	return apply_filters('loginout', $link);
 }
 
@@ -371,8 +362,8 @@ function wp_dashboard_comments($comment)
 
 		$actions['approve'] = "<a href='$approve_url' title='" . esc_attr__( 'Approve this comment' ) . "'><span>" . __( 'Approve' ) . '</span></a>';
 		$actions['unapprove'] = "<a href='$unapprove_url'  title='" . esc_attr__( 'Unapprove this comment' ) . "'><span>" . __( 'Unapprove' ) . '</span></a>';
-//		$actions['edit'] = "<a href='$edir_url' title='" . esc_attr__('Edit comment') . "'><span>". __('Edit') . '</a>';
-//		$actions['reply'] = '<a onclick="commentReply.open(\''.$comment->comment_ID.'\',\''.$comment->comment_post_ID.'\');return false;" title="'.esc_attr__('Reply to this comment').'" href="#">' . __('Reply') . '</span></a>';
+//		$actions['edit'] = "<a href='$edir_url' title='" . esc_attr__('Edit comment') . "'><span>". __('Edit') . '</span></a>';
+//		$actions['reply'] = '<a onclick="commentReply.open(\''.$comment->comment_ID.'\',\''.$comment->comment_post_ID.'\');return false;" title="'.esc_attr__('Reply to this comment').'" href="#"><span>' . __('Reply') . '</span></a>';
 		$actions['spam'] = "<a href='$spam_url' title='" . esc_attr__( 'Mark this comment as spam' ) . "'><span>" . /* translators: mark as spam link */  _x( 'Spam', 'verb' ) . '</span></a>';
 		if (!EMPTY_TRASH_DAYS)
 		{
@@ -383,12 +374,13 @@ function wp_dashboard_comments($comment)
 			$actions['trash'] = "<a href='$trash_url' title='" . esc_attr__( 'Move this comment to the trash' ) . "'><span>" . _x('Trash', 'verb') . '</span></a>';
 		}
 
-		$actions = apply_filters( 'comment_row_actions', array_filter($actions), $comment );
+//		$actions = apply_filters( 'comment_row_actions', array_filter($actions), $comment );
 
 		foreach ($actions as $action => $link)
 		{
+			if (!$link) { continue; }
 		//	$actions_string .= "<span class='$action'>$sep$link</span>";
-			$actions_string .= '<li class="' . strtolower($action) . '-icon">' .$link . '</li>';
+			$actions_string .= '<li class="wp-' . strtolower($action) . '-icon">' .$link . '</li>';
 		}
 	}
 	

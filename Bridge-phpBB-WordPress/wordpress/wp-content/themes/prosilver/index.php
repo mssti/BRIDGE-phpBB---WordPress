@@ -49,11 +49,7 @@ if (have_posts())
 			'U_NO_COMMENT_NO_PING'		=> (!('open' == $post-> comment_status) && !('open' == $post->ping_status))? phpbb::$user->lang['WP_NO_COMMENT_NO_PING'] : '',
 
 			'POST_COMENT'		=> wp_comments_popup_link(phpbb::$user->lang['WP_NO_COMMENTS'], phpbb::$user->lang['WP_ONE_COMMENT'], phpbb::$user->lang['WP_COMMENTS']),
-
 		);
-
-
-
 
 		$autor = phpbb::phpbb_the_autor_full($post->post_author);
 		$topicrow = array_merge($topicrow, $autor);
@@ -78,7 +74,11 @@ else
 **/
 }
 
-//phpbb::sidebar($wp_list_pages, $wp_get_archives, $wp_list_categories);
+if (defined('RECENT_TOPICS') && RECENT_TOPICS)
+{
+	phpbb::phpbb_recet_topics();
+}
+
 phpbb::page_sidebar();
 
 phpbb::page_footer();

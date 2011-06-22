@@ -1,9 +1,9 @@
 
-<!-- IF POST_AUTHOR -->
+	<!-- IF POST_AUTHOR -->
 		<!-- INCLUDE wordpress/author_body.html -->
-<!-- ENDIF -->
+	<!-- ENDIF -->
 	
-		<!-- IF SIDEBAR_WP_IS_404 or SIDEBAR_WP_IS_CATEGORY or SIDEBAR_WP_IS_MONTH or SIDEBAR_WP_IS_YEAR or SIDEBAR_WP_IS_SEARCH or SIDEBAR_WP_IS_PAGED -->
+	<!-- IF SIDEBAR_WP_IS_404 or SIDEBAR_WP_IS_CATEGORY or SIDEBAR_WP_IS_MONTH or SIDEBAR_WP_IS_YEAR or SIDEBAR_WP_IS_SEARCH or SIDEBAR_WP_IS_PAGED -->
 		<div class="panel bg3">
 			<div class="inner"><span class="corners-top"><span></span></span>
 				<!-- IF SIDEBAR_WP_IS_404 --><h3>{L_WP_ERROR_GENERAL}</h3><!-- ENDIF -->
@@ -17,9 +17,9 @@
 				</ul>
 			<span class="corners-bottom"><span></span></span></div>
 		</div>
-		<!-- ENDIF -->
+	<!-- ENDIF -->
 
-		<!-- IF SIDEBAR_WP_PAGES_LIST -->
+	<!-- IF SIDEBAR_WP_PAGES_LIST -->
 		<div class="panel bg3">
 			<div class="inner"><span class="corners-top"><span></span></span>
 				<h3>{L_WP_TITLE_PAGES}</h3>
@@ -28,9 +28,9 @@
 				</ul>
 			<span class="corners-bottom"><span></span></span></div>
 		</div>
-		<!-- ENDIF -->
+	<!-- ENDIF -->
 
-		<!-- IF SIDEBAR_WP_ARCHIVES_LIST -->
+	<!-- IF SIDEBAR_WP_ARCHIVES_LIST -->
 		<div class="panel bg3">
 			<div class="inner"><span class="corners-top"><span></span></span>
 				<h3>{L_WP_TITLE_ARCHIVES}</h3>
@@ -39,9 +39,9 @@
 				</ul>
 			<span class="corners-bottom"><span></span></span></div>
 		</div>
-		<!-- ENDIF -->
+	<!-- ENDIF -->
 
-		<!-- IF SIDEBAR_WP_CATEGORIES -->
+	<!-- IF SIDEBAR_WP_CATEGORIES -->
 		<div class="panel bg3">
 			<div class="inner"><span class="corners-top"><span></span></span>
 				<h3>{L_WP_TITLE_CATEGORIES}</h3>
@@ -50,9 +50,9 @@
 				</ul>
 			<span class="corners-bottom"><span></span></span></div>
 		</div>
-		<!-- ENDIF -->
+	<!-- ENDIF -->
 
-		<!-- IF SIDEBAR_WP_BOOKMARKS_LIST or SIDEBAR_WP_REGISTER or SIDEBAR_WP_LOGINOUT or SIDEBAR_WP_VALIDATOR or SIDEBAR_WP_FRIENDS or SIDEBAR_WP_WORDPRESS -->
+	<!-- IF SIDEBAR_WP_BOOKMARKS_LIST or SIDEBAR_WP_REGISTER or SIDEBAR_WP_LOGINOUT or SIDEBAR_WP_VALIDATOR or SIDEBAR_WP_FRIENDS or SIDEBAR_WP_WORDPRESS -->
 		<div class="panel bg3">
 			<div class="inner"><span class="corners-top"><span></span></span>
 				<h3>{L_WP_TITLE_BOOKMARKS}</h3>
@@ -66,9 +66,9 @@
 				</ul>
 			<span class="corners-bottom"><span></span></span></div>
 		</div>
-		<!-- ENDIF -->
+	<!-- ENDIF -->
 
-		<!-- IF SIDEBAR_WP_META -->
+	<!-- IF SIDEBAR_WP_META -->
 		<div class="panel bg3">
 			<div class="inner"><span class="corners-top"><span></span></span>
 				<h3>{L_WP_TITLE_META}</h3>
@@ -77,9 +77,9 @@
 				</ul>
 			<span class="corners-bottom"><span></span></span></div>
 		</div>
-		<!-- ENDIF -->
+	<!-- ENDIF -->
 
-		<!-- IF SIDEBAR_WP_TAG_CLOUD -->
+	<!-- IF SIDEBAR_WP_TAG_CLOUD -->
 		<div class="panel bg3">
 			<div class="inner"><span class="corners-top"><span></span></span>
 				<h3>{L_WP_TITLE_TAG_CLOUD}</h3>
@@ -88,4 +88,40 @@
 				</ul>
 			<span class="corners-bottom"><span></span></span></div>
 		</div>
+	<!-- ENDIF -->
+
+	<!-- IF S_RECENT_TOPICS -->
+		<!-- BEGIN recettopicsrow -->
+
+		<!-- IF recettopicsrow.S_FIRST_ROW -->
+		<div class="forumbg">
+			<div class="inner"><span class="corners-top"><span></span></span>
+				<ul class="topiclist">
+					<li class="header">
+						<dl class="icon">
+							<dt>{L_LAST_POST}</dt>
+						</dl>
+					</li>
+				</ul>
+				<ul class="topiclist topics">
 		<!-- ENDIF -->
+					<li class="row<!-- IF recettopicsrow.S_ROW_COUNT is even --> bg1<!-- ELSE --> bg2<!-- ENDIF -->">
+						<dl class="icon" style="padding: 2px 5px;">
+							<dt style="padding: 0; width:100%;" title="{recettopicsrow.TOPIC_FOLDER_IMG_ALT}">
+								<!-- IF recettopicsrow.FORUM_NAME -->{L_FORUM}: <a href="{recettopicsrow.U_VIEW_FORUM}" class="topictitle">{LAST_POST_IMG} {recettopicsrow.FORUM_NAME}</a><br /><!-- ENDIF -->
+								{L_TOPIC}: <a href="{recettopicsrow.U_VIEW_TOPIC}" class="topictitle">{LAST_POST_IMG} {recettopicsrow.TOPIC_TITLE}</a><br />
+								<!-- IF recettopicsrow.TOPIC_AUTHOR_FULL -->{L_AUTHOR}: {recettopicsrow.TOPIC_AUTHOR_FULL} &raquo; {recettopicsrow.FIRST_POST_TIME}<br /><!-- ENDIF -->
+								<!-- IF recettopicsrow.REPLIES != '' -->{L_REPLIES}: {recettopicsrow.REPLIES}<br /><!-- ENDIF -->
+								<!-- IF recettopicsrow.VIEWS != '' -->{L_VIEWS}: {recettopicsrow.VIEWS}<br /><!-- ENDIF -->
+								{L_LAST_POST}: <!-- IF not S_IS_BOT --><a href="{recettopicsrow.U_LAST_POST}">{LAST_POST_IMG}</a> <!-- ENDIF -->{L_POST_BY_AUTHOR} {recettopicsrow.LAST_POST_AUTHOR_FULL}  &raquo; {recettopicsrow.LAST_POST_TIME}
+							</dt>
+						</dl>
+					</li>
+		<!-- IF recettopicsrow.S_LAST_ROW -->
+				</ul>
+			<span class="corners-bottom"><span></span></span></div>
+		</div>
+		<!-- ENDIF -->
+
+		<!-- END recettopicsrow -->
+	<!-- ENDIF -->

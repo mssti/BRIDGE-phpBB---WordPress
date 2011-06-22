@@ -8,6 +8,7 @@
 					<!-- IF G_USER_LOGGED_IN -->
 					<li class="icon-register rightside">{U_LOGIN}</li>
 					<!-- ENDIF -->
+					<!-- IF not S_USER_LOGGED_IN and S_REGISTER_ENABLED and not (S_SHOW_COPPA or S_REGISTRATION) --><li class="icon-register rightside"><a href="{U_REGISTER}">{L_REGISTER}</a></li><!-- ENDIF -->
 				<!-- ENDIF -->
 			</ul>
 			<!-- IF S_CLOCK -->
