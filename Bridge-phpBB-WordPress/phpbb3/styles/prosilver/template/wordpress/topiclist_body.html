@@ -1,7 +1,7 @@
 
 	<div id="content" class="narrowcolumn">
 		<!-- BEGIN topicrow -->
-		<div class="post <!-- IF topicrow.POST_ID is odd -->bg2<!-- ELSE -->bg2<!-- ENDIF -->" id="post-{topicrow.POST_ID}">
+		<div class="row post <!-- IF topicrow.POST_ID is odd -->bg2<!-- ELSE -->bg2<!-- ENDIF -->" id="post-{topicrow.POST_ID}">
 			<div class="inner"><span class="corners-top"><span></span></span>
 			<div class="postbody">
 				<!-- IF not S_IS_BOT -->
@@ -24,13 +24,14 @@
 					{L_POST_BY_AUTHOR} <strong>{topicrow.POST_AUTHOR_FULL}</strong> &raquo; {topicrow.POST_DATE}
 				</p>
 
-				<div class="entry content">{topicrow.MESSAGE}</div>
+				<div class="entry content">{topicrow.MESSAGE}<!-- IF topicrow.XPAGINATION --><strong class="pagination"><span>{topicrow.PAGINATION}</span></strong><!-- ENDIF --></div>
+
 
 				<!-- IF topicrow.POST_TAGS or topicrow.POST_CATS or topicrow.POST_EDIT or topicrow.POST_COMENT -->
 				<div class="postmetadata alt notice">
 					<!-- IF topicrow.POST_TAGS -->{topicrow.POST_TAGS}<!-- ENDIF -->
 					<!-- IF topicrow.POST_CATS -->{topicrow.POST_CATS}<!-- ENDIF -->
-					<!-- IF topicrow.POST_COMENT --><!-- IF topicrow.POST_CATS --> | <!-- ENDIF -->{topicrow.POST_COMENT}<!-- ENDIF -->
+					<!-- IF topicrow.POST_COMENT --><!-- IF topicrow.POST_CATS --> | <!-- ENDIF -->{topicrow.POST_COMENT}<!-- IF topicrow.PAGINATION --><strong class="pagination"><span>{topicrow.PAGINATION}</span></strong><!-- ENDIF --><!-- ENDIF -->
 					<!-- IF topicrow.U_FOLLOW_FEED --><br />{topicrow.U_FOLLOW_FEED}<!-- ENDIF -->
 					<!-- IF topicrow.U_YES_COMMENT_YES_PING --><br />{topicrow.U_YES_COMMENT_YES_PING}<!-- ENDIF -->
 					<!-- IF topicrow.U_NO_COMMENT_YES_PING --><br />{topicrow.U_NO_COMMENT_YES_PING}<!-- ENDIF -->
@@ -43,6 +44,15 @@
 			<span class="corners-bottom"><span></span></span></div>
 		</div>
 		<hr class="divider" />
+
+		<!-- IF PREVIOUS_ENTRIE or NEXT_ENTRIE -->
+		<ul class="linklist leftside">
+			<li>{PREVIOUS_ENTRIE}</li>
+		</ul>
+		<ul class="linklist rightside">
+			<li>{NEXT_ENTRIE}</li>
+		</ul>
+		<!-- ENDIF -->
 
 		<!-- BEGINELSE -->
 

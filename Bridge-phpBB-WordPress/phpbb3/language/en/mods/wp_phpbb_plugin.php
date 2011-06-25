@@ -40,6 +40,9 @@ if (empty($lang) || !is_array($lang))
 //
 
 $lang = array_merge($lang, array(
+	// the page title numbering
+	'WP_PAGE_NUMBER'			=> 'Page %s',
+
 	// footer
 	'WP_RSS_NOTES'				=> '%1$s and %2$s',
 	'WP_RSS_ENRIES_LINK'		=> 'Entries (RSS)',
@@ -57,6 +60,8 @@ $lang = array_merge($lang, array(
 
 	// Sidebar
 	'WP_AUTHOR_TITLE'			=> 'Author',
+	'WP_FORUM_POSTS'			=> 'Forum posts',
+	'WP_BLOG_POSTS'				=> 'Blog posts',
 	'WP_SEARCH_USER_POSTS'		=> 'Search user’s posts',
 	'WP_TITLE_PAGES'			=> 'Pages',
 	'WP_TITLE_ARCHIVES'			=> 'Archives',
@@ -70,8 +75,6 @@ $lang = array_merge($lang, array(
 	'WP_TITLE_SEARCH'				=> 'Blog Search',
 	'WP_SEARCH_NOT_FOUND'			=> 'Not Found',
 	'WP_SEARCH_NOT_FOUND_EXPLAIN'	=> 'Sorry, but you are looking for something that isn’t here.',
-	'FORUM_POSTS'					=> 'Forum posts',
-	'BLOG_POSTS'					=> 'Blog posts',
 
 	// WP entries
 	'WP_POST_NOT_FOUND_EXPLAIN'	=> 'Apologies, but no results were found for the requested archive. Perhaps searching will help find a related post.',
@@ -90,15 +93,14 @@ $lang = array_merge($lang, array(
 	'WP_COMMENTS_OFF'			=> 'Comments Off',
 	'WP_COMMENTS_PASSWORED'		=> 'Enter your password to view comments.',
 	'WP_COMMENTS_TO'			=> ' to “%s” ',
-	'WP_OLDER_ENTRIES'			=> '« Older Entries',
-	'WP_NEWER_ENTRIES'			=> 'Newer Entries »',
-	'WP_PREVIOUS_POST'			=> 'Previous Entrie',
-	'WP_NEXT_POST'				=> 'Next Entrie',
+	// Index & Topics navigation
+	'PREVIOUS_ENTRIE'			=> '« Previous Entrie',
+	'NEXT_ENTRIE'				=> 'Next Entrie » ',
+	// Comment pagination
 	'WP_PAGINATION'				=> 'Pages',
 	'WP_PAGINATION_PREVIOUS'	=> 'Older Comments',
 	'WP_PAGINATION_NEXT'		=> 'Newer Comments',
-	
-	
+
 	// Moderation actions
 	'WP_COMMENT_APPROVE'				=> 'Approve',
 	'WP_COMMENT_APPROVE_EXPLAIN'		=> 'Approve this comment',
@@ -118,7 +120,7 @@ $lang = array_merge($lang, array(
 	'WP_COMMENT_TRASH_EXPLAIN'			=> 'Move this comment to the trash',
 	'WP_COMMENT_DELETE'					=> 'Delete',
 	'WP_COMMENT_DELETE_EXPLAIN'			=> 'Delete Permanently',
-	
+
 	// Comment form
 	'WP_LOGIN_NEED'						=> 'You must be <a href="%s">logged in</a> to post a comment.',
 	'WP_LOGGED_IN'						=> 'Logged in as',
@@ -131,7 +133,7 @@ $lang = array_merge($lang, array(
 	'WP_WEBSITE_REQUIRED_MINLENGTH'		=> '* El el campo "%s" debe contener al menos 10 Caracteres.',
 	'WP_MESSAGE_REQUIRED_NOTE'			=> '* Por favor, complete el campo "%s" con un comentario válido.',
 	'WP_MESSAGE_REQUIRED_MINLENGTH'		=> '* El el campo "%s" debe contener al menos 20 Caracteres.',
-	
+
 	'WP_EMAIL_NOTE'						=> 'Your email address will not be published.',
 	'WP_ALLOWED_TAGS'					=> 'You may use these <abbr title="HyperText Markup Language">HTML</abbr> tags and attributes: %s',
 

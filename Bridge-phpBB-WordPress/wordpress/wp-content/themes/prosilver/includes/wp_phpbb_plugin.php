@@ -173,7 +173,7 @@ function wp_adjacent_post_link($format, $link, $in_same_cat = false, $excluded_c
 	$title = $post->post_title;
 
 	if ( empty($post->post_title) )
-		$title = $previous ? phpbb::$user->lang['WP_PREVIOUS_POST'] : phpbb::$user->lang['WP_NEXT_POST'];
+		$title = $previous ? phpbb::$user->lang['PREVIOUS_ENTRIE'] : phpbb::$user->lang['NEXT_ENTRIE'];
 
 	$title = apply_filters('the_title', $title, $post->ID);
 	$date = mysql2date(get_option('date_format'), $post->post_date);

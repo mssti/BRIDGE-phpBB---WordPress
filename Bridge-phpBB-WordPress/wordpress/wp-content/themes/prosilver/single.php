@@ -11,8 +11,6 @@
 
 require_once('includes/wp_phpbb_plugin.php'); 
 
-phpbb::page_header(phpbb::$user->lang['INDEX']);
-
 $postrow = $commentrow = $autor = array();
 $topic_title = $topic_link = '';
 
@@ -116,6 +114,25 @@ if (have_posts())
 		));
 	}
 
+	// Pagination : Are there comments to navigate through?
+	$total_comments = (int) get_comments_number($post_id);
+	$comments_per_page = (int) get_option('comments_per_page');
+
+	if ($total_comments > 1 && $comments_per_page)
+	{
+		$on_page = request_var('cpage', 1);
+		$base_url = apply_filters('the_permalink', get_permalink());
+
+		phpbb::$template->assign_vars(array(
+			'PAGINATION' 	=> wp_generate_pagination($base_url, $total_comments, $comments_per_page, $on_page),
+			'PAGE_NUMBER' 	=> sprintf(phpbb::$user->lang['PAGE_OF'], $on_page, max(ceil($total_comments / $comments_per_page), 1)),
+			'TOTAL_POSTS'	=> ($total_comments == 1) ? phpbb::$user->lang['VIEW_TOPIC_POST'] : sprintf(phpbb::$user->lang['VIEW_TOPIC_POSTS'], $total_comments),
+
+			'PREVIOUS_PAGE'	=> get_previous_comments_link(phpbb::$user->lang['WP_PAGINATION_PREVIOUS']),
+			'NEXT_PAGE'		=> get_next_comments_link(phpbb::$user->lang['WP_PAGINATION_NEXT'] . '&nbsp;'),
+		));
+	}
+
 	// Assign post specific vars
 	phpbb::$template->assign_vars(array(
 		'IN_SINGLE'				=> true,
@@ -133,10 +150,12 @@ if (have_posts())
 
 		// Pagination
 		'POST_REPLIES'			=> wp_comments_number(phpbb::$user->lang['WP_NO_COMMENTS'], phpbb::$user->lang['WP_ONE_COMMENT'], phpbb::$user->lang['WP_COMMENTS']) . sprintf(phpbb::$user->lang['WP_COMMENTS_TO'], $topic_title),
-		'WP_PREVIOUS_POST'		=> wp_adjacent_post_link(phpbb::$user->lang['WP_PREVIOUS_POST'] . ' &laquo; %link', '%title', false, '', true),
-		'WP_NEXT_POST'			=> wp_adjacent_post_link('%link &raquo; ' . phpbb::$user->lang['WP_NEXT_POST'], '%title', false, '', false),
+		'PREVIOUS_ENTRIE'		=> wp_adjacent_post_link(phpbb::$user->lang['PREVIOUS_ENTRIE'] . ' %link', '%title', false, '', true),
+		'NEXT_ENTRIE'			=> wp_adjacent_post_link('%link ' . phpbb::$user->lang['NEXT_ENTRIE'], '%title', false, '', false),
 	));
 }
+
+phpbb::page_header(phpbb::$user->lang['INDEX']);
 
 phpbb::page_sidebar();
 

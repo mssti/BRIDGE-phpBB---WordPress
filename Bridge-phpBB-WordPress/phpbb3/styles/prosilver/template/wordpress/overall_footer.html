@@ -1,8 +1,18 @@
-		<!-- IF WP_PREVIOUS_POST or WP_NEXT_POST -->
+		<ul class="linklist <!-- IF PREVIOUS_ENTRIE or NEXT_ENTRIE -->navlinks<!-- ENDIF -->">
+			<!-- IF U_WEB --><li class="icon-home"><a href="{U_WEB}" title="{L_WP_TITLE_WEB_EXPLAIN}" >{L_WP_TITLE_WEB}</a></li><!-- ENDIF -->
+			<!-- IF U_INDEX --><li class="icon-home"><a href="{U_INDEX}" title="{L_WP_TITLE_FORUM_EXPLAIN}" >{L_WP_TITLE_FORUM}</a></li><!-- ENDIF -->
+			<!-- IF U_BLOG --><li class="icon-home"><a href="{U_BLOG}" title="{L_WP_TITLE_BLOG_EXPLAIN}" >{L_WP_TITLE_BLOG}</a></li><!-- ENDIF -->
+			<!-- IF not S_IS_BOT -->
+				<!-- IF U_WP_ACP --><li class="icon-register rightside"><a href="{U_WP_ACP}">{L_WP_ADMIN_PANEL}</a></li><!-- ENDIF -->
+				<li class="icon-logout rightside"><a href="{U_LOGIN_LOGOUT}" title="{L_LOGIN_LOGOUT}" accesskey="x">{L_LOGIN_LOGOUT}</a></li>
+				<!-- IF not S_USER_LOGGED_IN and S_REGISTER_ENABLED and not (S_SHOW_COPPA or S_REGISTRATION) --><li class="icon-register rightside"><a href="{U_REGISTER}">{L_REGISTER}</a></li><!-- ENDIF -->
+			<!-- ENDIF -->
+		</ul>
+		<!-- IF PREVIOUS_ENTRIE or NEXT_ENTRIE -->
 		<ul class="linklist leftside">
-			<li>{WP_PREVIOUS_POST}</li>
+			<li>{PREVIOUS_ENTRIE}</li>
 		</ul>
 		<ul class="linklist rightside">
-			<li>{WP_NEXT_POST}</li>
+			<li>{NEXT_ENTRIE}</li>
 		</ul>
 		<!-- ENDIF -->

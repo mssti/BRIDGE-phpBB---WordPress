@@ -237,6 +237,29 @@ class phpbb
 		$web_path = (defined('PHPBB_USE_BOARD_URL_PATH') && PHPBB_USE_BOARD_URL_PATH) ? $board_url : PHPBB_ROOT_PATH;
 		$blog_path = get_option( 'siteurl' );
 
+		/**
+		 * Print the <title> tag based on what is being viewed.
+		 */
+		global $page, $paged;
+
+		$wp_title = wp_title('|', false, 'right');
+
+		// Add the blog name.
+		$wp_title .= get_bloginfo('name', 'display');
+
+		// Add the blog description for the home/front page.
+		$site_description = get_bloginfo( 'description', 'display' );
+		if ( $site_description && (is_home() || is_front_page()))
+		{
+			$wp_title .= " | $site_description";
+		}
+
+		// Add a page number if necessary:
+		if ($paged || $page) //if ($paged >= 2 || $page >= 2)
+		{
+			$wp_title .= ' | ' . sprintf(phpbb::$user->lang['WP_PAGE_NUMBER'], max($paged, $page));
+		}
+
 		// Do the phpBB page header stuff first
 		page_header(phpbb::$user->lang['INDEX']);
 
@@ -253,23 +276,15 @@ class phpbb
 			'U_INDEX'			=> append_sid($web_path),
 			'U_BLOG'			=> append_sid($blog_path),
 
-			'WP_USER_LOGGED_IN'	=> is_user_logged_in(),
-
-			'WP_USER_NAME'		=> self::$user->data['wp_user']['user_nicename'],
-			'WP_USER_ID'		=> self::$user->data['wp_user']['ID'],
-
-			'PHPBB_USER_NAME'	=> self::$user->data['username'],
-			'PHPBB_USER_ID'		=> self::$user->data['user_id'],
+			'PAGE_TITLE'		=> $wp_title,
+			'BLOG_HEADER'		=> self::wp_page_header($blog_path),
+			'S_DISPLAY_SEARCH'	=> false,
+			'S_CLOCK'			=> self::clock(),
 
 			'S_REGISTER_ENABLED'=> (self::$config['require_activation'] != USER_ACTIVATION_DISABLE && get_option('users_can_register')) ? true : false,
 			'U_LOGIN_LOGOUT'	=> (!is_user_logged_in()) ? get_option('siteurl') . '/?action=login' : get_option('siteurl') . '/?action=logout',
 			'L_LOGIN_LOGOUT'	=> (!is_user_logged_in()) ? self::$user->lang['LOGIN'] : sprintf(self::$user->lang['LOGOUT_USER'], self::$user->data['username']),
 			'U_WP_ACP'			=> (self::$user->data['user_type'] == USER_FOUNDER) ? admin_url() : '',
-
-			'PAGE_TITLE'		=> get_bloginfo('name'),
-			'BLOG_HEADER'		=> self::wp_page_header($blog_path),
-			'S_DISPLAY_SEARCH'	=> false,
-			'S_CLOCK'			=> self::clock(),
 
 			'T_THEME_PATH'			=> "{$web_path}styles/" . self::$user->theme['theme_path'] . '/theme',
 			'T_STYLESHEET_LINK'		=> (!self::$user->theme['theme_storedb']) ? "{$web_path}styles/" . self::$user->theme['theme_path'] . '/theme/stylesheet.css' : append_sid("{$web_path}style." . PHP_EXT, 'id=' . self::$user->theme['style_id'] . '&amp;lang=' . self::$user->data['user_lang']),
@@ -1017,6 +1032,10 @@ function wp_generate_pagination($base_url, $num_items, $per_page, $on_page)
 		return false;
 	}
 
+	global $paged;
+	$paged = $on_page;
+
+
 	$url_delim = (strpos($base_url, '?') === false) ? '?' : ((strpos($base_url, '?') === strlen($base_url) - 1) ? '' : '&amp;');
 
 	$page_string = ($on_page == 1) ? '<strong>1</strong>' : '<a href="' . $base_url . '">1</a>';
@@ -1030,6 +1049,7 @@ function wp_generate_pagination($base_url, $num_items, $per_page, $on_page)
 
 		for ($i = $start_cnt + 1; $i < $end_cnt; $i++)
 		{
+		//	$page_string .= ($i == $on_page) ? '<strong>' . $i . '</strong>' : '<a href="' . $base_url . "{$url_delim}cpage=" . $i . (($i > 1) ? '#comments' : '') . '">' . $i . '</a>';
 			$page_string .= ($i == $on_page) ? '<strong>' . $i . '</strong>' : '<a href="' . $base_url . "{$url_delim}cpage=" . $i . '">' . $i . '</a>';
 			if ($i < $end_cnt - 1)
 			{
@@ -1045,6 +1065,7 @@ function wp_generate_pagination($base_url, $num_items, $per_page, $on_page)
 
 		for ($i = 2; $i < $total_pages; $i++)
 		{
+		//	$page_string .= ($i == $on_page) ? '<strong>' . $i . '</strong>' : '<a href="' . $base_url . "{$url_delim}cpage=" . $i . (($i > 1) ? '#comments' : '') . '">' . $i . '</a>';
 			$page_string .= ($i == $on_page) ? '<strong>' . $i . '</strong>' : '<a href="' . $base_url . "{$url_delim}cpage=" . $i . '">' . $i . '</a>';
 			if ($i < $total_pages)
 			{
@@ -1053,9 +1074,53 @@ function wp_generate_pagination($base_url, $num_items, $per_page, $on_page)
 		}
 	}
 
+//	$page_string .= ($on_page == $total_pages) ? '<strong>' . $total_pages . '</strong>' : '<a href="' . $base_url . "{$url_delim}cpage=" . $total_pages . (($i > 1) ? '#comments' : '') . '">' . $total_pages . '</a>';
 	$page_string .= ($on_page == $total_pages) ? '<strong>' . $total_pages . '</strong>' : '<a href="' . $base_url . "{$url_delim}cpage=" . $total_pages . '">' . $total_pages . '</a>';
 
 	return $page_string;
 }
 
+/**
+ * Generate topic pagination
+ * 
+ * Based off : phpbb3.0.8
+ * File : phpbb/includes/functions_display.php
+ */
+function wp_topic_generate_pagination($url, $replies, $per_page)
+{
+	// Make sure $per_page is a valid value
+//	$per_page = ($config['posts_per_page'] <= 0) ? 1 : $config['posts_per_page'];
+
+	if (($replies + 1) > $per_page)
+	{
+		$total_pages = ceil(($replies + 1) / $per_page);
+		$pagination = '';
+
+		$times = 1;
+		for ($j = 0; $j < $replies + 1; $j += $per_page)
+		{
+		//	$pagination .= '<a href="' . $url . ($j == 0 ? '' : '&amp;cpage=' . $times) . (($times > 1) ? '#comments' : '') . '">' . $times . '</a>';
+			$pagination .= '<a href="' . $url . ($j == 0 ? '' : '&amp;cpage=' . $times) . '">' . $times . '</a>';
+			if ($times == 1 && $total_pages > 5)
+			{
+				$pagination .= ' ... ';
+
+				// Display the last three pages
+				$times = $total_pages - 3;
+				$j += ($total_pages - 4) * $per_page;
+			}
+			else if ($times < $total_pages)
+			{
+				$pagination .= '<span class="page-sep">' . phpbb::$user->lang['COMMA_SEPARATOR'] . '</span>';
+			}
+			$times++;
+		}
+	}
+	else
+	{
+		$pagination = '';
+	}
+
+	return $pagination;
+}
 ?>

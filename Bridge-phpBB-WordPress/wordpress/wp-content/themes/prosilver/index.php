@@ -11,8 +11,6 @@
 
 require_once('includes/wp_phpbb_plugin.php'); 
 
-phpbb::page_header(phpbb::$user->lang['INDEX']);
-
 $topicrow = $autor = array();
 
 $have_posts = false;
@@ -42,6 +40,8 @@ if (have_posts())
 
 			'POST_TAGS'			=> get_the_tag_list(phpbb::$user->lang['WP_TITLE_TAGS'] . ': ', ', ', '<br />'),
 			'POST_CATS'			=> sprintf(phpbb::$user->lang['WP_POSTED_IN'] , get_the_category_list(', ')),
+			'POST_COMENT'		=> wp_comments_popup_link(phpbb::$user->lang['WP_NO_COMMENTS'], phpbb::$user->lang['WP_ONE_COMMENT'], phpbb::$user->lang['WP_COMMENTS']),
+			'PAGINATION'		=> wp_topic_generate_pagination(apply_filters('the_permalink', get_permalink()), (int) get_comments_number($post_id), (int) get_option('comments_per_page')),
 			'U_FOLLOW_FEED'		=> sprintf(phpbb::$user->lang['WP_FOLLOW_FEED'], get_post_comments_feed_link($post_id)),
 			// Both Comments and Pings are open
 			'U_YES_COMMENT_YES_PING'	=> (('open' == $post-> comment_status) && ('open' == $post->ping_status)) ? sprintf(phpbb::$user->lang['WP_YES_COMMENT_YES_PING'], get_trackback_url()) : '',
@@ -51,8 +51,6 @@ if (have_posts())
 			'U_YES_COMMENT_NO_PING'		=> (('open' == $post-> comment_status) && !('open' == $post->ping_status)) ? phpbb::$user->lang['WP_YES_COMMENT_NO_PING'] : '',
 			// Neither Comments, nor Pings are open
 			'U_NO_COMMENT_NO_PING'		=> (!('open' == $post-> comment_status) && !('open' == $post->ping_status))? phpbb::$user->lang['WP_NO_COMMENT_NO_PING'] : '',
-
-			'POST_COMENT'		=> wp_comments_popup_link(phpbb::$user->lang['WP_NO_COMMENTS'], phpbb::$user->lang['WP_ONE_COMMENT'], phpbb::$user->lang['WP_COMMENTS']),
 		);
 
 		$autor = phpbb::phpbb_the_autor_full($post->post_author);
@@ -62,21 +60,25 @@ if (have_posts())
 		phpbb::$template->assign_block_vars('topicrow', $topicrow);
 	}
 }
+/**
 else
 {
-/**	
+
 	<h2 class="center"><?php _e('Not Found'); ?></h2>
 	<p class="center"><?php _e('Sorry, but you are looking for something that isn&#8217;t here.'); ?></p>
 	<?php include (TEMPLATEPATH . "/searchform.php"); ?>
-**/
 }
+**/
+
+phpbb::page_header(phpbb::$user->lang['INDEX']);
 
 // Assign index specific vars
 phpbb::$template->assign_vars(array(
 	'IN_SINGLE'			=> false,
 	'IN_ERROR'			=> !$have_posts,
-	'WP_NEXT_POST'		=> get_next_posts_link(phpbb::$user->lang['WP_OLDER_ENTRIES']),
-	'WP_PREVIOUS_POST'	=> get_previous_posts_link(phpbb::$user->lang['WP_NEWER_ENTRIES']),
+	// Display navigation to next/previous pages when applicable 
+	'NEXT_ENTRIE'		=> ($wp_query->max_num_pages > 1) ? get_next_posts_link(phpbb::$user->lang['NEXT_ENTRIE']) : '',
+	'PREVIOUS_ENTRIE'	=> ($wp_query->max_num_pages > 1) ? get_previous_posts_link(phpbb::$user->lang['PREVIOUS_ENTRIE']) : '',
 ));
 
 if (defined('RECENT_TOPICS') && RECENT_TOPICS)

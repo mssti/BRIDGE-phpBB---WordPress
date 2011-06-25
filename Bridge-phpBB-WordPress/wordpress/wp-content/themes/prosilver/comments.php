@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.8 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/theme/prosilver
- * @version: $Id: wp_phpbb_core.php, v 0.0.1 2011/06/20 11:06:20 leviatan21 Exp $
+ * @version: $Id: comments.php, v 0.0.1 2011/06/20 11:06:20 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -110,25 +110,6 @@ function prosilver_comment($comment, $args, $depth)
 
 	// Dump vars into template
 	phpbb::$template->assign_block_vars('postrow', $commentrow);
-
-	// Pagination : Are there comments to navigate through?
-	$total_posts = (int) get_comments_number();
-	$posts_per_page = (int) get_option('comments_per_page');
-
-	if ($total_posts > 1 && $posts_per_page)
-	{
-		$on_page = request_var('cpage', 1);
-		$base_url = apply_filters('the_permalink', get_permalink());
-
-		phpbb::$template->assign_vars(array(
-			'PAGINATION' 	=> wp_generate_pagination($base_url, $total_posts, $posts_per_page, $on_page),
-			'PAGE_NUMBER' 	=> sprintf(phpbb::$user->lang['PAGE_OF'], $on_page, max(ceil($total_posts / $posts_per_page), 1)),
-			'TOTAL_POSTS'	=> ($total_posts == 1) ? phpbb::$user->lang['VIEW_TOPIC_POST'] : sprintf(phpbb::$user->lang['VIEW_TOPIC_POSTS'], $total_posts),
-
-			'PREVIOUS_PAGE'	=> get_previous_comments_link(phpbb::$user->lang['WP_PAGINATION_PREVIOUS']),
-			'NEXT_PAGE'		=> get_next_comments_link(phpbb::$user->lang['WP_PAGINATION_NEXT'] . '&nbsp;'),
-		));
-	}
 }
 
 ?>
