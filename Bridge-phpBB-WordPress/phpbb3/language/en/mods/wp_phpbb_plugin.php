@@ -53,10 +53,11 @@ $lang = array_merge($lang, array(
 	'WP_TITLE_BLOG_EXPLAIN'		=> 'Click aqui para ir al blog',
 	'WP_TITLE_FORUM'			=> 'Foro',
 	'WP_TITLE_FORUM_EXPLAIN'	=> 'Click aqui para ir al foro',
+	'WP_ADMIN_PANEL'			=> 'Site Admin',
 
 	// Sidebar
 	'WP_AUTHOR_TITLE'			=> 'Author',
-	'WP_READ_TOPICS'			=> 'Ver todas las entradas de %s &rarr;',
+	'WP_SEARCH_USER_POSTS'		=> 'Search user’s posts',
 	'WP_TITLE_PAGES'			=> 'Pages',
 	'WP_TITLE_ARCHIVES'			=> 'Archives',
 	'WP_TITLE_CATEGORIES'		=> 'Categories',	
@@ -65,24 +66,59 @@ $lang = array_merge($lang, array(
 	'WP_TITLE_BOOKMARKS'		=> 'Bookmarks',
 	'WP_TITLE_META'				=> 'Meta',
 
+	// Search
+	'WP_TITLE_SEARCH'				=> 'Blog Search',
+	'WP_SEARCH_NOT_FOUND'			=> 'Not Found',
+	'WP_SEARCH_NOT_FOUND_EXPLAIN'	=> 'Sorry, but you are looking for something that isn’t here.',
+	'FORUM_POSTS'					=> 'Forum posts',
+	'BLOG_POSTS'					=> 'Blog posts',
+
 	// WP entries
-	'WP_POST_EDIT'				=> 'Editar entrada',
-	'WP_READ_MORE'				=> 'Leer entrada completa »',
-	'WP_POSTED_IN'				=> 'Publicado en: %s',
+	'WP_POST_NOT_FOUND_EXPLAIN'	=> 'Apologies, but no results were found for the requested archive. Perhaps searching will help find a related post.',
+	'WP_READ_MORE'				=> 'Read full enry »',
+	'WP_POSTED_IN'				=> 'Posted in: %s',
 	'WP_FOLLOW_FEED'			=> 'You can follow any responses to this entry through the <a href="%s">RSS 2.0</a> feed.',
 	'WP_YES_COMMENT_YES_PING'	=> 'You can <a href="#respond">leave a response</a>, or <a href="%s" rel="trackback">trackback</a> from your own site.',
 	'WP_NO_COMMENT_YES_PING'	=> 'Responses are currently closed, but you can <a href="%s" rel="trackback">trackback</a> from your own site.',
 	'WP_YES_COMMENT_NO_PING'	=> 'You can skip to the end and leave a response. Pinging is currently not allowed.',
 	'WP_NO_COMMENT_NO_PING'		=> 'Both comments and pings are currently closed.',
 
-	'WP_NO_COMMENTS'	=> 'No Comments',
-	'WP_ONE_COMMENT'	=> '1 Comment',
-	'WP_COMMENTS'		=> '% Comments',
-	'WP_COMMENTS_TO'	=> ' to “%s” ',
-	'WP_OLDER_ENTRIES'	=> '&laquo; Older Entries',
-	'WP_NEWER_ENTRIES'	=> 'Newer Entries &raquo;',
-	'WP_PAGINATION'		=> 'Pages',
-
+	'WP_NO_COMMENTS'			=> 'No Comments',
+	'WP_ONE_COMMENT'			=> '1 Comment',
+	'WP_COMMENTS'				=> '% Comments',
+	'WP_COMMENTS_ON'			=> 'Comment on %s',
+	'WP_COMMENTS_OFF'			=> 'Comments Off',
+	'WP_COMMENTS_PASSWORED'		=> 'Enter your password to view comments.',
+	'WP_COMMENTS_TO'			=> ' to “%s” ',
+	'WP_OLDER_ENTRIES'			=> '« Older Entries',
+	'WP_NEWER_ENTRIES'			=> 'Newer Entries »',
+	'WP_PREVIOUS_POST'			=> 'Previous Entrie',
+	'WP_NEXT_POST'				=> 'Next Entrie',
+	'WP_PAGINATION'				=> 'Pages',
+	'WP_PAGINATION_PREVIOUS'	=> 'Older Comments',
+	'WP_PAGINATION_NEXT'		=> 'Newer Comments',
+	
+	
+	// Moderation actions
+	'WP_COMMENT_APPROVE'				=> 'Approve',
+	'WP_COMMENT_APPROVE_EXPLAIN'		=> 'Approve this comment',
+	'WP_COMMENT_UNAPPROVE'				=> 'Unapprove',
+	'WP_COMMENT_UNAPPROVE_EXPLAIN'		=> 'Unapprove this comment',
+	'WP_COMMENT_UNAPPROVED'				=> 'This comment is waiting for approval',
+	'WP_COMMENT_EDIT'					=> 'Edit',
+	'WP_COMMENT_EDIT_EXPLAIN'			=> 'Edit comment',
+	'WP_COMMENT_REPLY'					=> 'Reply',
+	'WP_COMMENT_REPLY_EXPLAIN'			=> 'Reply to this comment',
+	'WP_COMMENT_SPAM'					=> 'Spam',
+	'WP_COMMENT_SPAM_EXPLAIN'			=> 'Mark this comment as spam',
+	'WP_COMMENT_REPORTED_NOTE'			=> 'This comment is maked as Spam',
+	'WP_COMMENT_UNSPAM'					=> 'Not Spam',
+	'WP_COMMENT_UNSPAM_EXPLAIN'			=> 'Mark this comment as not Spam',
+	'WP_COMMENT_TRASH'					=> 'Trash',
+	'WP_COMMENT_TRASH_EXPLAIN'			=> 'Move this comment to the trash',
+	'WP_COMMENT_DELETE'					=> 'Delete',
+	'WP_COMMENT_DELETE_EXPLAIN'			=> 'Delete Permanently',
+	
 	// Comment form
 	'WP_LOGIN_NEED'						=> 'You must be <a href="%s">logged in</a> to post a comment.',
 	'WP_LOGGED_IN'						=> 'Logged in as',
@@ -99,7 +135,6 @@ $lang = array_merge($lang, array(
 	'WP_EMAIL_NOTE'						=> 'Your email address will not be published.',
 	'WP_ALLOWED_TAGS'					=> 'You may use these <abbr title="HyperText Markup Language">HTML</abbr> tags and attributes: %s',
 
-	
 	'WP_ERROR_GENERAL'					=> 'Not Found',
 	'WP_ERROR_404'						=> 'Apologies, but the page you requested could not be found. Perhaps searching will help.',
 	'WP_TITLE_ARCHIVE_EXPLAIN'			=> 'You are currently browsing the <a href="%1$s/">%2$s</a> blog archives.',
@@ -107,7 +142,8 @@ $lang = array_merge($lang, array(
 	'WP_TITLE_ARCHIVE_DAY_EXPLAIN'		=> 'You are currently browsing the <a href="%1$s/">%2$s</a> blog archives for the day %3$s.',
 	'WP_TITLE_ARCHIVE_MONTH_EXPLAIN'	=> 'You are currently browsing the <a href="%1$s/">%2$s</a> blog archives for %3$s.',
 	'WP_TITLE_ARCHIVE_YEAR_EXPLAIN'		=> 'You are currently browsing the <a href="%1$s/">%2$s</a> blog archives for the year %3$s.',
-	'WP_TITLE_ARCHIVE_SEARCH_EXPLAIN' 	=> 'You have searched the <a href="%1$s/">%2$s</a> blog archives for <strong>&#8216;%3$s&#8217;</strong>. If you are unable to find anything in these search results, you can try one of these links.',
+	'WP_TITLE_ARCHIVE_SEARCH_EXPLAIN' 	=> 'You have searched the <a href="%1$s/">%2$s</a> blog archives for <strong>&#8216;%3$s&#8217;</strong>.',
 
 ));
+
 ?>

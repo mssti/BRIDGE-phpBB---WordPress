@@ -3,16 +3,33 @@
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
 <tr>
 <td id="phpbb_blog_middle">
-	<!-- IF IS_SINGLE -->
+	<br />
+	<!-- IF WP_NOTES_IS_404 or WP_NOTES_IS_CATEGORY or WP_NOTES_IS_MONTH or WP_NOTES_IS_YEAR or WP_NOTES_IS_SEARCH or WP_NOTES_IS_PAGED -->
+		<div class="rules">
+			<div class="inner"><span class="corners-top"><span></span></span>
+				<!-- IF WP_NOTES_IS_404 -->
+				<h3>{L_WP_ERROR_GENERAL}</h3>
+				{WP_NOTES_IS_404}
+				<!-- ENDIF -->
+				<!-- IF WP_NOTES_IS_CATEGORY -->{WP_NOTES_IS_CATEGORY}<!-- ENDIF -->
+				<!-- IF WP_NOTES_IS_MONTH -->{WP_NOTES_IS_MONTH}<!-- ENDIF -->
+				<!-- IF WP_NOTES_IS_YEAR -->{WP_NOTES_IS_YEAR}<!-- ENDIF -->
+				<!-- IF WP_NOTES_IS_SEARCH -->{WP_NOTES_IS_SEARCH}<!-- ENDIF -->
+				<!-- IF WP_NOTES_IS_PAGED -->{WP_NOTES_IS_PAGED}<!-- ENDIF -->
+			<span class="corners-bottom"><span></span></span></div>
+		</div>
+		<br />
+	<!-- ENDIF -->
+
+	<!-- IF IN_SINGLE -->
 		<!-- INCLUDE wordpress/viewtopic_body.html -->
 	<!-- ELSE -->
 		<!-- INCLUDE wordpress/topiclist_body.html -->
 	<!-- ENDIF -->
 </td>
 <td id="phpbb_blog_right" style="width: {BLOG_LEFT_COLUMN}px;">
-	<div id="sidebar">
-		<!-- INCLUDE wordpress/left_sidebar_body.html -->
-	</div>
+	<br />
+	<!-- INCLUDE wordpress/left_sidebar_body.html -->
 </td>
 </tr>
 </table>

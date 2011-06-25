@@ -8,11 +8,11 @@ Author URI: http://www.mssti.com/
 Tags: blue, phpbb, full width, two columns
 
 	Prosilver v1.0
-	 http://www.mssti.com/
+	http://www.mssti.com/
 
 	Based on style:	proSilver (this is the default phpBB 3 style)
-	Original author:	subBlue ( http://www.subBlue.com/ )
-	Modified by:	leviatan21	
+	Original author: subBlue ( http://www.subBlue.com/ )
+	Modified by: leviatan21	
 	
 	Copyright 2006 phpBB Group ( http://www.phpbb.com/ )
     --------------------------------------------------------------
@@ -34,10 +34,9 @@ Tags: blue, phpbb, full width, two columns
 	width: 250px;
 }
 
-
-
-
-
+.section-blog div.rules {
+	margin-top: 0;
+}
 /** Topics & Posts **/
 .section-blog .postbody {
 	width: 100%;
@@ -73,21 +72,7 @@ Tags: blue, phpbb, full width, two columns
 	background-color: #F8F8F8;
 	border: 1px solid #DDDDDD;
 }
-/**
-.section-blog ul.profile-icons li.approve-icon,
-.section-blog ul.profile-icons li.unapprove-icon,
-.section-blog ul.profile-icons li.spam-icon,
-.section-blog ul.profile-icons li.trash-icon {
-	margin-top: 3px; 
-}
-.section-blog ul.profile-icons li.approve-icon span,
-.section-blog ul.profile-icons li.unapprove-icon span,
-.section-blog ul.profile-icons li.spam-icon span,
-.section-blog ul.profile-icons li.trash-icon span {
-	display: inline;
-	margin-top: 3px; 
-}
-**/
+
 .section-blog blockquote {
   background-image: none;
 }
@@ -112,7 +97,16 @@ Tags: blue, phpbb, full width, two columns
 	list-style-type: none;
 	margin: 0;
 	padding: 5px;
-/**	border-bottom: 1px solid #CCCCCC;	**/
+}
+/** Search form **/
+.section-blog #searchform {
+	margin: 1em 0;
+}
+.section-blog #searchform #s {
+	border: 1px solid #B0B0B0;
+	font-size: 1.1em;
+	padding: 2px 2px 2px 17px;	
+/*	width: 60%;	*/
 }
 
 .section-blog #commentform fieldset.fields1 dt {

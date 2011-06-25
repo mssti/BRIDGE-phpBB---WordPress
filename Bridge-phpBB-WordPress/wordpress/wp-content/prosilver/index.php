@@ -15,8 +15,12 @@ phpbb::page_header(phpbb::$user->lang['INDEX']);
 
 $topicrow = $autor = array();
 
+$have_posts = false;
+
 if (have_posts())
 {
+	$have_posts = true;
+
 	while (have_posts())
 	{
 		the_post();
@@ -29,7 +33,7 @@ if (have_posts())
 		$topicrow = array(
 			'POST_ID'			=> $post_id,
 			'POST_DATE'			=> phpbb::$user->format_date($post_date_time, false, true),
-			'U_POST_EDIT'		=> wp_edit_post_link(phpbb::$user->lang['WP_POST_EDIT'], '', '', $post_id),
+			'U_POST_EDIT'		=> get_edit_post_link($post_id),
 			'MINI_POST_IMG'		=> $user->img('icon_post_target', 'POST'),
 			'U_MINI_POST'		=> apply_filters('the_permalink', get_permalink()),
 			'POST_SUBJECT'		=> get_the_title(),
@@ -57,13 +61,6 @@ if (have_posts())
 		// Dump vars into template
 		phpbb::$template->assign_block_vars('topicrow', $topicrow);
 	}
-		
-	// Assign index specific vars
-	phpbb::$template->assign_vars(array(
-		'IS_SINGLE'			=> false, //is_single(),
-		'WP_NEXT_POST'		=> get_next_posts_link(phpbb::$user->lang['WP_OLDER_ENTRIES']),
-		'WP_PREVIOUS_POST'	=> get_previous_posts_link(phpbb::$user->lang['WP_NEWER_ENTRIES']),
-	));
 }
 else
 {
@@ -73,6 +70,14 @@ else
 	<?php include (TEMPLATEPATH . "/searchform.php"); ?>
 **/
 }
+
+// Assign index specific vars
+phpbb::$template->assign_vars(array(
+	'IN_SINGLE'			=> false,
+	'IN_ERROR'			=> !$have_posts,
+	'WP_NEXT_POST'		=> get_next_posts_link(phpbb::$user->lang['WP_OLDER_ENTRIES']),
+	'WP_PREVIOUS_POST'	=> get_previous_posts_link(phpbb::$user->lang['WP_NEWER_ENTRIES']),
+));
 
 if (defined('RECENT_TOPICS') && RECENT_TOPICS)
 {

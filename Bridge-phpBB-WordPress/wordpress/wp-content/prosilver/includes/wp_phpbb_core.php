@@ -19,6 +19,9 @@ if (!defined('IN_WP_PHPBB_BRIDGE'))
 
 /**
  * phpBB class that will be used in place of globalising these variables.
+ * 
+ * Based off : Titania 0.3.11
+ * * File : titania/includes/core/phpbb.php
  */
 class phpbb
 {
@@ -71,6 +74,7 @@ class phpbb
 	 * Update phpbb user data with wp user data
 	 * 	Andupdate wp user data with phpbb user data
 	 *
+	 * based off the WP add-on by Jason Sanborn <jsanborn@simplicitypoint.com> http://www.e-xtnd.it/wp-phpbb-bridge/
 	 */
 	public static function wp_phpbb_sanitize_userid()
 	{
@@ -243,6 +247,7 @@ class phpbb
 			'PHPBB_IN_PASTEBIN'	=> false,
 			'SCRIPT_NAME'		=> 'blog',
 			'BLOG_LEFT_COLUMN'	=> BLOG_LEFT_COLUMN_WIDTH,
+			'IN_HOME'			=> is_home(),
 
 		//	'U_WEB'				=> append_sid($web_path),
 			'U_INDEX'			=> append_sid($web_path),
@@ -252,15 +257,16 @@ class phpbb
 
 			'WP_USER_NAME'		=> self::$user->data['wp_user']['user_nicename'],
 			'WP_USER_ID'		=> self::$user->data['wp_user']['ID'],
-			
+
 			'PHPBB_USER_NAME'	=> self::$user->data['username'],
 			'PHPBB_USER_ID'		=> self::$user->data['user_id'],
 
-			'U_WP_ACP'			=> (self::$user->data['user_type'] == USER_FOUNDER) ? wp_register('<li class="icon-register rightside">', '</li>', false ) : '',
-			'U_LOGIN'			=> wp_get_register(),
-			'U_LOGOUT'			=> wp_get_loginout(),
+			'S_REGISTER_ENABLED'=> (self::$config['require_activation'] != USER_ACTIVATION_DISABLE && get_option('users_can_register')) ? true : false,
+			'U_LOGIN_LOGOUT'	=> (!is_user_logged_in()) ? get_option('siteurl') . '/?action=login' : get_option('siteurl') . '/?action=logout',
+			'L_LOGIN_LOGOUT'	=> (!is_user_logged_in()) ? self::$user->lang['LOGIN'] : sprintf(self::$user->lang['LOGOUT_USER'], self::$user->data['username']),
+			'U_WP_ACP'			=> (self::$user->data['user_type'] == USER_FOUNDER) ? admin_url() : '',
 
-		//	'PAGE_TITLE'		=> get_bloginfo('name'),
+			'PAGE_TITLE'		=> get_bloginfo('name'),
 			'BLOG_HEADER'		=> self::wp_page_header($blog_path),
 			'S_DISPLAY_SEARCH'	=> false,
 			'S_CLOCK'			=> self::clock(),
@@ -268,6 +274,11 @@ class phpbb
 			'T_THEME_PATH'			=> "{$web_path}styles/" . self::$user->theme['theme_path'] . '/theme',
 			'T_STYLESHEET_LINK'		=> (!self::$user->theme['theme_storedb']) ? "{$web_path}styles/" . self::$user->theme['theme_path'] . '/theme/stylesheet.css' : append_sid("{$web_path}style." . PHP_EXT, 'id=' . self::$user->theme['style_id'] . '&amp;lang=' . self::$user->data['user_lang']),
 		));
+		
+		if (is_404() || is_category() || is_day() || is_month() || is_year() || is_search() || is_paged())
+		{
+			self::wp_notes();
+		}
 		
 		/* Always have wp_head() just before the closing </head>
 		 * tag of your theme, or you will break many plugins, which
@@ -315,7 +326,7 @@ class phpbb
 
 		$blog_header .= '<script type="text/javascript" src="' . get_bloginfo('stylesheet_directory') . '/js/javascript.js"></script>' . "\n";
 
-		// jQuery
+		// jQuery for resply to comments
 		if (is_single())
 		{
 		//	$blog_header .= '<script type="text/javascript" src="'. $blog_path .'/wp-includes/js/jquery/jquery.js"></script>' . "\n";
@@ -325,6 +336,56 @@ class phpbb
 		}
 
 		return $blog_header;
+	}
+
+	public static function wp_notes()
+	{
+		$is_404 = $is_category = $is_day = $is_month = $is_year = $is_search = $is_paged = '';
+
+		// If this is a 404 page
+		if (is_404())
+		{
+			$error_404 = self::$user->lang['WP_ERROR_404'];
+		}
+		// If this is a category archive
+		else if (is_category())
+		{
+			$is_category = sprintf(self::$user->lang['WP_TITLE_CATEGORIES_EXPLAIN'], single_cat_title('', false));
+		}
+		// If this is a yearly archive
+		else if (is_day())
+		{
+			$is_day = sprintf(self::$user->lang['WP_TITLE_ARCHIVE_DAY_EXPLAIN'], get_bloginfo('url'), get_bloginfo('name'), get_the_time(__('l, F jS, Y', 'default')));
+		}
+		// If this is a monthly archive
+		else if (is_month())
+		{
+			$is_month = sprintf(self::$user->lang['WP_TITLE_ARCHIVE_MONTH_EXPLAIN'], get_bloginfo('url'), get_bloginfo('name'), get_the_time(__('F, Y', 'default')));
+		}
+		//	If this is a yearly archive
+		else if (is_year())
+		{
+			$is_year = sprintf(self::$user->lang['WP_TITLE_ARCHIVE_YEAR_EXPLAIN'], get_bloginfo('url'), get_bloginfo('name'), get_the_time('Y'));
+		}
+		//	If this is a monthly archive
+		else if (is_search())
+		{
+			$is_search = sprintf(self::$user->lang['WP_TITLE_ARCHIVE_SEARCH_EXPLAIN'], get_bloginfo('url'), get_bloginfo('name'), get_search_query());
+		}
+		//	If this is a monthly archive
+		else if (isset($_GET['paged']) && !empty($_GET['paged']))
+		{
+			$is_paged = sprintf(self::$user->lang['WP_TITLE_ARCHIVE_EXPLAIN'], get_bloginfo('url'), get_bloginfo('name'));
+		}
+
+		self::$template->assign_vars(array(
+			'WP_NOTES_IS_404'		=> $is_404,
+			'WP_NOTES_IS_CATEGORY'	=> $is_category,
+			'WP_NOTES_IS_MONTH'		=> $is_month,
+			'WP_NOTES_IS_YEAR'		=> $is_year,
+			'WP_NOTES_IS_SEARCH'	=> $is_search,
+			'WP_NOTES_IS_PAGED'		=> $is_paged,
+		));
 	}
 
 	/**
@@ -347,46 +408,6 @@ class phpbb
 		$wp_list_categories = (defined('LIST_CATEGORIES') && LIST_CATEGORIES) ? wp_list_categories(array('title_li' => '', 'echo' => 0)) : '';
 		$wp_tag_cloud = (defined('LIST_TAGCLOUD') && LIST_CATEGORIES) ? wp_tag_cloud(array('separator' => ", ", 'echo' => 0)) : '';
 
-		$is_404 = $is_category = $is_day = $is_month = $is_year = $is_search = $is_paged = '';
-		if (is_404() || is_category() || is_day() || is_month() || is_year() || is_search() || is_paged())
-		{
-			// If this is a 404 page
-			if (is_404())
-			{
-				$error_404 = self::$user->lang['WP_ERROR_404'];
-			}
-			// If this is a category archive
-			else if (is_category())
-			{
-				$is_category = sprintf(self::$user->lang['WP_TITLE_CATEGORIES_EXPLAIN'], single_cat_title('', false));
-			}
-			// If this is a yearly archive
-			else if (is_day())
-			{
-				$is_day = sprintf(self::$user->lang['WP_TITLE_ARCHIVE_DAY_EXPLAIN'], get_bloginfo('url'), get_bloginfo('name'), get_the_time(__('l, F jS, Y', 'default')));
-			}
-			// If this is a monthly archive
-			else if (is_month())
-			{
-				$is_month = sprintf(self::$user->lang['WP_TITLE_ARCHIVE_MONTH_EXPLAIN'], get_bloginfo('url'), get_bloginfo('name'), get_the_time(__('F, Y', 'default')));
-			}
-			//	If this is a yearly archive
-			else if (is_year())
-			{
-				$is_year = sprintf(self::$user->lang['WP_TITLE_ARCHIVE_YEAR_EXPLAIN'], get_bloginfo('url'), get_bloginfo('name'), get_the_time('Y'));
-			}
-			//	If this is a monthly archive
-			else if (is_search())
-			{
-				$is_search = sprintf(self::$user->lang['WP_TITLE_ARCHIVE_SEARCH_EXPLAIN'], get_bloginfo('url'), get_bloginfo('name'), get_search_query());
-			}
-			//	If this is a monthly archive
-			else if (isset($_GET['paged']) && !empty($_GET['paged']))
-			{
-				$is_paged = sprintf(self::$user->lang['WP_TITLE_ARCHIVE_EXPLAIN'], get_bloginfo('url'), get_bloginfo('name'));
-			}
-		}
-
 		$wp_list_bookmarks = $wp_register = $wp_meta = false;
 	/**
 		// If this is the frontpage
@@ -399,12 +420,9 @@ class phpbb
 		}
 	**/
 		self::$template->assign_vars(array(
-			'SIDEBAR_WP_IS_404'				=> $is_404,
-			'SIDEBAR_WP_IS_CATEGORY'		=> $is_category,
-			'SIDEBAR_WP_IS_MONTH'			=> $is_month,
-			'SIDEBAR_WP_IS_YEAR'			=> $is_year,
-			'SIDEBAR_WP_IS_SEARCH'			=> $is_search,
-			'SIDEBAR_WP_IS_PAGED'			=> $is_paged,
+			'SIDEBAR_WP_SEARCHFORM'			=> (defined('SIDEBAR_SEARCHFORM') && SIDEBAR_SEARCHFORM) ? true : false,
+			'U_WP_SEARCHFORM'				=> get_bloginfo('url'),
+			'SEARCH_QUERY'					=> esc_attr(apply_filters('the_search_query', get_search_query(false))),
 
 			'SIDEBAR_WP_PAGES_LIST'			=> $wp_list_pages,
 			'SIDEBAR_WP_ARCHIVES_LIST'		=> $wp_get_archives,
@@ -680,8 +698,10 @@ class phpbb
 			'POST_AUTHOR_COLOUR'	=> $user_cache['author_colour'],
 			'POST_AUTHOR'			=> $user_cache['author_username'],
 			'U_POST_AUTHOR'			=> $user_cache['author_profile'],
-			'U_POSTS_AUTHOR'		=> get_author_posts_url($wp_poster_id),
-			'L_POSTS_AUTHOR'		=> sprintf(self::$user->lang['WP_READ_TOPICS'], $user_cache['author_username']),
+			'U_FORUM_POSTS_AUTHOR'	=> self::append_sid("search", array('author_id' => 2, 'sr' => 'posts')),
+			'U_BLOG_POSTS_AUTHOR'	=> get_author_posts_url($wp_poster_id),
+			'S_POSTS_AUTHOR'		=> get_the_author_posts(),
+		//	'L_POSTS_AUTHOR'		=> sprintf(self::$user->lang['WP_READ_TOPICS'], $user_cache['author_username']),
 
 		//	'ONLINE_IMG'			=> ($poster_id == ANONYMOUS || !self::$config['load_onlinetrack']) ? '' : (($user_cache['online']) ? self::$user->img('icon_user_online', 'ONLINE') : self::$user->img('icon_user_offline', 'OFFLINE')),
 		//	'S_ONLINE'				=> ($poster_id == ANONYMOUS || !self::$config['load_onlinetrack']) ? false : (($user_cache['online']) ? true : false),
@@ -980,5 +1000,62 @@ class phpbb
 	}
 }
 
+/**
+ * Pagination routine, generates page number sequence
+ * 
+ * Based off : phpbb3.0.8
+ * File : phpbb/includes/functions.php
+ */
+function wp_generate_pagination($base_url, $num_items, $per_page, $on_page)
+{
+
+	$seperator = '<span class="page-sep">' . phpbb::$user->lang['COMMA_SEPARATOR'] . '</span>';
+	$total_pages = ceil($num_items / $per_page);
+
+	if ($total_pages == 1 || !$num_items)
+	{
+		return false;
+	}
+
+	$url_delim = (strpos($base_url, '?') === false) ? '?' : ((strpos($base_url, '?') === strlen($base_url) - 1) ? '' : '&amp;');
+
+	$page_string = ($on_page == 1) ? '<strong>1</strong>' : '<a href="' . $base_url . '">1</a>';
+	$max_pages = min(ceil($num_items / $total_pages), 4);
+	if ($total_pages > 5)
+	{
+		$start_cnt = min(max(1, $on_page - $max_pages), $total_pages - 5);
+		$end_cnt = max(min($total_pages, $on_page + $max_pages), 6);
+
+		$page_string .= ($start_cnt > 1) ? ' ... ' : $seperator;
+
+		for ($i = $start_cnt + 1; $i < $end_cnt; $i++)
+		{
+			$page_string .= ($i == $on_page) ? '<strong>' . $i . '</strong>' : '<a href="' . $base_url . "{$url_delim}cpage=" . $i . '">' . $i . '</a>';
+			if ($i < $end_cnt - 1)
+			{
+				$page_string .= $seperator;
+			}
+		}
+
+		$page_string .= ($end_cnt < $total_pages) ? ' ... ' : $seperator;
+	}
+	else
+	{
+		$page_string .= $seperator;
+
+		for ($i = 2; $i < $total_pages; $i++)
+		{
+			$page_string .= ($i == $on_page) ? '<strong>' . $i . '</strong>' : '<a href="' . $base_url . "{$url_delim}cpage=" . $i . '">' . $i . '</a>';
+			if ($i < $total_pages)
+			{
+				$page_string .= $seperator;
+			}
+		}
+	}
+
+	$page_string .= ($on_page == $total_pages) ? '<strong>' . $total_pages . '</strong>' : '<a href="' . $base_url . "{$url_delim}cpage=" . $total_pages . '">' . $total_pages . '</a>';
+
+	return $page_string;
+}
 
 ?>

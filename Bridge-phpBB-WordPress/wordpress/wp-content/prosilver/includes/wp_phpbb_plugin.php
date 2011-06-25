@@ -50,6 +50,12 @@ switch ($action)
 }
 
 /**
+* Below this there are a compendium of functions modified from WordPress 
+*	by changing the echo for return
+*	and porting the language strings to phpbb 
+**/
+
+/**
  * Load the correct database class file.
  *
  * This function is used to load the database class file either at runtime or by
@@ -79,55 +85,6 @@ function phpbb_get_wp_db()
 	return $wpdb;
 }
 
-function is_odd($number)
-{
-	return ($number % 2) ? true : false; // false = even, true = odd
-}
-
-function wp_get_register()
-{
-	$link = '';
-
-	if (!is_user_logged_in())
-	{
-		if (get_option('users_can_register'))
-		{
-		//	$link = '<a href="' . get_option('siteurl') . '/wp-login.php?action=register">' . __('Register') . '</a>';
-			$link = '<a href="' . get_option('siteurl') . '/?action=register">' . __('Register') . '</a>';
-		}
-		else
-		{
-			if (phpbb::$config['require_activation'] != USER_ACTIVATION_DISABLE)
-			{
-			//	phpbb::append_sid("ucp", 'mode=register');
-				$link = '<a href="' . get_option('siteurl') . '/?action=register">' . __('Log in') . '</a>';
-			}
-		}
-	}
-	else
-	{
-		$link = '<a href="' . get_option('siteurl') . '/wp-admin/index.php">' . __('Site Admin') . '</a>';
-	}
-
-	return apply_filters('register', $link);
-}
-
-function wp_get_loginout()
-{
-	if (!is_user_logged_in())
-	{
-	//	$link = '<a href="' . get_option('siteurl') . '/wp-login.php">' . __('Log in') . '</a>';
-		$link = '<a href="' . get_option('siteurl') . '/?action=login">' . __('Log in') . '</a>';
-	}
-	else
-	{
-	//	$link = '<a href="' . get_option('siteurl') . '/wp-login.php?action=logout">' . __('Log out') . '</a>';
-		$link = '<a href="' . get_option('siteurl') . '/?action=logout">' . __('Log out') . '</a>';
-	}
-
-	return apply_filters('loginout', $link);
-}
-
 /**
  * Display the post content.
  *
@@ -144,29 +101,6 @@ function wp_the_content($more_link_text = null, $stripteaser = 0) {
 	$content = apply_filters('the_content', $content);
 	$content = str_replace(']]>', ']]&gt;', $content);
 	return $content;
-}
-
-/**
- * Display edit post link for post.
- *
- * @since 1.0.0
- *
- * @param string $link Optional. Anchor text.
- * @param string $before Optional. Display before edit link.
- * @param string $after Optional. Display after edit link.
- * @param int $id Optional. Post ID.
- * 
- * Based off : wordpress 3.1.3
- * File : wordpress/wp-includes/link-template.php
- */
-function wp_edit_post_link( $link = null, $before = '', $after = '', $id = 0 ) {
-	if ( !$post = &get_post( $id ) )
-		return;
-
-	if ( !$url = get_edit_post_link( $post->ID ) )
-		return;
-
-	return $url;
 }
 
 /**
@@ -189,48 +123,71 @@ function wp_edit_comment_link( $link = null, $before = '', $after = '' ) {
 		return;
 
 	if ( null === $link )
-		$link = __('Edit This');
+		$link = phpbb::$user->lang['WP_COMMENT_EDIT'];
 
 	return get_edit_comment_link($comment->comment_ID);
 }
 
+/**
+ * Displays the text of the current comment.
+ *
+ * @since 0.71
+ * @uses apply_filters() Passes the comment content through the 'comment_text' hook before display
+ * @uses get_comment_text() Gets the comment content
+ *
+ * @param int $comment_ID The ID of the comment for which to print the text. Optional.
+ * 
+ * Based off : wordpress 3.1.3
+ * File : wordpress/wp-includes/comment-template.php
+ */
 function wp_comment_text( $comment_ID = 0 ) {
 	$comment = get_comment( $comment_ID );
 	return apply_filters( 'comment_text', get_comment_text( $comment_ID ), $comment );
 }
 
-function wp_adjacent_post_link($format, $link, $in_same_cat = false, $excluded_categories = '', $previous = true)
-{
-	if ($previous && is_attachment())
-	{
+/**
+ * Display adjacent post link.
+ *
+ * Can be either next post link or previous.
+ *
+ * @since 2.5.0
+ *
+ * @param string $format Link anchor format.
+ * @param string $link Link permalink format.
+ * @param bool $in_same_cat Optional. Whether link should be in same category.
+ * @param string $excluded_categories Optional. Excluded categories IDs.
+ * @param bool $previous Optional, default is true. Whether display link to previous post.
+ * 
+ * Based off : wordpress 3.1.3
+ * File : wordpress/wp-includes/link-template.php
+ */
+function wp_adjacent_post_link($format, $link, $in_same_cat = false, $excluded_categories = '', $previous = true) {
+	if ( $previous && is_attachment() )
 		$post = & get_post($GLOBALS['post']->post_parent);
-	}
 	else
-	{
 		$post = get_adjacent_post($in_same_cat, $excluded_categories, $previous);
-	}
 
-	if (!$post)
-	{
-		return '';
-	}
+	if ( !$post )
+		return;
 
 	$title = $post->post_title;
 
-//	if ( empty($post->post_title) )
-//	{
-//		$title = $previous ? __('Previous Post') : __('Next Post');
-//	}
+	if ( empty($post->post_title) )
+		$title = $previous ? phpbb::$user->lang['WP_PREVIOUS_POST'] : phpbb::$user->lang['WP_NEXT_POST'];
 
-	$pre_title	= '<strong>' . (($previous) ? __('Previous Post') : __('Next Post') ) . ' : </strong>';
-	$title		= apply_filters('the_title', $title, $post);
-	$string		= '<a href="'.get_permalink($post).'">';
-	$link		= str_replace('%title', $title, $link);
-	$link		= $pre_title . $string . $link . '</a>';
+	$title = apply_filters('the_title', $title, $post->ID);
+	$date = mysql2date(get_option('date_format'), $post->post_date);
+	$rel = $previous ? 'prev' : 'next';
+
+	$string = '<a href="'.get_permalink($post).'" rel="'.$rel.'">';
+	$link = str_replace('%title', $title, $link);
+	$link = str_replace('%date', $date, $link);
+	$link = $string . $link . '</a>';
 
 	$format = str_replace('%link', $link, $format);
 
-	return $format;
+	$adjacent = $previous ? 'previous' : 'next';
+	return apply_filters( "{$adjacent}_post_link", $format, $link );
 }
 
 /**
@@ -259,10 +216,10 @@ function wp_comments_popup_link( $zero = false, $one = false, $more = false, $cs
 
 	$id = get_the_ID();
 
-	if ( false === $zero ) $zero = __( 'No Comments' );
-	if ( false === $one ) $one = __( '1 Comment' );
-	if ( false === $more ) $more = __( '% Comments' );
-	if ( false === $none ) $none = __( 'Comments Off' );
+	if ( false === $zero ) $zero = phpbb::$user->lang['WP_NO_COMMENTS'];
+	if ( false === $one ) $one = phpbb::$user->lang['WP_ONE_COMMENT'];
+	if ( false === $more ) $more = phpbb::$user->lang['WP_COMMENTS'];
+	if ( false === $none ) $none = phpbb::$user->lang['WP_COMMENTS_OFF'];
 
 	$number = get_comments_number( $id );
 
@@ -271,7 +228,7 @@ function wp_comments_popup_link( $zero = false, $one = false, $more = false, $cs
 	}
 
 	if ( post_password_required() ) {
-		return __('Enter your password to view comments.');
+		return phpbb::$user->lang['WP_COMMENTS_PASSWORED'];
 	}
 
 	$echo = '<a href="';
@@ -297,7 +254,7 @@ function wp_comments_popup_link( $zero = false, $one = false, $more = false, $cs
 
 	$echo .= apply_filters( 'comments_popup_link_attributes', '' );
 
-	$echo .= ' title="' . esc_attr( sprintf( __('Comment on %s'), $title ) ) . '">';
+	$echo .= ' title="' . esc_attr( sprintf(phpbb::$user->lang['WP_COMMENTS_ON'], $title ) ) . '">';
 	$echo .= wp_comments_number( $zero, $one, $more );
 	$echo .= '</a>';
 
@@ -325,66 +282,13 @@ function wp_comments_number( $zero = false, $one = false, $more = false, $deprec
 	$number = get_comments_number();
 
 	if ( $number > 1 )
-		$output = str_replace('%', number_format_i18n($number), ( false === $more ) ? __('% Comments') : $more);
+		$output = str_replace('%', number_format_i18n($number), ( false === $more ) ? phpbb::$user->lang['WP_COMMENTS'] : $more);
 	elseif ( $number == 0 )
-		$output = ( false === $zero ) ? __('No Comments') : $zero;
+		$output = ( false === $zero ) ? phpbb::$user->lang['WP_NO_COMMENTS'] : $zero;
 	else // must be one
-		$output = ( false === $one ) ? __('1 Comment') : $one;
+		$output = ( false === $one ) ? phpbb::$user->lang['WP_ONE_COMMENT'] : $one;
 
 	return apply_filters('comments_number', $output, $number);
-}
-
-function wp_dashboard_comments($comment)
-{
-	$actions_string = '';
-	if (current_user_can('edit_comment', $comment->comment_ID))
-	{
-		// preorder it: Approve | Reply | Edit | Spam | Trash
-		$actions = array(
-			'approve' => '',
-			'unapprove' => '',
-//			'reply' => '',
-//			'edit' => '',
-			'spam' => '',
-			'trash' => '',
-			'delete' => ''
-		);
-
-		$del_nonce = esc_html( '_wpnonce=' . wp_create_nonce( "delete-comment_$comment->comment_ID" ) );
-		$approve_nonce = esc_html( '_wpnonce=' . wp_create_nonce( "approve-comment_$comment->comment_ID" ) );
-
-		$approve_url = esc_url(get_option('home') . "/wp-admin/comment.php?action=approvecomment&p=$comment->comment_post_ID&c=$comment->comment_ID&$approve_nonce");
-		$unapprove_url = esc_url(get_option('home') . "/wp-admin/comment.php?action=unapprovecomment&p=$comment->comment_post_ID&c=$comment->comment_ID&$approve_nonce");
-//		$edir_url = esc_url(get_option('home') . "comment.php?action=editcomment&amp;c={$comment->comment_ID}");
-		$spam_url = esc_url(get_option('home') . "/wp-admin/comment.php?action=spamcomment&p=$comment->comment_post_ID&c=$comment->comment_ID&$del_nonce");
-		$trash_url = esc_url(get_option('home') . "/wp-admin/comment.php?action=trashcomment&p=$comment->comment_post_ID&c=$comment->comment_ID&$del_nonce");
-		$delete_url = esc_url(get_option('home') . "/wp-admin/comment.php?action=deletecomment&p=$comment->comment_post_ID&c=$comment->comment_ID&$del_nonce");
-
-		$actions['approve'] = "<a href='$approve_url' title='" . esc_attr__( 'Approve this comment' ) . "'><span>" . __( 'Approve' ) . '</span></a>';
-		$actions['unapprove'] = "<a href='$unapprove_url'  title='" . esc_attr__( 'Unapprove this comment' ) . "'><span>" . __( 'Unapprove' ) . '</span></a>';
-//		$actions['edit'] = "<a href='$edir_url' title='" . esc_attr__('Edit comment') . "'><span>". __('Edit') . '</span></a>';
-//		$actions['reply'] = '<a onclick="commentReply.open(\''.$comment->comment_ID.'\',\''.$comment->comment_post_ID.'\');return false;" title="'.esc_attr__('Reply to this comment').'" href="#"><span>' . __('Reply') . '</span></a>';
-		$actions['spam'] = "<a href='$spam_url' title='" . esc_attr__( 'Mark this comment as spam' ) . "'><span>" . /* translators: mark as spam link */  _x( 'Spam', 'verb' ) . '</span></a>';
-		if (!EMPTY_TRASH_DAYS)
-		{
-			$actions['delete'] = "<a href='$delete_url'title='" . esc_attr__( 'Delete Permanently' ) . "'><span>" . __('Delete Permanently') . '</span></a>';
-		}
-		else
-		{
-			$actions['trash'] = "<a href='$trash_url' title='" . esc_attr__( 'Move this comment to the trash' ) . "'><span>" . _x('Trash', 'verb') . '</span></a>';
-		}
-
-//		$actions = apply_filters( 'comment_row_actions', array_filter($actions), $comment );
-
-		foreach ($actions as $action => $link)
-		{
-			if (!$link) { continue; }
-		//	$actions_string .= "<span class='$action'>$sep$link</span>";
-			$actions_string .= '<li class="wp-' . strtolower($action) . '-icon">' .$link . '</li>';
-		}
-	}
-	
-	return $actions_string;
 }
 
 ?>

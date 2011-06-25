@@ -5,9 +5,14 @@
 			<div class="inner"><span class="corners-top"><span></span></span>
 			<div class="postbody">
 				<!-- IF not S_IS_BOT -->
-					<!-- IF topicrow.U_POST_EDIT -->
+					<!-- IF topicrow.U_POST_EDIT or topicrow.U_POST_DELETE or topicrow.U_POST_TRASH or topicrow.U_POST_SPAM or topicrow.U_POST_APPROVE or topicrow.U_POST_UNAPPROVE -->
 					<ul class="profile-icons">
-						<!-- IF topicrow.U_POST_EDIT --><li class="edit-icon"><a class="post-edit-link" href="{topicrow.U_POST_EDIT}" title="{L_EDIT_POST}"><span>{L_EDIT_POST}</span></a></li><!-- ENDIF -->
+						<!-- IF topicrow.U_POST_EDIT --><li class="edit-icon"><a href="{topicrow.U_POST_EDIT}" title="{L_WP_COMMENT_EDIT_EXPLAIN}"><span>{L_WP_COMMENT_EDIT}</span></a></li><!-- ENDIF -->
+						<!-- IF topicrow.U_POST_DELETE --><li class="edit-icon"><a href="{topicrow.U_POST_DELETE}" title="{L_WP_COMMENT_DELETE_EXPLAIN}"><span>{L_WP_COMMENT_DELETE}</span></a></li><!-- ENDIF -->
+						<!-- IF topicrow.U_POST_TRASH --><li class="wp-trash-icon"><a href="{topicrow.U_POST_TRASH}" title="{L_WP_COMMENT_TRASH_EXPLAIN}"><span>{L_WP_COMMENT_TRASH}</span></a></li><!-- ENDIF -->
+						<!-- IF topicrow.U_POST_SPAM --><li class="spam-icon"><a href="{topicrow.U_POST_SPAM}" title="{L_WP_COMMENT_SPAM_EXPLAIN}"><span>{L_WP_COMMENT_SPAM}</span></a></li><!-- ENDIF -->
+						<!-- IF topicrow.U_POST_APPROVE --><li class="wp-approve-icon"><a href="{topicrow.U_POST_APPROVE}" title="{L_WP_COMMENT_APPROVE_EXPLAIN}"><span>{L_WP_COMMENT_APPROVE}</span></a></li><!-- ENDIF -->
+						<!-- IF topicrow.U_POST_UNAPPROVE --><li class="wp-unapprove-icon"><a href="{topicrow.U_POST_UNAPPROVE}" title="{L_WP_COMMENT_APPROVE_EXPLAIN}"><span>{L_WP_COMMENT_APPROVE}</span></a></li><!-- ENDIF -->
 					</ul>
 					<!-- ENDIF -->
 				<!-- ENDIF -->
@@ -25,8 +30,7 @@
 				<div class="postmetadata alt notice">
 					<!-- IF topicrow.POST_TAGS -->{topicrow.POST_TAGS}<!-- ENDIF -->
 					<!-- IF topicrow.POST_CATS -->{topicrow.POST_CATS}<!-- ENDIF -->
-					<!-- IF topicrow.POST_EDIT --><!-- IF topicrow.POST_CATS --> | <!-- ENDIF --> {topicrow.POST_EDIT}<!-- ENDIF -->
-					<!-- IF topicrow.POST_TAGS --><!-- IF topicrow.POST_CATS or topicrow.POST_EDIT --> | <!-- ENDIF -->{topicrow.POST_COMENT}<!-- ENDIF -->
+					<!-- IF topicrow.POST_COMENT --><!-- IF topicrow.POST_CATS --> | <!-- ENDIF -->{topicrow.POST_COMENT}<!-- ENDIF -->
 					<!-- IF topicrow.U_FOLLOW_FEED --><br />{topicrow.U_FOLLOW_FEED}<!-- ENDIF -->
 					<!-- IF topicrow.U_YES_COMMENT_YES_PING --><br />{topicrow.U_YES_COMMENT_YES_PING}<!-- ENDIF -->
 					<!-- IF topicrow.U_NO_COMMENT_YES_PING --><br />{topicrow.U_NO_COMMENT_YES_PING}<!-- ENDIF -->
@@ -39,6 +43,25 @@
 			<span class="corners-bottom"><span></span></span></div>
 		</div>
 		<hr class="divider" />
+
+		<!-- BEGINELSE -->
+
+			<!-- IF IN_SEARCH -->
+			<div class="panel">
+				<div class="inner"><span class="corners-top"><span></span></span>
+					<h3>{L_WP_SEARCH_NOT_FOUND}</h3>
+					<div class="postbody"><div class="entry content">{L_WP_SEARCH_NOT_FOUND_EXPLAIN}</div></div>
+				<span class="corners-bottom"><span></span></span></div>
+			</div>
+			<!-- ELSE -->
+			<div class="panel">
+				<div class="inner"><span class="corners-top"><span></span></span>
+					<h3>{L_WP_SEARCH_NOT_FOUND}</h3>
+					<div class="postbody"><div class="entry content">{L_WP_POST_NOT_FOUND_EXPLAIN}</div></div>
+				<span class="corners-bottom"><span></span></span></div>
+			</div>
+			<!-- ENDIF -->
+
 		<!-- END topicrow -->
 
 	</div>
