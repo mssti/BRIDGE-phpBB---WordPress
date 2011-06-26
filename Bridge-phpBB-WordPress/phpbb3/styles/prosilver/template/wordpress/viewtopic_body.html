@@ -1,18 +1,16 @@
 
-	<h2><a href="{U_TOPIC}" rel="bookmark" title="{TOPIC_SUBJECT}">{TOPIC_SUBJECT}</a></h2>
-	<br />
+		<h2><a href="{U_TOPIC}" rel="bookmark" title="{TOPIC_SUBJECT}">{TOPIC_SUBJECT}</a></h2>
 
-	<!-- IF PAGINATION or TOTAL_POSTS -->
-	<div class="topic-actions">
-		<div class="pagination">
-			{TOTAL_POSTS}
-			<!-- IF PAGE_NUMBER --><!-- IF PAGINATION --> &bull; {PAGE_NUMBER} &bull; <span>{PAGINATION}</span><!-- ELSE --> &bull; {PAGE_NUMBER}<!-- ENDIF --><!-- ENDIF -->
+		<!-- IF PAGINATION or TOTAL_POSTS -->
+		<div class="topic-actions">
+			<div class="pagination">
+				{TOTAL_POSTS}
+				<!-- IF PAGE_NUMBER --><!-- IF PAGINATION --> &bull; {PAGE_NUMBER} &bull; <span>{PAGINATION}</span><!-- ELSE --> &bull; {PAGE_NUMBER}<!-- ENDIF --><!-- ENDIF -->
+			</div>
 		</div>
-	</div>
-	<!-- ENDIF -->
+		<!-- ENDIF -->
 
-	<div id="content" class="widecolumn">
-	<!-- BEGIN postrow -->
+		<!-- BEGIN postrow -->
 		<div class="post<!-- IF postrow.S_FIRST_ROW --> bg3<!-- ELSE --><!-- IF postrow.POST_ID is odd --> bg2<!-- ELSE --> bg1<!-- ENDIF --><!-- ENDIF --><!-- IF (postrow.S_POST_UNAPPROVED or postrow.S_POST_REPORTED) --> reported<!-- ENDIF -->" id="<!-- IF postrow.S_COMMENT -->comment-{postrow.POST_ID}<!-- ELSE -->post-{postrow.POST_ID}<!-- ENDIF -->">
 			<div class="inner"><span class="corners-top"><span></span></span>
 				<div class="postbody">
@@ -72,15 +70,16 @@
 		<!-- IF postrow.S_FIRST_ROW and POST_REPLIES --><h3 id="comments">{POST_REPLIES}</h3><!-- ENDIF -->
 		<hr class="divider" />
 
-	<!-- END postrow -->
-		<div class="topic-actions">
+		<!-- END postrow -->
+
 		<!-- IF PREVIOUS_PAGE or NEXT_PAGE -->
-			<hr />
-			<p style="text-align: center;"><!-- IF PREVIOUS_PAGE -->{PREVIOUS_PAGE}<!-- ENDIF --><strong>{TOTAL_POSTS}</strong> &bull; {PAGE_NUMBER}<!-- IF NEXT_PAGE -->{NEXT_PAGE}<!-- ENDIF --></p>
+		<br />
+		<div style="text-align: center;"><!-- IF PREVIOUS_PAGE -->{PREVIOUS_PAGE}<!-- ENDIF --><strong>{TOTAL_POSTS}</strong> &bull; {PAGE_NUMBER}<!-- IF NEXT_PAGE -->{NEXT_PAGE}<!-- ENDIF --></div>
 		<!-- ENDIF -->
 
+		<hr />
+		<div class="topic-actions">
 		<!-- IF not S_IS_BOT and S_DISPLAY_REPLY_INFO -->
-			<hr />
 			<div class="buttons">
 				<!-- IF S_IS_LOCKED -->
 					<div class="locked-icon"><a href="#" title="{L_TOPIC_LOCKED}"><span></span>{L_TOPIC_LOCKED_SHORT}{L_POST_REPLY}</a></div>
@@ -99,7 +98,5 @@
 		</div>
 
 	<!-- IF not S_IS_BOT and not S_IS_LOCKED -->
-		<!-- INCLUDE wordpress/posting_body.html -->
+		<div id="respond"><!-- INCLUDE wordpress/posting_body.html --></div>
 	<!-- ENDIF -->
-
-	</div><!-- id="content" class="widecolumn //-->

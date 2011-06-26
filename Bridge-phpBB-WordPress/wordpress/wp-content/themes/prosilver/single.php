@@ -2,14 +2,14 @@
 /**
  * 
  * @package: phpBB 3.0.8 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/theme/prosilver
- * @version: $Id: single.php, v 0.0.1 2011/06/20 11:06:20 leviatan21 Exp $
+ * @version: $Id: single.php, v0.0.2 2011/06/26 11:06:26 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
  * 
  */
 
-require_once('includes/wp_phpbb_plugin.php'); 
+require_once('includes/wp_phpbb_bridge.php'); 
 
 $postrow = $commentrow = $autor = array();
 $topic_title = $topic_link = '';
@@ -41,8 +41,7 @@ if (have_posts())
 			'MINI_POST_IMG'		=> phpbb::$user->img('icon_post_target', 'POST'),
 			'U_MINI_POST'		=> apply_filters('the_permalink', get_permalink()) . "#post-$post_id",
 			'POST_SUBJECT'		=> get_the_title(),
-			'MESSAGE'			=> wp_the_content(),
-		//	'MESSAGE'			=> (!post_password_required()) ? wp_the_content('<br /><div class="notice">' . __('[Read more...]') . '</div>') : get_the_excerpt(),
+			'MESSAGE'			=> wp_do_action('the_content'),
 
 			'POST_TAGS'			=> get_the_tag_list(phpbb::$user->lang['WP_TITLE_TAGS'] . ': ', ', ', ''),
 			'POST_CATS'			=> sprintf(phpbb::$user->lang['WP_POSTED_IN'], get_the_category_list(', ')),
@@ -67,22 +66,11 @@ if (have_posts())
 		phpbb::$template->assign_block_vars('postrow', $postrow);
 	}
 
-//	$post_id = request_var('p', $post->ID);
-
 	comments_template('/comments.php', true);
 
 	// comments are opened
 	if ($post->comment_status == 'open')
 	{
-	//	global $wp_query, $withcomments, $post, $wpdb, $id, $comment, $user_login, $user_ID, $user_identity, $overridden_cpage;
-
-	//	do_action('comment_form', $post_id);
-	//	wp_nonce_field('replyto-comment', '_ajax_nonce-replyto-comment', false, false);
-	//	wp_comment_form_unfiltered_html_nonce();
-	//	if (current_user_can('unfiltered_html'))
-	//	{
-	//		wp_nonce_field('unfiltered-html-comment_' . $post_id, '_wp_unfiltered_html_comment', false, false);
-	//	}
 		$comment_author       = utf8_normalize_nfc(request_var('author', phpbb::$user->data['username'], true));
 		$comment_author_email = strtolower(request_var('email', phpbb::$user->data['user_email']));
 		$comment_author_url   = strtolower(request_var('url', phpbb::$user->data['user_website']));
@@ -141,7 +129,7 @@ if (have_posts())
 
 		// Reply
 		'S_IS_LOCKED'			=> ($post->comment_status == 'open') ? false : true,
-		'S_DISPLAY_REPLY_INFO'	=> ($post->comment_status == 'open' && (phpbb::$auth->acl_get('f_reply', PERMISSION_FORUM_ID) || phpbb::$user->data['user_id'] == ANONYMOUS)) ? true : false,
+		'S_DISPLAY_REPLY_INFO'	=> ($post->comment_status == 'open' && (phpbb::$auth->acl_get('f_reply', phpbb::$config['wp_phpbb_bridge_permissions_forum_id']) || phpbb::$user->data['user_id'] == ANONYMOUS)) ? true : false,
 		'S_DISPLAY_NOTE'		=> (get_option('comment_registration') && phpbb::$user->data['user_id'] == ANONYMOUS) ? phpbb::$user->lang['WP_LOGIN_NEED'] : '',
 
 		// Icons
@@ -149,9 +137,9 @@ if (have_posts())
 		'UNAPPROVED_IMG'		=> phpbb::$user->img('icon_topic_unapproved', 'POST_UNAPPROVED'),
 
 		// Pagination
-		'POST_REPLIES'			=> wp_comments_number(phpbb::$user->lang['WP_NO_COMMENTS'], phpbb::$user->lang['WP_ONE_COMMENT'], phpbb::$user->lang['WP_COMMENTS']) . sprintf(phpbb::$user->lang['WP_COMMENTS_TO'], $topic_title),
-		'PREVIOUS_ENTRIE'		=> wp_adjacent_post_link(phpbb::$user->lang['PREVIOUS_ENTRIE'] . ' %link', '%title', false, '', true),
-		'NEXT_ENTRIE'			=> wp_adjacent_post_link('%link ' . phpbb::$user->lang['NEXT_ENTRIE'], '%title', false, '', false),
+		'POST_REPLIES'			=> wp_do_action('comments_number' , phpbb::$user->lang['WP_NO_COMMENTS'], phpbb::$user->lang['WP_ONE_COMMENT'], phpbb::$user->lang['WP_COMMENTS']) . sprintf(phpbb::$user->lang['WP_COMMENTS_TO'], $topic_title),
+		'PREVIOUS_ENTRIE'		=> wp_do_action('adjacent_post_link', phpbb::$user->lang['PREVIOUS_ENTRIE'] . ' %link', '%title', false, '', true),
+		'NEXT_ENTRIE'			=> wp_do_action('adjacent_post_link', '%link ' . phpbb::$user->lang['NEXT_ENTRIE'], '%title', false, '', false),
 	));
 }
 

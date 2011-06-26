@@ -1,9 +1,7 @@
 <!-- INCLUDE overall_header.html -->
 
-<table border="0" cellpadding="0" cellspacing="0" width="100%">
-<tr>
-<td id="phpbb_blog_middle">
-	<br />
+<div id="container">
+	<div id="content">
 	<!-- IF WP_NOTES_IS_404 or WP_NOTES_IS_CATEGORY or WP_NOTES_IS_MONTH or WP_NOTES_IS_YEAR or WP_NOTES_IS_SEARCH or WP_NOTES_IS_PAGED -->
 		<div class="rules">
 			<div class="inner"><span class="corners-top"><span></span></span>
@@ -17,7 +15,7 @@
 				<!-- IF WP_NOTES_IS_SEARCH -->{WP_NOTES_IS_SEARCH}<!-- ENDIF -->
 				<!-- IF WP_NOTES_IS_PAGED -->{WP_NOTES_IS_PAGED}<!-- ENDIF -->
 			<span class="corners-bottom"><span></span></span></div>
-		</div>
+		</div><!-- .rules //-->
 		<br />
 	<!-- ENDIF -->
 
@@ -26,12 +24,11 @@
 	<!-- ELSE -->
 		<!-- INCLUDE wordpress/topiclist_body.html -->
 	<!-- ENDIF -->
-</td>
-<td id="phpbb_blog_right" style="width: {BLOG_LEFT_COLUMN}px;">
-	<br />
+	</div><!-- #content //-->
+</div><!-- #container //-->
+
+<div id="primary" class="widget-area">
 	<!-- INCLUDE wordpress/left_sidebar_body.html -->
-</td>
-</tr>
-</table>
+</div><!-- #primary .widget-area //-->
 
 <!-- INCLUDE overall_footer.html -->

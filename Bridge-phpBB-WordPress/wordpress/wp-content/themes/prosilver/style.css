@@ -2,12 +2,12 @@
 Theme Name: Prosilver
 Theme URI: http://www.mssti.com/
 Description: proSilver (this is the default phpBB 3 style) <a href="http://www.mssti.com/">leviatan21</a>.
-Version: 1.0
+Version: v0.0.2 2011/06/26 11:06:26
 Author: leviatan21
 Author URI: http://www.mssti.com/
 Tags: blue, phpbb, full width, two columns
 
-	Prosilver v1.0
+	Prosilver v0.0.2
 	http://www.mssti.com/
 
 	Based on style:	proSilver (this is the default phpBB 3 style)
@@ -22,18 +22,29 @@ Tags: blue, phpbb, full width, two columns
 
 */
 
-.section-blog td#phpbb_blog_middle {
-	vertical-align: top;
+/** Main layout 2 columns **/
+.section-blog #page-body {
+	clear: both;
+	overflow: hidden;
 }
-.section-blog td#phpbb_blog_middle {
-	vertical-align: top;
+.section-blog #container {
+	float: left;
+	margin: 1em -240px 1em 0;
+	width: 100%;
 }
-.section-blog td#phpbb_blog_right {
-	padding: 0 0 0 1em;
-	vertical-align: top;
-	width: 250px;
+.section-blog #content {
+	margin: 0 240px 0 0;
+}
+.section-blog #primary {
+	float: right;
+	margin: 1em 0 1em 0;
+	overflow: hidden;
+	width: 220px;
 }
 
+.section-blog #container h2 {
+	margin: 0 0 0.2em 0;
+}
 .section-blog div.rules {
 	margin-top: 0;
 }

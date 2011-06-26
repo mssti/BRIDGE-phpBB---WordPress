@@ -2,14 +2,14 @@
 /**
  * 
  * @package: phpBB 3.0.8 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/theme/prosilver
- * @version: $Id: index.php, v 0.0.1 2011/06/20 11:06:20 leviatan21 Exp $
+ * @version: $Id: index.php, v0.0.2 2011/06/26 11:06:26 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
  * 
  */
 
-require_once('includes/wp_phpbb_plugin.php'); 
+require_once('includes/wp_phpbb_bridge.php'); 
 
 $topicrow = $autor = array();
 
@@ -35,12 +35,11 @@ if (have_posts())
 			'MINI_POST_IMG'		=> $user->img('icon_post_target', 'POST'),
 			'U_MINI_POST'		=> apply_filters('the_permalink', get_permalink()),
 			'POST_SUBJECT'		=> get_the_title(),
-			'MESSAGE'			=> wp_the_content(phpbb::$user->lang['WP_READ_MORE']),
-		//	'MESSAGE'			=> (!post_password_required()) ? wp_the_content('<br /><div class="notice">' . __('[Read more...]') . '</div>') : get_the_excerpt(),
+			'MESSAGE'			=> wp_do_action('the_content', phpbb::$user->lang['WP_READ_MORE']),
 
 			'POST_TAGS'			=> get_the_tag_list(phpbb::$user->lang['WP_TITLE_TAGS'] . ': ', ', ', '<br />'),
 			'POST_CATS'			=> sprintf(phpbb::$user->lang['WP_POSTED_IN'] , get_the_category_list(', ')),
-			'POST_COMENT'		=> wp_comments_popup_link(phpbb::$user->lang['WP_NO_COMMENTS'], phpbb::$user->lang['WP_ONE_COMMENT'], phpbb::$user->lang['WP_COMMENTS']),
+			'POST_COMENT'		=> wp_do_action('comments_popup_link', phpbb::$user->lang['WP_NO_COMMENTS'], phpbb::$user->lang['WP_ONE_COMMENT'], phpbb::$user->lang['WP_COMMENTS']),
 			'PAGINATION'		=> wp_topic_generate_pagination(apply_filters('the_permalink', get_permalink()), (int) get_comments_number($post_id), (int) get_option('comments_per_page')),
 			'U_FOLLOW_FEED'		=> sprintf(phpbb::$user->lang['WP_FOLLOW_FEED'], get_post_comments_feed_link($post_id)),
 			// Both Comments and Pings are open
@@ -60,15 +59,6 @@ if (have_posts())
 		phpbb::$template->assign_block_vars('topicrow', $topicrow);
 	}
 }
-/**
-else
-{
-
-	<h2 class="center"><?php _e('Not Found'); ?></h2>
-	<p class="center"><?php _e('Sorry, but you are looking for something that isn&#8217;t here.'); ?></p>
-	<?php include (TEMPLATEPATH . "/searchform.php"); ?>
-}
-**/
 
 phpbb::page_header(phpbb::$user->lang['INDEX']);
 
@@ -81,7 +71,7 @@ phpbb::$template->assign_vars(array(
 	'PREVIOUS_ENTRIE'	=> ($wp_query->max_num_pages > 1) ? get_previous_posts_link(phpbb::$user->lang['PREVIOUS_ENTRIE']) : '',
 ));
 
-if (defined('RECENT_TOPICS') && RECENT_TOPICS)
+if (phpbb::$config['wp_phpbb_bridge_recent_topics'])
 {
 	phpbb::phpbb_recet_topics();
 }

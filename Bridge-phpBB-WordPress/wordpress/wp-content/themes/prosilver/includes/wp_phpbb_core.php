@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.8 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/theme/prosilver
- * @version: $Id: wp_phpbb_core.php, v 0.0.1 2011/06/20 11:06:20 leviatan21 Exp $
+ * @version: $Id: wp_phpbb_core.php, v0.0.2 2011/06/26 11:06:26 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -68,6 +68,9 @@ class phpbb
 			self::$user->setup();
 		}
 		self::wp_phpbb_sanitize_userid();
+
+		// enhance phpbb $config data with WP $config data
+		self::wp_get_config();
 	}
 
 	/**
@@ -199,7 +202,7 @@ class phpbb
 
 		if ($count > 0)
 		{
-			$new_username .= (string)$count;
+			$new_username .= (string) $count;
 		}
 
 		if (username_exists($new_username))
@@ -209,6 +212,34 @@ class phpbb
 		}
 
 		return $new_username;
+	}
+
+	/**
+	* Force some variables
+	* We do this instead made an ACP module for phpBB to manage this bridge configurations
+	*/
+	public static function wp_get_config()
+	{
+		self::$config = array_merge(self::$config, array(
+			// For the moment the ID of you forum where to use permissions ( like $auth->acl_get('f_reply') )
+			'wp_phpbb_bridge_permissions_forum_id'		=> 2,
+			// The left column width, in pixels
+			'wp_phpbb_bridge_left_column_width'			=> 300,
+			// The width size of avatars in comments, in pixels
+			'wp_phpbb_bridge_comments_avatar_width'		=> 32,
+			// Display a block with latest topics in left sidebar
+			'wp_phpbb_bridge_recent_topics'				=> 1,
+			// Display a block with a list of pages in left sidebar
+			'wp_phpbb_bridge_list_pages'				=> 1,
+			// Display a block with a list of archives in left sidebar
+			'wp_phpbb_bridge_list_archives'				=> 1,
+			// Display a block with a list of categories in left sidebar
+			'wp_phpbb_bridge_list_categories'			=> 1,
+			// Display a block with tag clouds in left sidebar
+			'wp_phpbb_bridge_list_tagclouds'			=> 1,
+			// Display the search block
+			'wp_phpbb_bridge_search_form'				=> 1,
+		));
 	}
 
 	/**
@@ -223,6 +254,33 @@ class phpbb
 	public static function append_sid($script, $params = false, $is_amp = true, $session_id = false)
 	{
 		return append_sid( PHPBB_ROOT_PATH . $script . '.' . PHP_EXT, $params, $is_amp, $session_id);
+	}
+
+	/**
+	 * @description: Generate the clock time
+	 * @param: 				$gmepoch = a date;
+	 * @return: (string) 	$time . $midnight = a formated hour HH:MM:SS am/pm
+	 * @version: OK
+	 */
+	public static function clock($gmepoch = '')
+	{
+		$zone_offset = (int) self::$user->timezone + (int) self::$user->dst;
+
+		$date = preg_split('/(H:i|g:i)/', self::$user->lang['default_dateformat']);
+
+		$gmepoch = ($gmepoch) ? $gmepoch : time();
+
+		$time = gmdate('H:i:s', $gmepoch + $zone_offset);
+
+		list($h, $m, $s) = explode(':', $time);
+		$midnight = ( (int) $h > 12) ? ' pm' : ' am';
+
+		self::$template->assign_vars(array(
+			'CURRENT_DATE'	=> sprintf(self::$user->lang['CURRENT_TIME'], self::$user->format_date(time() + $zone_offset, $date[0], true)),
+			'CURRENT_TIME'	=> $time . $midnight,
+		));
+
+		return true;
 	}
 
 	/**
@@ -269,7 +327,6 @@ class phpbb
 			'PHPBB_IN_BLOG'		=> true,
 			'PHPBB_IN_PASTEBIN'	=> false,
 			'SCRIPT_NAME'		=> 'blog',
-			'BLOG_LEFT_COLUMN'	=> BLOG_LEFT_COLUMN_WIDTH,
 			'IN_HOME'			=> is_home(),
 
 		//	'U_WEB'				=> append_sid($web_path),
@@ -277,7 +334,7 @@ class phpbb
 			'U_BLOG'			=> append_sid($blog_path),
 
 			'PAGE_TITLE'		=> $wp_title,
-			'BLOG_HEADER'		=> self::wp_page_header($blog_path),
+			'BLOG_HEADER'		=> self::wp_page_header(),
 			'S_DISPLAY_SEARCH'	=> false,
 			'S_CLOCK'			=> self::clock(),
 
@@ -286,69 +343,37 @@ class phpbb
 			'L_LOGIN_LOGOUT'	=> (!is_user_logged_in()) ? self::$user->lang['LOGIN'] : sprintf(self::$user->lang['LOGOUT_USER'], self::$user->data['username']),
 			'U_WP_ACP'			=> (self::$user->data['user_type'] == USER_FOUNDER) ? admin_url() : '',
 
-			'T_THEME_PATH'			=> "{$web_path}styles/" . self::$user->theme['theme_path'] . '/theme',
-			'T_STYLESHEET_LINK'		=> (!self::$user->theme['theme_storedb']) ? "{$web_path}styles/" . self::$user->theme['theme_path'] . '/theme/stylesheet.css' : append_sid("{$web_path}style." . PHP_EXT, 'id=' . self::$user->theme['style_id'] . '&amp;lang=' . self::$user->data['user_lang']),
+			'T_THEME_PATH'		=> "{$web_path}styles/" . self::$user->theme['theme_path'] . '/theme',
+			'T_STYLESHEET_LINK'	=> (!self::$user->theme['theme_storedb']) ? "{$web_path}styles/" . self::$user->theme['theme_path'] . '/theme/stylesheet.css' : append_sid("{$web_path}style." . PHP_EXT, 'id=' . self::$user->theme['style_id'] . '&amp;lang=' . self::$user->data['user_lang']),
 		));
 		
 		if (is_404() || is_category() || is_day() || is_month() || is_year() || is_search() || is_paged())
 		{
 			self::wp_notes();
 		}
-		
+	}
+
+	/**
+	 * Enter description here...
+	 * See also WordPress root/wp-content/theme/prosilver/functions.php
+	 *
+	 * @return unknown
+	 */
+	public static function wp_page_header()
+	{
+		$blog_header = "\n";
+		$blog_header .= '<link rel="pingback" href="' . wp_do_action('bloginfo', 'pingback_url') . '" />' . "\n";
+
+		add_action('wp_head', 'wp_prosilver_stylesheet');
+		add_action('wp_head', 'wp_prosilver_javascript');
+
+
 		/* Always have wp_head() just before the closing </head>
 		 * tag of your theme, or you will break many plugins, which
 		 * generally use this hook to add elements to <head> such
 		 * as styles, scripts, and meta tags.
 		 */
-	//	wp_head();
-	}
-
-	/**
-	 * @description: Generate the clock time
-	 * @param: 				$gmepoch = a date;
-	 * @return: (string) 	$time . $midnight = a formated hour HH:MM:SS am/pm
-	 * @version: OK
-	 */
-	public static function clock($gmepoch = '')
-	{
-		$zone_offset = (int) self::$user->timezone + (int) self::$user->dst;
-
-		$date = preg_split('/(H:i|g:i)/', self::$user->lang['default_dateformat']);
-
-		$gmepoch = ($gmepoch) ? $gmepoch : time();
-
-		$time = gmdate('H:i:s', $gmepoch + $zone_offset);
-
-		list($h, $m, $s) = explode(':', $time);
-		$midnight = ( (int) $h > 12) ? ' pm' : ' am';
-
-		self::$template->assign_vars(array(
-			'CURRENT_DATE'	=> sprintf(self::$user->lang['CURRENT_TIME'], self::$user->format_date(time() + $zone_offset, $date[0], true)),
-			'CURRENT_TIME'	=> $time . $midnight,
-		));
-
-		return true;
-	}
-
-	public static function wp_page_header($blog_path = '')
-	{
-		$blog_header  = get_the_generator('xhtml') . "\n";
-		$blog_header .= '<link rel="pingback" href="' . get_bloginfo('pingback_url') . '" />' . "\n";
-		$blog_header .= '<link rel="alternate" type="application/rss+xml" title="' . get_bloginfo('name') . ' - RSS Feed' . '" href="' . get_bloginfo('rss2_url') . '" />' . "\n";
-
-	//	$blog_header .= '<link rel="stylesheet" href="' . $blog_path . '/wp-admin/css/colors-classic.css" type="text/css" media="screen" />' . "\n";
-		$blog_header .= '<link rel="stylesheet" href="' . get_bloginfo('stylesheet_directory') . '/style.css" type="text/css" media="screen" />' . "\n";
-
-		$blog_header .= '<script type="text/javascript" src="' . get_bloginfo('stylesheet_directory') . '/js/javascript.js"></script>' . "\n";
-
-		// jQuery for resply to comments
-		if (is_single())
-		{
-		//	$blog_header .= '<script type="text/javascript" src="'. $blog_path .'/wp-includes/js/jquery/jquery.js"></script>' . "\n";
-			$blog_header .= '<script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>' . "\n";
-		//	$blog_header .= '<script type="text/javascript" src="http://dev.jquery.com/view/trunk/plugins/validate/jquery.validate.js"></script>' . "\n";
-			$blog_header .= '<script type="text/javascript" src=" '. get_bloginfo('stylesheet_directory') .'/js/jquery.validate.js"></script>' . "\n";
-		}
+		$blog_header .= wp_do_action('wp_head');
 
 		return $blog_header;
 	}
@@ -418,10 +443,10 @@ class phpbb
 			self::phpbb_the_autor_full($post->post_author, true, false);
 		}
 
-		$wp_list_pages = (defined('LIST_PAGES') && LIST_PAGES) ? wp_list_pages(array('title_li' => '', 'echo' => 0)) : '';
-		$wp_get_archives = (defined('LIST_ARCHIVES') && LIST_ARCHIVES) ? wp_get_archives(array('type=monthly', 'echo' => 0)) : '';
-		$wp_list_categories = (defined('LIST_CATEGORIES') && LIST_CATEGORIES) ? wp_list_categories(array('title_li' => '', 'echo' => 0)) : '';
-		$wp_tag_cloud = (defined('LIST_TAGCLOUD') && LIST_CATEGORIES) ? wp_tag_cloud(array('separator' => ", ", 'echo' => 0)) : '';
+		$wp_list_pages = (self::$config['wp_phpbb_bridge_list_pages']) ? wp_list_pages(array('title_li' => '', 'echo' => 0)) : '';
+		$wp_get_archives = (self::$config['wp_phpbb_bridge_list_archives']) ? wp_get_archives(array('type=monthly', 'echo' => 0)) : '';
+		$wp_list_categories = (self::$config['wp_phpbb_bridge_list_categories']) ? wp_list_categories(array('title_li' => '', 'echo' => 0)) : '';
+		$wp_tag_cloud = (self::$config['wp_phpbb_bridge_list_tagclouds']) ? wp_tag_cloud(array('separator' => ", ", 'echo' => 0)) : '';
 
 		$wp_list_bookmarks = $wp_register = $wp_meta = false;
 	/**
@@ -435,7 +460,7 @@ class phpbb
 		}
 	**/
 		self::$template->assign_vars(array(
-			'SIDEBAR_WP_SEARCHFORM'			=> (defined('SIDEBAR_SEARCHFORM') && SIDEBAR_SEARCHFORM) ? true : false,
+			'SIDEBAR_WP_SEARCHFORM'			=> (self::$config['wp_phpbb_bridge_search_form']) ? true : false,
 			'U_WP_SEARCHFORM'				=> get_bloginfo('url'),
 			'SEARCH_QUERY'					=> esc_attr(apply_filters('the_search_query', get_search_query(false))),
 
@@ -621,7 +646,7 @@ class phpbb
 		
 		if ($is_commen)
 		{
-			$row['user_avatar_width'] = $row['user_avatar_height'] = COMMENT_AVATAR_WIDTH;
+			$row['user_avatar_width'] = $row['user_avatar_height'] = self::$config['wp_phpbb_bridge_comments_avatar_width'];
 		}
 
 		$user_cache = array(
@@ -720,7 +745,7 @@ class phpbb
 
 		//	'ONLINE_IMG'			=> ($poster_id == ANONYMOUS || !self::$config['load_onlinetrack']) ? '' : (($user_cache['online']) ? self::$user->img('icon_user_online', 'ONLINE') : self::$user->img('icon_user_offline', 'OFFLINE')),
 		//	'S_ONLINE'				=> ($poster_id == ANONYMOUS || !self::$config['load_onlinetrack']) ? false : (($user_cache['online']) ? true : false),
-			'POSTER_AVATAR'			=> ($user_cache['avatar'] !== false) ? (($user_cache['avatar']) ? $user_cache['avatar'] : get_avatar($wp_poster_id, COMMENT_AVATAR_WIDTH)) : '',
+			'POSTER_AVATAR'			=> ($user_cache['avatar'] !== false) ? (($user_cache['avatar']) ? $user_cache['avatar'] : get_avatar($wp_poster_id, self::$config['wp_phpbb_bridge_comments_avatar_width'])) : '',
 			'RANK_TITLE'			=> $user_cache['rank_title'],
 			'RANK_IMG'				=> $user_cache['rank_image'],
 			'RANK_IMG_SRC'			=> $user_cache['rank_image_src'],
@@ -785,11 +810,6 @@ class phpbb
 		}
 
 		return $blog_footer;
-	}
-
-	function wp_phpbb_hook()
-	{
-		
 	}
 
 	/**
@@ -997,22 +1017,6 @@ class phpbb
 
 		self::page_footer(true, 'login_body.html');
 	}
-
-	/**
-	* Update a user's postcount
-	*
-	* @param int $user_id The user_id
-	* @param string $direction (+, -)
-	* @param int $amount The amount to add or subtract
-	*/
-	public static function update_user_postcount($user_id, $direction = '+', $amount = 1)
-	{
-		$sql = 'UPDATE ' . USERS_TABLE . '
-			SET user_posts = user_posts ' . (($direction == '+') ? '+' : '-') . ' ' . (int) $amount .
-				(($direction == '+') ? ', user_lastpost_time = ' . time() : '') . '
-			WHERE user_id = ' . (int) $user_id;
-		self::$db->sql_query($sql);
-	}
 }
 
 /**
@@ -1049,7 +1053,6 @@ function wp_generate_pagination($base_url, $num_items, $per_page, $on_page)
 
 		for ($i = $start_cnt + 1; $i < $end_cnt; $i++)
 		{
-		//	$page_string .= ($i == $on_page) ? '<strong>' . $i . '</strong>' : '<a href="' . $base_url . "{$url_delim}cpage=" . $i . (($i > 1) ? '#comments' : '') . '">' . $i . '</a>';
 			$page_string .= ($i == $on_page) ? '<strong>' . $i . '</strong>' : '<a href="' . $base_url . "{$url_delim}cpage=" . $i . '">' . $i . '</a>';
 			if ($i < $end_cnt - 1)
 			{
@@ -1065,7 +1068,6 @@ function wp_generate_pagination($base_url, $num_items, $per_page, $on_page)
 
 		for ($i = 2; $i < $total_pages; $i++)
 		{
-		//	$page_string .= ($i == $on_page) ? '<strong>' . $i . '</strong>' : '<a href="' . $base_url . "{$url_delim}cpage=" . $i . (($i > 1) ? '#comments' : '') . '">' . $i . '</a>';
 			$page_string .= ($i == $on_page) ? '<strong>' . $i . '</strong>' : '<a href="' . $base_url . "{$url_delim}cpage=" . $i . '">' . $i . '</a>';
 			if ($i < $total_pages)
 			{
@@ -1074,7 +1076,6 @@ function wp_generate_pagination($base_url, $num_items, $per_page, $on_page)
 		}
 	}
 
-//	$page_string .= ($on_page == $total_pages) ? '<strong>' . $total_pages . '</strong>' : '<a href="' . $base_url . "{$url_delim}cpage=" . $total_pages . (($i > 1) ? '#comments' : '') . '">' . $total_pages . '</a>';
 	$page_string .= ($on_page == $total_pages) ? '<strong>' . $total_pages . '</strong>' : '<a href="' . $base_url . "{$url_delim}cpage=" . $total_pages . '">' . $total_pages . '</a>';
 
 	return $page_string;
@@ -1088,9 +1089,6 @@ function wp_generate_pagination($base_url, $num_items, $per_page, $on_page)
  */
 function wp_topic_generate_pagination($url, $replies, $per_page)
 {
-	// Make sure $per_page is a valid value
-//	$per_page = ($config['posts_per_page'] <= 0) ? 1 : $config['posts_per_page'];
-
 	if (($replies + 1) > $per_page)
 	{
 		$total_pages = ceil(($replies + 1) / $per_page);
@@ -1099,7 +1097,6 @@ function wp_topic_generate_pagination($url, $replies, $per_page)
 		$times = 1;
 		for ($j = 0; $j < $replies + 1; $j += $per_page)
 		{
-		//	$pagination .= '<a href="' . $url . ($j == 0 ? '' : '&amp;cpage=' . $times) . (($times > 1) ? '#comments' : '') . '">' . $times . '</a>';
 			$pagination .= '<a href="' . $url . ($j == 0 ? '' : '&amp;cpage=' . $times) . '">' . $times . '</a>';
 			if ($times == 1 && $total_pages > 5)
 			{
@@ -1123,4 +1120,63 @@ function wp_topic_generate_pagination($url, $replies, $per_page)
 
 	return $pagination;
 }
+
+/**
+ * Capture the output of a function, which simply echo's a string. 
+ * 	Capture the echo into a variable without actually echo'ing the string. 
+ * 	You can do so by leveraging PHP's output buffering functions. Here's how you do it:
+ *
+ * @param string $tag The name of the action to be executed.
+ * @param mixed $arg,... Optional additional arguments which are passed on to the functions hooked to the action.
+ * @return null Will return null if $tag does not exist in $wp_filter array
+ */
+function wp_do_action($tag)
+{
+	// Retrieve arguments list
+    $_args = func_get_args();
+
+    // Delete the first argument which is the class name
+    $_className = array_shift($_args);
+
+	ob_start();
+
+	call_user_func_array($tag, $_args);
+
+	$echo = ob_get_contents();
+
+	ob_end_clean();
+
+	return $echo;
+}
+
+/**
+ * Load the correct database class file.
+ *
+ * This function is used to load the database class file either at runtime or by
+ * wp-admin/setup-config.php. We must globalize $wpdb to ensure that it is
+ * defined globally by the inline code in wp-db.php.
+ *
+ * @since 2.5.0
+ * @global $wpdb WordPress Database Object
+ * 
+ * Based off : wordpress 3.1.3
+ * File : wordpress/wp-includes/load.php
+ */
+function phpbb_get_wp_db()
+{
+	global $wpdb;
+
+	require_once(ABSPATH . WPINC . '/wp-db.php');
+	if ( file_exists(WP_CONTENT_DIR . '/db.php'))
+	{
+		require_once(WP_CONTENT_DIR . '/db.php');
+	}
+
+	$wpdb = new wpdb(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST);
+
+	$wpdb ->set_prefix(WP_TABLE_PREFIX);
+
+	return $wpdb;
+}
+
 ?>

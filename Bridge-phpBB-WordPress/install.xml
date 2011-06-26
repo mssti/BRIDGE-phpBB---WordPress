@@ -30,7 +30,7 @@
 
 		</author-group>
 
-		<mod-version>0.0.1</mod-version>
+		<mod-version>0.0.2</mod-version>
 
 		<installation>
 			<level>easy</level>
@@ -39,6 +39,13 @@
 		</installation>
 
 		<history>
+			<entry>
+				<date>2011-06-26</date>
+				<rev-version>0.0.2</rev-version>
+				<changelog lang="en">
+					<change> Several improvements</change>
+				</changelog>
+			</entry>
 			<entry>
 				<date>2011-06-20</date>
 				<rev-version>0.0.1</rev-version>
@@ -148,7 +155,7 @@ if (!function_exists('make_clickable'))
 			<edit>
 				<find><![CDATA[@import url("colours.css");]]></find>
 				<action type="before-add"><![CDATA[/* MOD : WordPress - phpBB Integration Mod - START */
-@import url("wp_phpbb_plugin.css");
+@import url("wp_phpbb_bridge.css");
 /* MOD : WordPress - phpBB Integration Mod - END */
 ]]></action>
 			</edit>

@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.8 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/theme/prosilver
- * @version: $Id: comments.php, v 0.0.1 2011/06/20 11:06:20 leviatan21 Exp $
+ * @version: $Id: comments.php, v0.0.2 2011/06/26 11:06:26 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -22,13 +22,11 @@ add_filter('next_comments_link_attributes', 'prosilver_next_comments_link_attrib
 
 function prosilver_previous_comments_link_attributes()
 {
-//	'S_CONTENT_FLOW_BEGIN'	=> ($user->lang['DIRECTION'] == 'ltr') ? 'left' : 'right',
 	return ' class="left-box ' . ((phpbb::$user->lang['DIRECTION'] == 'ltr') ? 'left' : 'right') . '" ';
 }
 
 function prosilver_next_comments_link_attributes()
 {
-//	'S_CONTENT_FLOW_END'	=> ($user->lang['DIRECTION'] == 'ltr') ? 'right' : 'left',
 	return ' class="right-box ' . ((phpbb::$user->lang['DIRECTION'] == 'ltr') ? 'right' : 'left') . '" ';
 }
 
@@ -45,7 +43,7 @@ $defaults = array(
 	'type' => 'all',
 	'page' => '',
 	'per_page' => '',
-	'avatar_size' => COMMENT_AVATAR_WIDTH,
+	'avatar_size' => phpbb::$config['wp_phpbb_bridge_comments_avatar_width'],
 	'reverse_top_level' => null,
 	'reverse_children' => ''
 );
@@ -102,7 +100,7 @@ function prosilver_comment($comment, $args, $depth)
 		'U_MINI_POST'		=> apply_filters('the_permalink', get_permalink()) . "#comment-$comment_id",
 		'S_POST_UNAPPROVED'	=> ($status == 'unapproved') ? true : false,
 		'S_POST_REPORTED'	=> ($status == 'spam') ? true : false,
-		'MESSAGE'			=> wp_comment_text($comment_id),
+		'MESSAGE'			=> wp_do_action('comment_text', $comment_id),
 	);
 
 	$autor = phpbb::phpbb_the_autor_full($comment->user_id, false, true);
