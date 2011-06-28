@@ -17,9 +17,9 @@
  * Hierarchy :
  * 
  * functions.php
- * wp_phpbb_bridge.php
- * wp_phpbb_constants.php
- * wp_phpbb_core.php
+ * includes/wp_phpbb_bridge.php
+ * includes/wp_phpbb_constants.php
+ * includes/wp_phpbb_core.php
  * index.php
  */
 

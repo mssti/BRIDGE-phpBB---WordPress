@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.8 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/theme/prosilver
- * @version: $Id: wp_phpbb_core.php, v0.0.2 2011/06/26 11:06:26 leviatan21 Exp $
+ * @version: $Id: wp_phpbb_core.php, v0.0.3 2011/06/28 11:06:28 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -362,11 +362,18 @@ class phpbb
 	public static function wp_page_header()
 	{
 		$blog_header = "\n";
-		$blog_header .= '<link rel="pingback" href="' . wp_do_action('bloginfo', 'pingback_url') . '" />' . "\n";
+		$blog_header .= '<link rel="pingback" href="' . get_bloginfo('pingback_url') . '" />' . "\n";
 
-		add_action('wp_head', 'wp_prosilver_stylesheet');
+		// Main layout 1 column
+		$blog_header .= '<link rel="stylesheet" type="text/css" media="all" href="' . get_bloginfo('stylesheet_url') . '" />' . "\n";
+
+		// Extra layout 2 columns
+		if (is_active_sidebar('prosilver-widget-area') || is_single())
+		{
+			add_action('wp_head', 'wp_prosilver_stylesheet');
+		}
+
 		add_action('wp_head', 'wp_prosilver_javascript');
-
 
 		/* Always have wp_head() just before the closing </head>
 		 * tag of your theme, or you will break many plugins, which
@@ -433,8 +440,6 @@ class phpbb
 	 */
 	public static function page_sidebar()
 	{
-		$wp_list_pages = $wp_get_archives = $wp_list_categories = $wp_tag_cloud = '';
-
 		// Author information 
 		$post_ID = request_var('p', 0);
 		if (is_single() && $post_ID)
@@ -443,64 +448,28 @@ class phpbb
 			self::phpbb_the_autor_full($post->post_author, true, false);
 		}
 
-		$wp_list_pages = (self::$config['wp_phpbb_bridge_list_pages']) ? wp_list_pages(array('title_li' => '', 'echo' => 0)) : '';
-		$wp_get_archives = (self::$config['wp_phpbb_bridge_list_archives']) ? wp_get_archives(array('type=monthly', 'echo' => 0)) : '';
-		$wp_list_categories = (self::$config['wp_phpbb_bridge_list_categories']) ? wp_list_categories(array('title_li' => '', 'echo' => 0)) : '';
-		$wp_tag_cloud = (self::$config['wp_phpbb_bridge_list_tagclouds']) ? wp_tag_cloud(array('separator' => ", ", 'echo' => 0)) : '';
-
-		$wp_list_bookmarks = $wp_register = $wp_meta = false;
-	/**
-		// If this is the frontpage
-		if (is_home() || is_page())
-		{
-			$wp_list_bookmarks = wp_list_bookmarks(array('echo' => 0));
-			$wp_register = wp_register('', false);
-			$wp_loginout = wp_loginout('', false);
-			$wp_meta = wp_meta();
-		}
-	**/
-		self::$template->assign_vars(array(
-			'SIDEBAR_WP_SEARCHFORM'			=> (self::$config['wp_phpbb_bridge_search_form']) ? true : false,
-			'U_WP_SEARCHFORM'				=> get_bloginfo('url'),
-			'SEARCH_QUERY'					=> esc_attr(apply_filters('the_search_query', get_search_query(false))),
-
-			'SIDEBAR_WP_PAGES_LIST'			=> $wp_list_pages,
-			'SIDEBAR_WP_ARCHIVES_LIST'		=> $wp_get_archives,
-			'SIDEBAR_WP_CATEGORIES'			=> $wp_list_categories,
-		#	'SIDEBAR_WP_BOOKMARKS_LIST'		=> $wp_list_bookmarks,
-		#	'SIDEBAR_WP_REGISTER'			=> $wp_register,
-		#	'SIDEBAR_WP_LOGINOUT'			=> $wp_loginout,
-		#	'SIDEBAR_WP_META'				=> $wp_meta,
-		#	'SIDEBAR_WP_VALIDATOR'			=> '<a href="http://validator.w3.org/check/referer" title="' . __('This page validates as XHTML 1.0 Transitional') . '">' . __('Valid <abbr title="eXtensible HyperText Markup Language">XHTML</abbr>') . '</a>',
-		#	'SIDEBAR_WP_FRIENDS'			=> '<a href="http://gmpg.org/xfn/"><abbr title="' . __('XHTML Friends Network') . '">' . __('XFN') . '</abbr></a>',
-		#	'SIDEBAR_WP_WORDPRESS'			=> '<a href="http://wordpress.org/" title="' . __('Powered by WordPress, state-of-the-art semantic personal publishing platform.') . '">WordPress</a>',
-			'SIDEBAR_WP_TAG_CLOUD'			=> "<li>$wp_tag_cloud</li>",
-		));
+		get_sidebar();
 	}
 
 	/**
 	 * Allows you to display a list of recent topics within a specific forum id's.
 	 *
 	 */
-	public static function phpbb_recet_topics()
+	public static function phpbb_recet_topics($instance, $defaults)
 	{
-		$defaults = array(
-			'title'				=> 'Latest posts',
-			'forums'			=> 0,	// array(1)	// array(1,2)
-			'total'				=> 10,
-			'showForum'			=> true,
-			'showUsername'		=> true,
-			'showTotalViews'	=> true,
-			'showTotalPosts'	=> true,
-		);
-
-		if (!is_array($defaults['forums']))
+		// Only run this widget on index page
+		if (!is_home() || !is_front_page())
 		{
-			$defaults['forums'] = array($defaults['forums']);
+			return false;
 		}
-		if ($defaults['forums'][0] == 0)
+
+		$instance = wp_parse_args($instance, $defaults);
+
+		$instance['forums'] = explode(',', $instance['forums']);
+
+		if ($instance['forums'][0] == 0)
 		{
-			$defaults['forums'] = self::$auth->acl_getf('f_read', true);
+			$instance['forums'] = array_keys(self::$auth->acl_getf('f_read', true));
 		}
 
 		$sql_array = array(
@@ -521,7 +490,7 @@ class phpbb
 					'ON' => 't.topic_poster = u.user_id',
 				),
 			),
-			'WHERE' => self::$db->sql_in_set('t.forum_id', array_keys($defaults['forums'])) . '
+			'WHERE' => self::$db->sql_in_set('t.forum_id', $instance['forums']) . '
 				AND t.topic_status <> ' . ITEM_MOVED . '
 				AND t.topic_approved = 1
 					OR t.forum_id = 0', //OR t.forum_id = 0, esta linea es para que muestre tambien los globales ya que el id del foro de estos es 0
@@ -529,7 +498,7 @@ class phpbb
 		);
 
 		$sql = self::$db->sql_build_query('SELECT', $sql_array);
-		$result = self::$db->sql_query_limit($sql, (int) $defaults['total']);
+		$result = self::$db->sql_query_limit($sql, (int) $instance['total']);
 
 		while ($row = self::$db->sql_fetchrow($result))
 		{
@@ -558,14 +527,14 @@ class phpbb
 				'TOPIC_TITLE' 	=> $topic_data['topic_title'],
 				'U_VIEW_TOPIC'	=> self::append_sid("viewtopic", array('f' => $topic_data['forum_id'], 't' => $topic_data['topic_id'])),
 
-				'FORUM_NAME' 	=> ($defaults['showForum']) ? $topic_data['forum_name'] : '',
+				'FORUM_NAME' 	=> ($instance['showForum']) ? $topic_data['forum_name'] : '',
 				'U_VIEW_FORUM'	=> self::append_sid("viewforum", array('f' => $topic_data['forum_id'])),
 
 			//	'TOPIC_FOLDER_IMG_SRC'	=> self::$user->img($folder_img, $folder_alt, false, '', 'src'),
-				'REPLIES'		=> ($defaults['showTotalPosts']) ? $topic_data['topic_replies'] : '',
-				'VIEWS'			=> ($defaults['showTotalViews']) ? $topic_data['topic_views'] : '',
+				'REPLIES'		=> ($instance['showTotalPosts']) ? $topic_data['topic_replies'] : '',
+				'VIEWS'			=> ($instance['showTotalViews']) ? $topic_data['topic_views'] : '',
 
-				'TOPIC_AUTHOR_FULL'		=> ($defaults['showTotalPosts']) ? get_username_string('full', $topic_data['topic_poster'], $topic_data['topic_first_poster_name'], $topic_data['topic_first_poster_colour']) : '',
+				'TOPIC_AUTHOR_FULL'		=> ($instance['showTotalPosts']) ? get_username_string('full', $topic_data['topic_poster'], $topic_data['topic_first_poster_name'], $topic_data['topic_first_poster_colour']) : '',
 				'FIRST_POST_TIME'		=> self::$user->format_date($topic_data['topic_time']),
 
 				'U_LAST_POST'			=> self::append_sid("viewtopic", array('f' => $topic_data['forum_id'], 't' => $topic_data['topic_id'], 'p'=> $topic_data['topic_last_post_id'] . '#p' . $topic_data['topic_last_post_id'])),
@@ -575,8 +544,9 @@ class phpbb
 		}
 
 		self::$template->assign_vars(array(
-			'S_RECENT_TOPICS' => sizeof($topic_list),
-			'LAST_POST_IMG'	=> self::$user->img('icon_topic_latest', 'VIEW_LATEST_POST'),
+			'L_RECENT_TOPICS'	=> ($instance['title']) ? $instance['title'] : phpbb::$user->lang['WP_TITLE_RECENT_TOPICS'],
+			'S_RECENT_TOPICS'	=> sizeof($topic_list),
+			'LAST_POST_IMG'		=> self::$user->img('icon_topic_latest', 'VIEW_LATEST_POST'),
 		));
  	}
 
@@ -756,7 +726,7 @@ class phpbb
 			'POSTER_AGE'			=> $user_cache['age'],
 			'SIGNATURE'				=> $user_cache['sig'],
 
-			'ICQ_STATUS_IMG'		=> $user_cache['icq_status_img'],
+		//	'ICQ_STATUS_IMG'		=> $user_cache['icq_status_img'],
 			'U_PROFILE'		=> $user_cache['profile'],
 		//	'U_SEARCH'		=> $user_cache['search'],
 		//	'U_PM'			=> ($poster_id != ANONYMOUS && self::$config['allow_privmsg'] && self::$auth->acl_get('u_sendpm') && ($user_cache['allow_pm'] || self::$auth->acl_gets('a_', 'm_') || self::$auth->acl_getf_global('m_'))) ? self::append_sid("ucp", 'i=pm&amp;mode=compose&amp;action=quotepost&amp;p=' . $row['post_id']) : '',
@@ -802,7 +772,9 @@ class phpbb
 		$blog_footer  = '&nbsp;|&nbsp;Powered by <a href="http://wordpress.org/" title="Semantic Personal Publishing Platform" rel="generator" id="site-generator" onclick="window.open(this.href);return false;">WordPress</a>&nbsp;|&nbsp;Bridge by <a href="http://www.mssti.com/phpbb3" title="Micro Software &amp; Servicio Técnico Informático" onclick="window.open(this.href);return false;">.:: MSSTI ::.</a><br />';
 		$blog_footer .= '<!-- If you\'d like to support WordPress, having the "powered by" link somewhere on your blog is the best way; it\'s our only promotion or advertising. -->' . "\n";
 		$blog_footer .= sprintf(self::$user->lang['WP_RSS_NOTES'], '<a href="' . get_bloginfo('rss2_url') . '">' . self::$user->lang['WP_RSS_ENRIES_LINK'] . '</a>', '<a href="' . get_bloginfo('comments_rss2_url') . '">' . self::$user->lang['WP_RSS_COMMENTS_LINK'] . '</a><br />');
-		
+
+	//	$blog_footer .= wp_do_action('wp_footer');
+
 		// Output page creation time
 		if (defined('WP_DEBUG') and WP_DEBUG == true)
 		{

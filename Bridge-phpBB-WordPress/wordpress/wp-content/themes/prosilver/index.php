@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.8 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/theme/prosilver
- * @version: $Id: index.php, v0.0.2 2011/06/26 11:06:26 leviatan21 Exp $
+ * @version: $Id: index.php, v0.0.3 2011/06/28 11:06:28 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -71,13 +71,11 @@ phpbb::$template->assign_vars(array(
 	'PREVIOUS_ENTRIE'	=> ($wp_query->max_num_pages > 1) ? get_previous_posts_link(phpbb::$user->lang['PREVIOUS_ENTRIE']) : '',
 ));
 
-if (phpbb::$config['wp_phpbb_bridge_recent_topics'])
-{
-	phpbb::phpbb_recet_topics();
-}
+/** Recent Topics is managed within WP widgets : WP_Widget_phpbb_recet_topics **/
 
 phpbb::page_sidebar();
 
 phpbb::page_footer();
+
 
 ?>

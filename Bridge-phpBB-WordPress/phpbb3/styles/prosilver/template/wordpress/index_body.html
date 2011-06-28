@@ -19,11 +19,21 @@
 		<br />
 	<!-- ENDIF -->
 
+	<!-- IF WIDGET_TEXT -->
+		<div class="panel" id="wp_widget_text">
+			<div class="inner"><span class="corners-top"><span></span></span>
+			{WIDGET_TEXT}
+			<span class="corners-bottom"><span></span></span></div>
+		</div><!-- .panel //-->
+		<br />
+	<!-- ENDIF -->
+
 	<!-- IF IN_SINGLE -->
 		<!-- INCLUDE wordpress/viewtopic_body.html -->
 	<!-- ELSE -->
 		<!-- INCLUDE wordpress/topiclist_body.html -->
 	<!-- ENDIF -->
+	
 	</div><!-- #content //-->
 </div><!-- #container //-->
 

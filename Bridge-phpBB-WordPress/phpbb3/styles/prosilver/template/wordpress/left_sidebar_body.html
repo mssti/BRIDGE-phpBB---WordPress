@@ -2,90 +2,9 @@
 	<!-- IF POST_AUTHOR -->
 		<!-- INCLUDE wordpress/author_body.html -->
 	<!-- ENDIF -->
-	
-	<!-- IF SIDEBAR_WP_SEARCHFORM and not (IN_SEARCH or IN_ERROR) -->
-		<div class="panel bg3">
-			<div class="inner"><span class="corners-top"><span></span></span>
-				<h3>{L_WP_TITLE_SEARCH}</h3>
-				<form method="get" id="searchform" action="{U_WP_SEARCHFORM}/">
-					<fieldset>
-						<input type="text" class="medium search" value="{SEARCH_QUERY}" name="s" id="s" />
-						<input type="submit" class="button2" value="{L_SEARCH}" id="searchsubmit" />
-					</fieldset>
-				</form>
-			<span class="corners-bottom"><span></span></span></div>
-		</div>
-	<!-- ENDIF -->
 
-	<!-- IF SIDEBAR_WP_PAGES_LIST -->
-		<div class="panel bg3">
-			<div class="inner"><span class="corners-top"><span></span></span>
-				<h3>{L_WP_TITLE_PAGES}</h3>
-				<ul class="menu">
-					{SIDEBAR_WP_PAGES_LIST}
-				</ul>
-			<span class="corners-bottom"><span></span></span></div>
-		</div>
-	<!-- ENDIF -->
-
-	<!-- IF SIDEBAR_WP_ARCHIVES_LIST -->
-		<div class="panel bg3">
-			<div class="inner"><span class="corners-top"><span></span></span>
-				<h3>{L_WP_TITLE_ARCHIVES}</h3>
-				<ul class="menu">
-					{SIDEBAR_WP_ARCHIVES_LIST}
-				</ul>
-			<span class="corners-bottom"><span></span></span></div>
-		</div>
-	<!-- ENDIF -->
-
-	<!-- IF SIDEBAR_WP_CATEGORIES -->
-		<div class="panel bg3">
-			<div class="inner"><span class="corners-top"><span></span></span>
-				<h3>{L_WP_TITLE_CATEGORIES}</h3>
-				<ul class="menu">
-					{SIDEBAR_WP_CATEGORIES}
-				</ul>
-			<span class="corners-bottom"><span></span></span></div>
-		</div>
-	<!-- ENDIF -->
-
-	<!-- IF SIDEBAR_WP_BOOKMARKS_LIST or SIDEBAR_WP_REGISTER or SIDEBAR_WP_LOGINOUT or SIDEBAR_WP_VALIDATOR or SIDEBAR_WP_FRIENDS or SIDEBAR_WP_WORDPRESS -->
-		<div class="panel bg3">
-			<div class="inner"><span class="corners-top"><span></span></span>
-				<h3>{L_WP_TITLE_BOOKMARKS}</h3>
-				<ul class="menu">
-					<!-- IF SIDEBAR_WP_BOOKMARKS_LIST -->{SIDEBAR_WP_BOOKMARKS_LIST}<!-- ENDIF -->
-					<!-- IF SIDEBAR_WP_REGISTER --><li>{SIDEBAR_WP_REGISTER}</li><!-- ENDIF -->
-					<!-- IF SIDEBAR_WP_LOGINOUT --><li>{SIDEBAR_WP_LOGINOUT}</li><!-- ENDIF -->
-					<!-- IF SIDEBAR_WP_VALIDATOR --><li>{SIDEBAR_WP_VALIDATOR}</li><!-- ENDIF -->
-					<!-- IF SIDEBAR_WP_FRIENDS --><li>{SIDEBAR_WP_FRIENDS}</li><!-- ENDIF -->
-					<!-- IF SIDEBAR_WP_WORDPRESS --><li>{SIDEBAR_WP_WORDPRESS}</li><!-- ENDIF -->
-				</ul>
-			<span class="corners-bottom"><span></span></span></div>
-		</div>
-	<!-- ENDIF -->
-
-	<!-- IF SIDEBAR_WP_META -->
-		<div class="panel bg3">
-			<div class="inner"><span class="corners-top"><span></span></span>
-				<h3>{L_WP_TITLE_META}</h3>
-				<ul class="menu">
-					{SIDEBAR_WP_META}
-				</ul>
-			<span class="corners-bottom"><span></span></span></div>
-		</div>
-	<!-- ENDIF -->
-
-	<!-- IF SIDEBAR_WP_TAG_CLOUD -->
-		<div class="panel bg3">
-			<div class="inner"><span class="corners-top"><span></span></span>
-				<h3>{L_WP_TITLE_TAG_CLOUD}</h3>
-				<ul class="menu">
-					{SIDEBAR_WP_TAG_CLOUD}
-				</ul>
-			<span class="corners-bottom"><span></span></span></div>
-		</div>
+	<!-- IF DYNAMIC_SIDEBAR -->
+	{DYNAMIC_SIDEBAR}
 	<!-- ENDIF -->
 
 	<!-- IF IN_HOME and S_RECENT_TOPICS -->
@@ -97,7 +16,7 @@
 				<ul class="topiclist">
 					<li class="header">
 						<dl class="icon">
-							<dt>{L_LAST_POST}</dt>
+							<dt>{L_RECENT_TOPICS}</dt>
 						</dl>
 					</li>
 				</ul>

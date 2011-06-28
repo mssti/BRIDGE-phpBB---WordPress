@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.8 :: BRIDGE phpBB & WordPress -> root/language/en/mods :: [en][English]
- * @version: $Id: wp_phpbb_bridge.php, v0.0.2 2011/06/26 11:06:26 leviatan21 Exp $
+ * @version: $Id: wp_phpbb_bridge.php, v0.0.3 2011/06/28 11:06:28 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -70,6 +70,7 @@ $lang = array_merge($lang, array(
 	'WP_TITLE_TAG_CLOUD'		=> 'Cloud tags',
 	'WP_TITLE_BOOKMARKS'		=> 'Bookmarks',
 	'WP_TITLE_META'				=> 'Meta',
+	'WP_TITLE_RECENT_TOPICS'	=> 'Recent Topics',
 
 	// Search
 	'WP_TITLE_SEARCH'				=> 'Blog Search',
