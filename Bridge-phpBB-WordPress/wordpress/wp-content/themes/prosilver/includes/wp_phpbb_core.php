@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.8 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/theme/prosilver
- * @version: $Id: wp_phpbb_core.php, v0.0.3 2011/06/28 11:06:28 leviatan21 Exp $
+ * @version: $Id: wp_phpbb_core.php, v0.0.3-pl1 2011/07/02 11:07:02 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -12,6 +12,7 @@
 /**
  * @ignore
  */
+
 if (!defined('IN_WP_PHPBB_BRIDGE'))
 {
 	exit;
@@ -42,6 +43,14 @@ class phpbb
 
 	/** @var user phpBB User class */
 	public static $user;
+
+	/**
+	 * Absolute Wordpress and Board Path
+	 *
+	 * @var string
+	 */
+	public static $absolute_path;
+	public static $absolute_board;
 
 	/**
 	 * Static Constructor.
@@ -220,25 +229,26 @@ class phpbb
 	*/
 	public static function wp_get_config()
 	{
+		$wp_phpbb_bridge_permissions_forum_id	= (isset(self::$config['wp_phpbb_bridge_permissions_forum_id'])	 && self::$config['wp_phpbb_bridge_permissions_forum_id']	!= 0) ? self::$config['wp_phpbb_bridge_permissions_forum_id']	: ((defined('WP_PHPBB_BRIDGE_PERMISSIONS_FORUM_ID')	 && WP_PHPBB_BRIDGE_PERMISSIONS_FORUM_ID  != false) ? WP_PHPBB_BRIDGE_PERMISSIONS_FORUM_ID	: 2);
+		$wp_phpbb_bridge_post_forum_id			= (isset(self::$config['wp_phpbb_bridge_post_forum_id'])		 && self::$config['wp_phpbb_bridge_post_forum_id']			!= 0) ? self::$config['wp_phpbb_bridge_post_forum_id']			: ((defined('WP_PHPBB_BRIDGE_POST_FORUM_ID')		 && WP_PHPBB_BRIDGE_POST_FORUM_ID		  != false) ? WP_PHPBB_BRIDGE_POST_FORUM_ID			: 2);
+		$wp_phpbb_bridge_left_column_width		= (isset(self::$config['wp_phpbb_bridge_left_column_width'])	 && self::$config['wp_phpbb_bridge_left_column_width']		!= 0) ? self::$config['wp_phpbb_bridge_left_column_width']		: ((defined('WP_PHPBB_BRIDGE_LEFT_COLUMN_WIDTH')	 && WP_PHPBB_BRIDGE_LEFT_COLUMN_WIDTH	  != false) ? WP_PHPBB_BRIDGE_LEFT_COLUMN_WIDTH		: 300);
+		$wp_phpbb_bridge_comments_avatar_width	= (isset(self::$config['wp_phpbb_bridge_comments_avatar_width']) && self::$config['wp_phpbb_bridge_comments_avatar_width']	!= 0) ? self::$config['wp_phpbb_bridge_comments_avatar_width']	: ((defined('WP_PHPBB_BRIDGE_COMMENTS_AVATAR_WIDTH') && WP_PHPBB_BRIDGE_COMMENTS_AVATAR_WIDTH != false) ? WP_PHPBB_BRIDGE_COMMENTS_AVATAR_WIDTH	: 32);
+		
 		self::$config = array_merge(self::$config, array(
 			// For the moment the ID of you forum where to use permissions ( like $auth->acl_get('f_reply') )
-			'wp_phpbb_bridge_permissions_forum_id'		=> 2,
+			'wp_phpbb_bridge_permissions_forum_id'	=> (int) $wp_phpbb_bridge_permissions_forum_id,
+			// For the moment the ID of you forum where to post a new entry whenever is published in the Wordpress
+			'wp_phpbb_bridge_post_forum_id'			=> (int) $wp_phpbb_bridge_post_forum_id,
 			// The left column width, in pixels
-			'wp_phpbb_bridge_left_column_width'			=> 300,
+			'wp_phpbb_bridge_left_column_width'		=> (int) $wp_phpbb_bridge_left_column_width,
 			// The width size of avatars in comments, in pixels
-			'wp_phpbb_bridge_comments_avatar_width'		=> 32,
-			// Display a block with latest topics in left sidebar
-			'wp_phpbb_bridge_recent_topics'				=> 1,
-			// Display a block with a list of pages in left sidebar
-			'wp_phpbb_bridge_list_pages'				=> 1,
-			// Display a block with a list of archives in left sidebar
-			'wp_phpbb_bridge_list_archives'				=> 1,
-			// Display a block with a list of categories in left sidebar
-			'wp_phpbb_bridge_list_categories'			=> 1,
-			// Display a block with tag clouds in left sidebar
-			'wp_phpbb_bridge_list_tagclouds'			=> 1,
-			// Display the search block
-			'wp_phpbb_bridge_search_form'				=> 1,
+			'wp_phpbb_bridge_comments_avatar_width'	=> (int) $wp_phpbb_bridge_comments_avatar_width,
+			// Display a block with latest topics, it's a WP widget
+			// Display a block with a list of pages, it's a WP widget
+			// Display a block with a list of archives, it's a WP widget
+			// Display a block with a list of categories, it's a WP widget
+			// Display a block with tag clouds, it's a WP widget
+			// Display the search block, it's a WP widget
 		));
 	}
 
@@ -291,9 +301,9 @@ class phpbb
 	public static function page_header($page_title = '')
 	{
 		// Determine board url - we may need it later
-		$board_url = generate_board_url() . '/';
+		$board_url = generate_board_url(false) . '/';
 		$web_path = (defined('PHPBB_USE_BOARD_URL_PATH') && PHPBB_USE_BOARD_URL_PATH) ? $board_url : PHPBB_ROOT_PATH;
-		$blog_path = get_option( 'siteurl' );
+		$blog_path = get_option('siteurl');
 
 		/**
 		 * Print the <title> tag based on what is being viewed.
@@ -367,13 +377,8 @@ class phpbb
 		// Main layout 1 column
 		$blog_header .= '<link rel="stylesheet" type="text/css" media="all" href="' . get_bloginfo('stylesheet_url') . '" />' . "\n";
 
-		// Extra layout 2 columns
-		if (is_active_sidebar('prosilver-widget-area') || is_single())
-		{
-			add_action('wp_head', 'wp_prosilver_stylesheet');
-		}
-
-		add_action('wp_head', 'wp_prosilver_javascript');
+		// Some js files
+		add_action('wp_head', 'wp_phpbb_javascript');
 
 		/* Always have wp_head() just before the closing </head>
 		 * tag of your theme, or you will break many plugins, which
@@ -548,6 +553,13 @@ class phpbb
 			'S_RECENT_TOPICS'	=> sizeof($topic_list),
 			'LAST_POST_IMG'		=> self::$user->img('icon_topic_latest', 'VIEW_LATEST_POST'),
 		));
+
+		// Make sure we set up the sidebar style
+		if (!did_action('wp_phpbb_stylesheet'))
+		{
+			// Extra layout 2 columns
+			add_action('wp_head', 'wp_phpbb_stylesheet');
+		}
  	}
 
 	/**
@@ -785,6 +797,24 @@ class phpbb
 	}
 
 	/**
+	* Set the custom template path for titania
+	*/
+	public static function set_custom_template()
+	{
+		phpbb::$user->theme['template_path'] = self::$config->style;
+		phpbb::$template->set_custom_template(TITANIA_ROOT . 'styles/' . self::$config->style . '/' . 'template', 'titania_' . self::$config->style);
+		phpbb::$user->theme['template_storedb'] = phpbb::$template->orig_tpl_storedb = false;
+
+		// Inherit from the boards prosilver (currently required for the Captcha)
+		if (self::$config->style !== 'default')
+		{
+			phpbb::$user->theme['template_inherits_id'] = phpbb::$template->orig_tpl_inherits_id = 1; // Doesn't seem to matter what number I put in here...
+			phpbb::$user->theme['template_inherit_path'] = 'default';
+			phpbb::$template->inherit_root = TITANIA_ROOT . 'styles/default/template';
+		}
+	}
+
+	/**
 	* Generate login box or verify password
 	*/
 	function login_box($redirect = '', $l_explain = '', $l_success = '', $admin = false, $s_display = true)
@@ -795,7 +825,6 @@ class phpbb
 		{
 			include($phpbb_root_path . 'includes/captcha/captcha_factory.' . $phpEx);
 		}
-	//	self::_include('captcha/captcha_factory', 'phpbb_captcha_factory');
 		self::$user->add_lang('ucp');
 
 		$err = '';

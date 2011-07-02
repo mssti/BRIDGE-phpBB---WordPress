@@ -50,7 +50,7 @@ Tags: blue, phpbb, full width, two columns
 	margin-top: 0;
 }
 /** Topics & Posts **/
-.section-blog .postbody {
+.section-blog .postbodyfull {
 	width: 100%;
 }
 .section-blog .postbody h3.first img {
@@ -59,6 +59,10 @@ Tags: blue, phpbb, full width, two columns
 }
 .section-blog .postbody .content {
 	font-size: 1.3em;
+	border-top: 1px solid #CCCCCC;
+}
+.section-blog .postbody .content p {
+	font-size: 1.1em;
 }
 .section-blog .notice {
 	margin-top: 0;

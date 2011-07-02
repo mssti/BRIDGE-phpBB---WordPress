@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.8 :: BRIDGE phpBB & WordPress -> root/language/en/mods :: [en][English]
- * @version: $Id: wp_phpbb_bridge.php, v0.0.3 2011/06/28 11:06:28 leviatan21 Exp $
+ * @version: $Id: wp_phpbb_bridge.php, v0.0.3-pl1 2011/07/02 11:07:02 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -76,13 +76,14 @@ $lang = array_merge($lang, array(
 	'WP_TITLE_SEARCH'				=> 'Blog Search',
 	'WP_SEARCH_NOT_FOUND'			=> 'Not Found',
 	'WP_SEARCH_NOT_FOUND_EXPLAIN'	=> 'Sorry, but you are looking for something that isn’t here.',
+	'WP_JUMP_TO_POST'				=> 'Jump to entrie',
 
 	// WP entries
 	'WP_POST_NOT_FOUND_EXPLAIN'	=> 'Apologies, but no results were found for the requested archive. Perhaps searching will help find a related post.',
 	'WP_READ_MORE'				=> 'Read full enry »',
 	'WP_POSTED_IN'				=> 'Posted in: %s',
 	'WP_FOLLOW_FEED'			=> 'You can follow any responses to this entry through the <a href="%s">RSS 2.0</a> feed.',
-	'WP_YES_COMMENT_YES_PING'	=> 'You can <a href="#respond">leave a response</a>, or <a href="%s" rel="trackback">trackback</a> from your own site.',
+	'WP_YES_COMMENT_YES_PING'	=> 'You can <a href="%1$s#respond">leave a response</a>, or <a href="%2$s" rel="trackback">trackback</a> from your own site.',
 	'WP_NO_COMMENT_YES_PING'	=> 'Responses are currently closed, but you can <a href="%s" rel="trackback">trackback</a> from your own site.',
 	'WP_YES_COMMENT_NO_PING'	=> 'You can skip to the end and leave a response. Pinging is currently not allowed.',
 	'WP_NO_COMMENT_NO_PING'		=> 'Both comments and pings are currently closed.',
@@ -147,6 +148,10 @@ $lang = array_merge($lang, array(
 	'WP_TITLE_ARCHIVE_YEAR_EXPLAIN'		=> 'You are currently browsing the <a href="%1$s/">%2$s</a> blog archives for the year %3$s.',
 	'WP_TITLE_ARCHIVE_SEARCH_EXPLAIN' 	=> 'You have searched the <a href="%1$s/">%2$s</a> blog archives for <strong>&#8216;%3$s&#8217;</strong>.',
 
+	// pbpbb posting 
+	'WP_SUBJECT_BLOG_PREFIX'			=> '[BLOG]: ',
+	'WP_POST_BLOG_PREFIX'				=> 'This is a [b]Blog entry[/b]. To read the original post, please Click » %1$s HERE %2$s',
+	'WP_POST_BLOG_TAIL'					=> '[b]Entry details: [/b]',
 ));
 
 ?>

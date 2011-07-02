@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.8 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/theme/prosilver
- * @version: $Id: wp_phpbb_bridge.php, v0.0.2 2011/06/26 11:06:26 leviatan21 Exp $
+ * @version: $Id: wp_phpbb_bridge.php, v0.0.3-pl1 2011/07/02 11:07:02 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -34,11 +34,6 @@ $wp_user = wp_get_current_user();
 // Version number (only used for the installer)
 @define('WP_PHPBB_BRIDGE_VERSION', '0.0.1');
 
-if (!defined('PHPBB_USE_BOARD_URL_PATH'))
-{
-	@define('PHPBB_USE_BOARD_URL_PATH', true);
-}
-
 // Without this we cannot include phpBB 3.0.x scripts.
 if (!defined('IN_PHPBB'))
 {
@@ -51,6 +46,19 @@ if (!file_exists(WP_PHPBB_BRIDGE_ROOT . 'includes/wp_phpbb_constants.' . PHP_EXT
 	die('<p>No "Bridge" constant found. Check the "' . WP_PHPBB_BRIDGE_ROOT . 'includes/wp_phpbb_constants.' . PHP_EXT . '" file.</p>');
 }
 require(WP_PHPBB_BRIDGE_ROOT . 'includes/wp_phpbb_constants.' . PHP_EXT);
+
+// Some often used path constants
+if (!defined('PHPBB_ROOT_PATH'))
+{
+	if (defined('WP_ADMIN') && WP_ADMIN == true)
+	{
+		define('PHPBB_ROOT_PATH', '../' . $wp_phpbb_bridge_config['phpbb_root_path']);
+	}
+	else
+	{
+		define('PHPBB_ROOT_PATH', $wp_phpbb_bridge_config['phpbb_root_path']);
+	}
+}
 
 // Make that phpBB itself understands out paths
 $phpbb_root_path = PHPBB_ROOT_PATH;
@@ -69,6 +77,11 @@ if (!file_exists(PHPBB_ROOT_PATH . 'common.' . PHP_EXT))
 	die('<p>No "phpBB" common found. Check the "' . PHPBB_ROOT_PATH . 'common.' . PHP_EXT . '" file.</p>');
 }
 require(PHPBB_ROOT_PATH . 'common.' . PHP_EXT);
+
+if (!defined('PHPBB_USE_BOARD_URL_PATH'))
+{
+	@define('PHPBB_USE_BOARD_URL_PATH', true);
+}
 
 // Initialise phpbb
 phpbb::initialise();

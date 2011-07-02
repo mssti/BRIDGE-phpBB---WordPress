@@ -11,9 +11,9 @@
 		<!-- ENDIF -->
 
 		<!-- BEGIN postrow -->
-		<div class="post<!-- IF postrow.S_FIRST_ROW --> bg3<!-- ELSE --><!-- IF postrow.POST_ID is odd --> bg2<!-- ELSE --> bg1<!-- ENDIF --><!-- ENDIF --><!-- IF (postrow.S_POST_UNAPPROVED or postrow.S_POST_REPORTED) --> reported<!-- ENDIF -->" id="<!-- IF postrow.S_COMMENT -->comment-{postrow.POST_ID}<!-- ELSE -->post-{postrow.POST_ID}<!-- ENDIF -->">
+		<div class="post<!-- IF postrow.S_FIRST_ROW --> bg3<!-- ELSE --><!-- IF postrow.S_ROW_COUNT is odd --> bg2<!-- ELSE --> bg1<!-- ENDIF --><!-- ENDIF --><!-- IF (postrow.S_POST_UNAPPROVED or postrow.S_POST_REPORTED) --> reported<!-- ENDIF -->" id="<!-- IF postrow.S_COMMENT -->comment-{postrow.POST_ID}<!-- ELSE -->post-{postrow.POST_ID}<!-- ENDIF -->">
 			<div class="inner"><span class="corners-top"><span></span></span>
-				<div class="postbody">
+				<div class="postbody<!-- IF DYNAMIC_SIDEBAR and postrow.S_FIRST_ROW--> postbodyfull<!-- ELSEIF not postrow.S_FIRST_ROW --> postbodyfull<!-- ENDIF -->">
 				<!-- IF not S_IS_BOT -->
 					<!-- IF postrow.S_POST_ACTIONS and (postrow.U_POST_EDIT or postrow.U_POST_DELETE or postrow.U_POST_TRASH or postrow.U_POST_SPAM or postrow.U_POST_UNSPAM or postrow.U_POST_APPROVE or postrow.U_POST_UNAPPROVE) -->
 					<ul class="profile-icons">
@@ -45,9 +45,7 @@
 						</p>
 					<!-- ENDIF -->
 
-					<div class="entry">{postrow.MESSAGE}</div>
-
-					<!-- IF postrow.SIGNATURE --><div id="sig-{postrow.POST_ID}" class="signature">{postrow.SIGNATURE}</div><!-- ENDIF -->
+					<div class="entry content">{postrow.MESSAGE}</div>
 
 					<!-- IF not postrow.S_COMMENT and ( postrow.POST_TAGS or postrow.POST_CATS or postrow.POST_EDIT or postrow.POST_COMENT or postrow.U_FOLLOW_FEED) -->
 					<div class="postmetadata alt notice">
@@ -63,17 +61,22 @@
 					</div>
 					<!-- ENDIF -->
 
+					<!-- IF postrow.SIGNATURE --><div id="sig-{postrow.POST_ID}" class="signature">{postrow.SIGNATURE}</div><!-- ENDIF -->
+
 				</div>
+				<!-- IF postrow.S_FIRST_ROW and not DYNAMIC_SIDEBAR -->
+					<!-- INCLUDE wordpress/author_body.html -->				
+				<!-- ENDIF -->
 			<span class="corners-bottom"><span></span></span></div>
 		</div>
 
-		<!-- IF postrow.S_FIRST_ROW and POST_REPLIES --><h3 id="comments">{POST_REPLIES}</h3><!-- ENDIF -->
+		<!-- IF postrow.S_FIRST_ROW and POST_REPLIES --><br /><h4 id="comments">{POST_REPLIES}</h4><!-- ENDIF -->
 		<hr class="divider" />
 
 		<!-- END postrow -->
 
 		<!-- IF PREVIOUS_PAGE or NEXT_PAGE -->
-		<br />
+		<hr />
 		<div style="text-align: center;"><!-- IF PREVIOUS_PAGE -->{PREVIOUS_PAGE}<!-- ENDIF --><strong>{TOTAL_POSTS}</strong> &bull; {PAGE_NUMBER}<!-- IF NEXT_PAGE -->{NEXT_PAGE}<!-- ENDIF --></div>
 		<!-- ENDIF -->
 
@@ -84,7 +87,7 @@
 				<!-- IF S_IS_LOCKED -->
 					<div class="locked-icon"><a href="#" title="{L_TOPIC_LOCKED}"><span></span>{L_TOPIC_LOCKED_SHORT}{L_POST_REPLY}</a></div>
 				<!-- ELSE -->
-					<div class="reply-icon"><a href="javascript:quickreply_toggle();" title="{L_POST_REPLY}"><span></span>{L_POST_REPLY}</a></div>
+					<div class="reply-icon"><a id="reply-button" title="{L_POST_REPLY}"><span></span>{L_POST_REPLY}</a></div>
 				<!-- ENDIF -->
 			</div>
 		<!-- ENDIF -->
@@ -98,5 +101,7 @@
 		</div>
 
 	<!-- IF not S_IS_BOT and not S_IS_LOCKED -->
-		<div id="respond"><!-- INCLUDE wordpress/posting_body.html --></div>
+		<div id="respond">
+			<!-- INCLUDE wordpress/posting_body.html -->
+		</div>
 	<!-- ENDIF -->

@@ -2,12 +2,16 @@
 /**
  * 
  * @package: phpBB 3.0.8 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/theme/prosilver
- * @version: $Id: index.php, v0.0.3 2011/06/28 11:06:28 leviatan21 Exp $
+ * @version: $Id: index.php, v0.0.3-pl1 2011/07/02 11:07:02 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
  * 
  */
+
+/**
+* @ignore
+**/
 
 require_once('includes/wp_phpbb_bridge.php'); 
 
@@ -43,7 +47,7 @@ if (have_posts())
 			'PAGINATION'		=> wp_topic_generate_pagination(apply_filters('the_permalink', get_permalink()), (int) get_comments_number($post_id), (int) get_option('comments_per_page')),
 			'U_FOLLOW_FEED'		=> sprintf(phpbb::$user->lang['WP_FOLLOW_FEED'], get_post_comments_feed_link($post_id)),
 			// Both Comments and Pings are open
-			'U_YES_COMMENT_YES_PING'	=> (('open' == $post-> comment_status) && ('open' == $post->ping_status)) ? sprintf(phpbb::$user->lang['WP_YES_COMMENT_YES_PING'], get_trackback_url()) : '',
+			'U_YES_COMMENT_YES_PING'	=> (('open' == $post-> comment_status) && ('open' == $post->ping_status)) ? sprintf(phpbb::$user->lang['WP_YES_COMMENT_YES_PING'], get_permalink(), get_trackback_url()) : '',
 			// Only Pings are Open
 			'U_NO_COMMENT_YES_PING'		=> (!('open' == $post-> comment_status) && ('open' == $post->ping_status)) ? sprintf(phpbb::$user->lang['WP_NO_COMMENT_YES_PING'], get_trackback_url()) : '',
 			// Comments are open, Pings are not
@@ -60,8 +64,6 @@ if (have_posts())
 	}
 }
 
-phpbb::page_header(phpbb::$user->lang['INDEX']);
-
 // Assign index specific vars
 phpbb::$template->assign_vars(array(
 	'IN_SINGLE'			=> false,
@@ -72,10 +74,10 @@ phpbb::$template->assign_vars(array(
 ));
 
 /** Recent Topics is managed within WP widgets : WP_Widget_phpbb_recet_topics **/
-
 phpbb::page_sidebar();
 
-phpbb::page_footer();
+phpbb::page_header(phpbb::$user->lang['INDEX']);
 
+phpbb::page_footer();
 
 ?>

@@ -1,6 +1,11 @@
 
-	<!-- IF POST_AUTHOR -->
-		<!-- INCLUDE wordpress/author_body.html -->
+	<!-- IF POST_AUTHOR and DYNAMIC_SIDEBAR -->
+		<div class="panel bg3">
+			<div class="inner"><span class="corners-top"><span></span></span>
+				<h3>{L_WP_AUTHOR_TITLE}</h3>
+				<!-- INCLUDE wordpress/author_body.html -->
+			<span class="corners-bottom"><span></span></span></div>
+		</div>
 	<!-- ENDIF -->
 
 	<!-- IF DYNAMIC_SIDEBAR -->

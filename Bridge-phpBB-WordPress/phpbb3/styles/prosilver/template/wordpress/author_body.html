@@ -1,8 +1,4 @@
-		<div class="panel bg3">
-			<div class="inner"><span class="corners-top"><span></span></span>
-				<h3>{L_WP_AUTHOR_TITLE}</h3>
-
-		<dl id="profile{POSTER_ID}">
+		<dl <!-- IF not DYNAMIC_SIDEBAR -->class="postprofile" <!-- ENDIF -->id="profile{POSTER_ID}">
 			<dt>
 				<!-- IF POSTER_AVATAR -->
 					<!-- IF U_POST_AUTHOR --><a href="{U_POST_AUTHOR}">{POSTER_AVATAR}</a><!-- ELSE -->{POSTER_AVATAR}<!-- ENDIF --><br />
@@ -28,8 +24,8 @@
 			<dd><strong>{custom_fields.PROFILE_FIELD_NAME}:</strong> {custom_fields.PROFILE_FIELD_VALUE}</dd>
 		<!-- END custom_fields -->
 
-	<!-- IF not S_IS_BOT -->
-		<!-- IF U_PM or U_EMAIL or U_WWW or U_MSN or U_ICQ or U_YIM or U_AIM or U_JABBER -->
+		<!-- IF not S_IS_BOT -->
+			<!-- IF U_PM or U_EMAIL or U_WWW or U_MSN or U_ICQ or U_YIM or U_AIM or U_JABBER -->
 			<dd>
 				<ul class="profile-icons">
 					<!-- IF U_PM --><li class="pm-icon"><a href="{U_PM}" title="{L_PRIVATE_MESSAGE}"><span>{L_PRIVATE_MESSAGE}</span></a></li><!-- ENDIF -->
@@ -42,11 +38,7 @@
 					<!-- IF U_JABBER --><li class="jabber-icon"><a href="{U_JABBER}" onclick="popup(this.href, 550, 320); return false;" title="{L_JABBER}"><span>{L_JABBER}</span></a></li><!-- ENDIF -->
 				</ul>
 			</dd>
+			<!-- ENDIF -->
 		<!-- ENDIF -->
-	<!-- ENDIF -->
 
 		</dl>
-
-			<span class="corners-bottom"><span></span></span></div>
-		</div>
-

@@ -2,12 +2,16 @@
 /**
  * 
  * @package: phpBB 3.0.8 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/theme/prosilver
- * @version: $Id: single.php, v0.0.3 2011/06/28 11:06:28 leviatan21 Exp $
+ * @version: $Id: single.php, v0.0.3-pl1 2011/07/02 11:07:02 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
  * 
  */
+
+/**
+* @ignore
+**/
 
 require_once('includes/wp_phpbb_bridge.php'); 
 
@@ -48,7 +52,7 @@ if (have_posts())
 			'POST_CATS'			=> sprintf(phpbb::$user->lang['WP_POSTED_IN'], get_the_category_list(', ')),
 			'U_FOLLOW_FEED'		=> sprintf(phpbb::$user->lang['WP_FOLLOW_FEED'], get_post_comments_feed_link($post_id)),
 			// Both Comments and Pings are open
-			'U_YES_COMMENT_YES_PING'	=> (('open' == $post-> comment_status) && ('open' == $post->ping_status)) ? sprintf(phpbb::$user->lang['WP_YES_COMMENT_YES_PING'], get_trackback_url()) : '',
+			'U_YES_COMMENT_YES_PING'	=> (('open' == $post-> comment_status) && ('open' == $post->ping_status)) ? sprintf(phpbb::$user->lang['WP_YES_COMMENT_YES_PING'], get_permalink(), get_trackback_url()) : '',
 			// Only Pings are Open
 			'U_NO_COMMENT_YES_PING'		=> (!('open' == $post-> comment_status) && ('open' == $post->ping_status)) ? sprintf(phpbb::$user->lang['WP_NO_COMMENT_YES_PING'], get_trackback_url()) : '',
 			// Comments are open, Pings are not
@@ -67,6 +71,10 @@ if (have_posts())
 		phpbb::$template->assign_block_vars('postrow', $postrow);
 	}
 
+	// Let us decide which comments text display and for who can see it
+	add_filter('query', 'wp_phpbb_query_filter');
+
+	// Loads the comment template
 	comments_template('/comments.php', true);
 
 	// comments are opened
@@ -144,10 +152,46 @@ if (have_posts())
 	));
 }
 
-phpbb::page_header(phpbb::$user->lang['INDEX']);
-
 phpbb::page_sidebar();
 
+phpbb::page_header(phpbb::$user->lang['INDEX']);
+
 phpbb::page_footer();
+
+/**
+ * Let us decide which comments text display and for who can see it
+ * 	http://codex.wordpress.org/Custom_Queries
+ *
+ * @uses apply_filters() Calls 'wp_phpbb_query_filter' hook on the comment query
+ * @param (string) $query : the query we are running now
+ * @return (string) $query : a new query 
+ */
+function wp_phpbb_query_filter($query)
+{
+	$query_comment = array(
+		'from' 	=> array(
+			'is_registered' => "AND (comment_approved = '1' OR ( user_id = " . trim(phpbb::$user->data['wp_user']['ID']) . " AND comment_approved = '0' ) )",
+			'is_anonymous' => "WHERE comment_approved = '1' AND"
+		),
+		'to'	=> array(
+			'is_registered' => "",
+			'is_anonymous' => "WHERE"
+		),
+	);
+
+	if (strpos($query, $query_comment['from']['is_registered']) !== false)
+	{
+		$query = str_replace($query_comment['from']['is_registered'], $query_comment['to']['is_registered'], $query);
+		remove_filter('query', 'query_filter');
+	}
+
+	if (strpos($query, $query_comment['from']['is_anonymous']) !== false)
+	{
+		$query = str_replace($query_comment['from']['is_anonymous'], $query_comment['to']['is_anonymous'], $query);
+		remove_filter('query', 'query_filter');
+	}
+
+	return $query;
+}
 
 ?>

@@ -1,9 +1,16 @@
 
-		<div id="quickreply" style="display: none;">
+		<div id="quickreply">
 			<script type="text/javascript">
 			// <![CDATA[
-			$(document).ready(function(){
-				$("#commentform").validate({
+			var $jQ_validation=jQuery;
+
+			$jQ_validation("#reply-button").click(function (){
+				$jQ_validation("#quickreply").slideToggle("fast");
+			});
+
+			$jQ_validation(document).ready(function(){
+				$jQ_validation("#quickreply").hide();
+				$jQ_validation("#commentform").validate({
 					rules: {
 					<!-- IF not S_USER_LOGGED_IN -->
 						author: {
@@ -53,7 +60,7 @@
 			<form action="{U_ACTION}" method="post" id="commentform">
 				<div class="panel bg3">
 					<div class="inner"><span class="corners-top"><span></span></span>
-						<h3 id="respond">{L_POST_REPLY}</h3>
+						<h3>{L_POST_REPLY}</h3>
 						<fieldset class="fields1">
 							<!-- IF S_USER_LOGGED_IN -->
 							<dl style="clear: left;">
