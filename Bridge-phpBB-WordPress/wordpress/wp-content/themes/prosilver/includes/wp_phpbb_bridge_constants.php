@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.8 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/theme/prosilver
- * @version: $Id: wp_phpbb_constants.php, v0.0.3-pl1 2011/07/02 11:07:02 leviatan21 Exp $
+ * @version: $Id: wp_phpbb_bridge_constants.php, v0.0.4 2011/07/04 11:07:04 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -29,38 +29,69 @@ if (!defined('IN_WP_PHPBB_BRIDGE'))
 $wp_phpbb_bridge_config = array(
 	/**
 	* Relative path to the phpBB installation.
+	*	True for enable the Bridge and false for disable the Bridge
 	*
-	* @param	string	$phpbb_root_path	Path relative from the wordpress root path.
+	* @param	boolean	$phpbb_bridge 
+	*/
+
+	'phpbb_bridge'	=> true,
+	/**
+	* Relative path to the phpBB installation.
+	*	Path relative from the wordpress root path.
+	*
+	* @param	string	$phpbb_root_path
 	*/
 //	'phpbb_root_path' => '../phpBB/',
-//	Example for localhost :	
+	//	Example for localhost :	
 	'phpbb_root_path' => '../foro/',
 
 	/**
 	* Relative path from the server root (generate_board_url(true))
+	*	Path to the phpBB folder
 	*
-	* @param	string	Path to the phpBB folder
+	* @param	string	$phpbb_script_path
 	*/
 //	'phpbb_script_path' => 'phpBB/',
-//	Example for localhost :	
+	//	Example for localhost :	
 	'phpbb_script_path' => 'phpbb/quickinstall/boards/wp_phpbb_bridge/foro/',
 
 	/**
 	* Relative path from the server root (generate_board_url(true))
+	*	Path to the wordpress folder
 	*
-	* @param	string	Path to the wordpress folder
+	* @param	string	$wordpress_script_path
 	*/
 //	'wordpress_script_path' => 'wordpress/',
-//	Example for localhost :	
+	//	Example for localhost :	
 	'wordpress_script_path' => 'phpbb/quickinstall/boards/wp_phpbb_bridge/wordpress/',
-);
 
-/**
- * Extra 
- */
-define('WP_PHPBB_BRIDGE_PERMISSIONS_FORUM_ID', 2);
-define('WP_PHPBB_BRIDGE_LEFT_COLUMN_WIDTH', 300);
-define('WP_PHPBB_BRIDGE_COMMENTS_AVATAR_WIDTH', 32);
-define('WP_PHPBB_BRIDGE_POST_FORUM_ID', 0);
+	/**
+	 * The ID of you forum where to use permissions ( like $auth->acl_get('f_reply') )
+	 *
+	 * @param integer $wp_phpbb_bridge_permissions_forum_id
+	 */
+	'wp_phpbb_bridge_permissions_forum_id'	=> 2,
+
+	/**
+	 * The ID of you forum where to post a new entry whenever is published in the Wordpress
+	 *
+	 * @param integer $wp_phpbb_bridge_post_forum_id
+	 */
+	'wp_phpbb_bridge_post_forum_id'			=> 0,
+
+	/**
+	 * The left column width, in pixels
+	 *
+	 * @param integer $wp_phpbb_bridge_left_column_width
+	 */
+	'wp_phpbb_bridge_left_column_width'		=> 300,
+
+	/**
+	 * The width size of avatars in comments, in pixels
+	 *
+	 * @param integer $wp_phpbb_bridge_comments_avatar_width
+	 */
+	'wp_phpbb_bridge_comments_avatar_width'	=> 32,
+);
 
 ?>

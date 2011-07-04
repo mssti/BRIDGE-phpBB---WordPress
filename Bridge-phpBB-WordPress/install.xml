@@ -30,7 +30,7 @@
 
 		</author-group>
 
-		<mod-version>0.0.2</mod-version>
+		<mod-version>0.0.4</mod-version>
 
 		<installation>
 			<level>easy</level>
@@ -39,6 +39,31 @@
 		</installation>
 
 		<history>
+			<entry>
+				<date>2011-06-26</date>
+				<rev-version>0.0.4</rev-version>
+				<changelog lang="en">
+					<change> More about settings + checks + names </change>
+					<change> Now we have a WP Plugin to manage settings too </change>
+					<change> Several improvements</change>
+				</changelog>
+			</entry>
+			<entry>
+				<date>2011-06-26</date>
+				<rev-version>0.0.3-pl1</rev-version>
+				<changelog lang="en">
+					<change> New Path Config Settins + WP_jQuery + Submit Entry to phpBB</change>
+					<change> Several improvements</change>
+				</changelog>
+			</entry>
+			<entry>
+				<date>2011-06-28</date>
+				<rev-version>0.0.3</rev-version>
+				<changelog lang="en">
+					<change> Now we have and manage widgets </change>
+					<change> Several improvements</change>
+				</changelog>
+			</entry>
 			<entry>
 				<date>2011-06-26</date>
 				<rev-version>0.0.2</rev-version>

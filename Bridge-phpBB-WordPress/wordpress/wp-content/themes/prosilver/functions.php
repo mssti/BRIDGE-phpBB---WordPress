@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.8 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/theme/prosilver
- * @version: $Id: functions.php, v0.0.3-pl1 2011/07/02 11:07:02 leviatan21 Exp $
+ * @version: $Id: functions.php, v0.0.4 2011/07/04 11:07:04 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -44,20 +44,149 @@ function wp_phpbb_stylesheet()
  */
 function wp_phpbb_javascript()
 {
-	$blog_javascript = '<script type="text/javascript" src="' . get_bloginfo('stylesheet_directory') . '/js/javascript.js"></script>' . "\n";
+	// javascript for general proposes
+	wp_register_script('javascript', get_bloginfo('stylesheet_directory') . '/js/javascript.js', false, '');
+	wp_enqueue_script('javascript');
+	wp_print_scripts('javascript');
+
 	// jQuery for resply to comments
 	if (is_single())
 	{
-	//	$blog_javascript .= '<script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>' . "\n";
-	//	$blog_javascript .= '<script type="text/javascript" src="http://dev.jquery.com/view/trunk/plugins/validate/jquery.validate.js"></script>' . "\n";
-	//	$blog_javascript .= '<script type="text/javascript" src="' . get_bloginfo('stylesheet_directory') . '/js/jquery-1.5.0.min.js"></script>' . "\n";
-	//	$blog_javascript .= '<script type="text/javascript" src="' . get_bloginfo('stylesheet_directory') . '/js/jquery.validate.js"></script>' . "\n";
 		wp_register_script('jquery', get_bloginfo('stylesheet_directory') . '/js/jquery-1.5.0.min.js', false, '1.5.0');
 		wp_register_script('jquery-validate', get_bloginfo('stylesheet_directory') . '/js/jquery.validate.js', array('jquery'), '1.5.2', true);
 		wp_enqueue_script('jquery-validate');
 		wp_print_scripts('jquery-validate');
 	}
-	echo $blog_javascript;
+}
+
+/**
+ * Pagination routine, generates page number sequence
+ * 
+ * Based off : phpbb3.0.8
+ * File : phpbb/includes/functions.php
+ */
+function wp_generate_pagination($base_url, $num_items, $per_page, $on_page)
+{
+
+	$seperator = '<span class="page-sep">' . phpbb::$user->lang['COMMA_SEPARATOR'] . '</span>';
+	$total_pages = ceil($num_items / $per_page);
+
+	if ($total_pages == 1 || !$num_items)
+	{
+		return false;
+	}
+
+	global $paged;
+	$paged = $on_page;
+
+
+	$url_delim = (strpos($base_url, '?') === false) ? '?' : ((strpos($base_url, '?') === strlen($base_url) - 1) ? '' : '&amp;');
+
+	$page_string = ($on_page == 1) ? '<strong>1</strong>' : '<a href="' . $base_url . '">1</a>';
+	$max_pages = min(ceil($num_items / $total_pages), 4);
+	if ($total_pages > 5)
+	{
+		$start_cnt = min(max(1, $on_page - $max_pages), $total_pages - 5);
+		$end_cnt = max(min($total_pages, $on_page + $max_pages), 6);
+
+		$page_string .= ($start_cnt > 1) ? ' ... ' : $seperator;
+
+		for ($i = $start_cnt + 1; $i < $end_cnt; $i++)
+		{
+			$page_string .= ($i == $on_page) ? '<strong>' . $i . '</strong>' : '<a href="' . $base_url . "{$url_delim}cpage=" . $i . '">' . $i . '</a>';
+			if ($i < $end_cnt - 1)
+			{
+				$page_string .= $seperator;
+			}
+		}
+
+		$page_string .= ($end_cnt < $total_pages) ? ' ... ' : $seperator;
+	}
+	else
+	{
+		$page_string .= $seperator;
+
+		for ($i = 2; $i < $total_pages; $i++)
+		{
+			$page_string .= ($i == $on_page) ? '<strong>' . $i . '</strong>' : '<a href="' . $base_url . "{$url_delim}cpage=" . $i . '">' . $i . '</a>';
+			if ($i < $total_pages)
+			{
+				$page_string .= $seperator;
+			}
+		}
+	}
+
+	$page_string .= ($on_page == $total_pages) ? '<strong>' . $total_pages . '</strong>' : '<a href="' . $base_url . "{$url_delim}cpage=" . $total_pages . '">' . $total_pages . '</a>';
+
+	return $page_string;
+}
+
+/**
+ * Generate topic pagination
+ * 
+ * Based off : phpbb3.0.8
+ * File : phpbb/includes/functions_display.php
+ */
+function wp_topic_generate_pagination($url, $replies, $per_page)
+{
+	if (($replies + 1) > $per_page)
+	{
+		$total_pages = ceil(($replies + 1) / $per_page);
+		$pagination = '';
+
+		$times = 1;
+		for ($j = 0; $j < $replies + 1; $j += $per_page)
+		{
+			$pagination .= '<a href="' . $url . ($j == 0 ? '' : '&amp;cpage=' . $times) . '">' . $times . '</a>';
+			if ($times == 1 && $total_pages > 5)
+			{
+				$pagination .= ' ... ';
+
+				// Display the last three pages
+				$times = $total_pages - 3;
+				$j += ($total_pages - 4) * $per_page;
+			}
+			else if ($times < $total_pages)
+			{
+				$pagination .= '<span class="page-sep">' . phpbb::$user->lang['COMMA_SEPARATOR'] . '</span>';
+			}
+			$times++;
+		}
+	}
+	else
+	{
+		$pagination = '';
+	}
+
+	return $pagination;
+}
+
+/**
+ * Capture the output of a function, which simply echo's a string. 
+ * 	Capture the echo into a variable without actually echo'ing the string. 
+ * 	You can do so by leveraging PHP's output buffering functions. Here's how you do it:
+ *
+ * @param string $tag The name of the action to be executed.
+ * @param mixed $arg,... Optional additional arguments which are passed on to the functions hooked to the action.
+ * @return null Will return null if $tag does not exist in $wp_filter array
+ */
+function wp_do_action($tag)
+{
+	// Retrieve arguments list
+    $_args = func_get_args();
+
+    // Delete the first argument which is the class name
+    $_className = array_shift($_args);
+
+	ob_start();
+
+	call_user_func_array($tag, $_args);
+
+	$echo = ob_get_contents();
+
+	ob_end_clean();
+
+	return $echo;
 }
 
 /**
@@ -234,15 +363,15 @@ class WP_Widget_phpbb_recet_topics extends WP_Widget
  * @param int $priority optional. Used to specify the order in which the functions associated with a particular action are executed (default: 10). Lower numbers correspond with earlier execution, and functions with the same priority are executed in the order in which they were added to the action.
  * @param int $accepted_args optional. The number of arguments the function accept (default 1).
  */
-add_action('publish_post', 'wp_phpbb_phpbb_posting', 10, 2);
+add_action('publish_post', 'wp_phpbb_posting', 10, 2);
 
 /**
  * Called whenever a new entry is published in the Wordpress.
  *
- * @param unknown_type $post_ID
- * @param unknown_type $post
+ * @param integer $post_ID
+ * @param object $post
  */
-function wp_phpbb_phpbb_posting($post_ID, $post)
+function wp_phpbb_posting($post_ID, $post)
 {
 	if ($post->post_status != 'publish')
 	{

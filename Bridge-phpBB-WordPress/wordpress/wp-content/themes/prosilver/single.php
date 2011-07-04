@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.8 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/theme/prosilver
- * @version: $Id: single.php, v0.0.3-pl1 2011/07/02 11:07:02 leviatan21 Exp $
+ * @version: $Id: single.php, v0.0.4 2011/07/04 11:07:04 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -87,7 +87,7 @@ if (have_posts())
 
 		// Assign posting specific vars
 		phpbb::$template->assign_vars(array(
-			'S_LOGGED_AS'			=> sprintf( phpbb::$user->lang['WP_LOGGED_AS_OUT'], admin_url('profile.php'), $user_identity, wp_logout_url(apply_filters('the_permalink', get_permalink($post_id)))),
+			'S_LOGGED_AS'			=> sprintf(phpbb::$user->lang['WP_LOGGED_AS_OUT'], admin_url('profile.php'), $user_identity, wp_logout_url(apply_filters('the_permalink', get_permalink($post_id)))),
 			'U_ACTION'				=> get_option('siteurl') . '/wp-comments-post.php',
 			'S_REPLYTO'				=> wp_nonce_field('replyto-comment', '_ajax_nonce-replyto-comment', false, false),
 			'S_UNFILTEREDHTML'		=> (current_user_can('unfiltered_html')) ? wp_nonce_field('unfiltered-html-comment_' . $post_id, '_wp_unfiltered_html_comment', false, false) : '',
@@ -99,7 +99,7 @@ if (have_posts())
 			'COMMENT_TO_POST_ID'		=> $post_id,
 			'REQUIRED_FIELDS'			=> get_option('require_name_email'),
 
-			'LA_USERNAME_REQUIRED_NOTE'		=> addslashes(sprintf(phpbb::$user->lang['WP_USERNAME_REQUIRED_NOTE'], phpbb::$user->lang['USERNAME'])),
+		//	'LA_USERNAME_REQUIRED_NOTE'		=> addslashes(sprintf(phpbb::$user->lang['WP_USERNAME_REQUIRED_NOTE'], phpbb::$user->lang['USERNAME'])),
 			'LA_EMAIL_REQUIRED_NOTE'		=> addslashes(sprintf(phpbb::$user->lang['WP_EMAIL_REQUIRED_NOTE'], phpbb::$user->lang['EMAIL_ADDRESS'])),
 			'LA_EMAIL_REQUIRED_MINLENGTH'	=> addslashes(sprintf(phpbb::$user->lang['WP_EMAIL_REQUIRED_MINLENGTH'], phpbb::$user->lang['EMAIL_ADDRESS'])),
 			'LA_WEBSITE_REQUIRED_NOTE'		=> addslashes(sprintf(phpbb::$user->lang['WP_WEBSITE_REQUIRED_NOTE'], phpbb::$user->lang['WEBSITE'])),
@@ -170,7 +170,7 @@ function wp_phpbb_query_filter($query)
 {
 	$query_comment = array(
 		'from' 	=> array(
-			'is_registered' => "AND (comment_approved = '1' OR ( user_id = " . trim(phpbb::$user->data['wp_user']['ID']) . " AND comment_approved = '0' ) )",
+			'is_registered' => "AND (comment_approved = '1' OR (user_id = " . trim(phpbb::$user->data['wp_user']['ID']) . " AND comment_approved = '0'))",
 			'is_anonymous' => "WHERE comment_approved = '1' AND"
 		),
 		'to'	=> array(

@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.8 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/theme/prosilver
- * @version: $Id: wp_phpbb_core.php, v0.0.3-pl1 2011/07/02 11:07:02 leviatan21 Exp $
+ * @version: $Id: wp_phpbb_bridge_core.php, v0.0.4 2011/07/04 11:07:04 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -16,6 +16,184 @@
 if (!defined('IN_WP_PHPBB_BRIDGE'))
 {
 	exit;
+}
+
+class bridge
+{
+	/**
+	 * Bridge configuration member
+	 *
+	 * @var bridge_config
+	 */
+	public static $config;
+
+	/**
+	 * Reads a configuration file with an assoc. config array
+	 *
+	 * @param boolean $force	force to update WP settings
+	 */
+	public static function read_config_file($force = false)
+	{
+		$wp_phpbb_bridge_constants = $wp_phpbb_bridge_settings = array('error' => false, 'message' => '', 'action' => '');
+
+		$plugins = (array) get_option('active_plugins', array());
+		$theme	 = get_option('template');
+		$active	 = get_option('wp_phpbb3_bridge');
+		$path	 = get_option('wp_phpbb_root_path');
+
+		// Measn the plugin is not enabbled yet!
+		// or the plugin is not set yet!
+		if (!in_array('wp_phpbb3_bridge_options.php', $plugins) || $active == '' || $path == '')
+		{
+			// Get the proper error and message
+			$wp_phpbb_bridge_settings = self::wp_phpbb_bridge_check($active, $path, $theme);
+
+			// must check that the user has the required capability
+			if (current_user_can('manage_options') && !in_array('wp_phpbb3_bridge_options.php', $plugins))
+			{
+				$redir = admin_url('plugins.php');
+				$wp_phpbb_bridge_settings['action'] = '<a href="' . $redir . '" title="' . esc_attr__('Activate Bridge', '') . '">Activate Bridge</a>';
+			}
+
+			wp_die($wp_phpbb_bridge_settings['message'] . '<br />' . $wp_phpbb_bridge_settings['action']);
+		}
+
+		global $wp_phpbb_bridge_config;
+
+		// First, we check against our own settings
+		if (isset($wp_phpbb_bridge_config) && (isset($wp_phpbb_bridge_config['phpbb_root_path']) && isset($wp_phpbb_bridge_config['phpbb_bridge'])))
+		{
+			$wp_phpbb_bridge_constants = self::wp_phpbb_bridge_check($wp_phpbb_bridge_config['phpbb_bridge'], $wp_phpbb_bridge_config['phpbb_root_path'], $theme);
+
+			// If no error, Now we know that the bridge is enabled and the path is fine
+			// we can continue, but do some extra checks
+			if (!$wp_phpbb_bridge_constants['error'])
+			{
+				if ($force && ($active != $wp_phpbb_bridge_config['phpbb_bridge'] || $path != $wp_phpbb_bridge_config['phpbb_root_path']))
+				{
+					update_option('wp_phpbb3_bridge', $wp_phpbb_bridge_config['phpbb_bridge']);
+					update_option('wp_phpbb_root_path', $wp_phpbb_bridge_config['phpbb_root_path']);
+				}
+				// Means that the bridge is disabled by the Dashboard settings, so we can't continue
+				else if (!$force && ($active != $wp_phpbb_bridge_config['phpbb_bridge'] || $path != $wp_phpbb_bridge_config['phpbb_root_path']))
+				{
+					$wp_phpbb_bridge_constants['error'] = true;
+				}
+
+				$wp_phpbb3_bridge_path = $wp_phpbb_bridge_config['phpbb_root_path'];
+			}
+		}
+
+		// Second, we check against WP settings
+		//	But only if the previous check fails
+		if ($wp_phpbb_bridge_constants['error'])
+		{
+			$wp_phpbb_bridge_settings = self::wp_phpbb_bridge_check(get_option('wp_phpbb3_bridge'), get_option('wp_phpbb_root_path'), $theme);
+
+			// If no error, we can continue, but do some extra checks
+			if (!$wp_phpbb_bridge_settings['error'])
+			{
+			//	$wp_phpbb_bridge_constants['error'] = false;
+				$wp_phpbb3_bridge_path = $wp_phpbb_bridge_settings['phpbb_root_path'];
+			}
+		}
+
+		// If both checks fails, display the proper message
+		if ($wp_phpbb_bridge_constants['error'] || $wp_phpbb_bridge_settings['error'])
+		{
+			if ($wp_phpbb_bridge_settings['error'])
+			{
+				wp_die(__('<h2>Error in WordPress Settings</h2>', 'wp_phpbb3_bridge') . '<br />' . $wp_phpbb_bridge_settings['message'] . '<br />' . $wp_phpbb_bridge_settings['action']);
+			}
+			if ($wp_phpbb_bridge_constants['error'])
+			{
+				wp_die(__('<h2>Error in phpBB Constants</h2>', 'wp_phpbb3_bridge') . '<br />' . $wp_phpbb_bridge_constants['message'] . '<br />' . $wp_phpbb_bridge_settings['action']);
+			}
+		}
+
+		if (defined('WP_ADMIN') && WP_ADMIN == true)
+		{
+			define('PHPBB_ROOT_PATH', '../' . $wp_phpbb3_bridge_path);
+		}
+		else
+		{
+			define('PHPBB_ROOT_PATH', $wp_phpbb3_bridge_path);
+		}
+
+		self::$config = $wp_phpbb_bridge_config;
+
+		// Make that phpBB itself understands out paths
+		global $phpbb_root_path, $phpEx;
+
+		$phpbb_root_path = PHPBB_ROOT_PATH;
+		$phpEx = PHP_EXT;			
+	}
+
+	/**
+	 * Enter description here...
+	 *
+	 * @param (bolean) $active
+	 * @param (string) $path
+	 * @param (string) $theme
+	 * @return (array)
+	 */
+	public static function wp_phpbb_bridge_check($active = false, $path = '../phpBB/', $theme = '')
+	{
+		$error = false;
+		$message = '';
+		$action = '';
+
+		if (!$active)
+		{
+			$error = true;
+			$message .= __('The "BRIDGE phpBB & WordPress" is deactivated', 'wp_phpbb3_bridge');
+		}
+
+		if ($path)
+		{
+			if (!@file_exists($path . 'config.php') || (@!is_dir($path) && @is_file($path)))
+			{
+				$error = true;
+				$message .= __("Could not find path to your former board. Please check your settings and try again.<br />» <samp>$path</samp> was specified as the source path.<br /><br />Cannot activate bridge.", 'wp_phpbb3_bridge');
+			}
+		}
+
+		if ($error)
+		{
+			// must check that the user has the required capability
+			if (current_user_can('manage_options'))
+			{
+				global $wp_phpbb_bridge_config;
+
+				$redir = admin_url('admin.php');
+				$redir = add_query_arg(array('page' => 'wp_phpbb3_bridge', 'wp_phpbb3_bridge' => '1', 'wp_phpbb_root_path' => stripslashes($wp_phpbb_bridge_config['phpbb_root_path'])), $redir);
+
+				$action .= '<a href="' . $redir . '" title="' . esc_attr__('Configure Bridge', '') . '">Configure Bridge</a>';
+			}
+			else
+			{
+				$action .= __('Please notify the system administrator or webmaster', 'wp_phpbb3_bridge');
+			}
+		}
+
+		if ($theme != '' && $theme != 'prosilver')
+		{
+			$error = true;
+			$message .= __('The "Prosilver" theme is deactivated', 'wp_phpbb3_bridge');
+
+			if (current_user_can('switch_themes'))
+			{
+				$redir = admin_url('themes.php');
+				$action .= '<a href="' . $redir . '" title="' . esc_attr__('Activate theme', '') . '">Activate theme</a>';
+			}
+			else
+			{
+				$action .= __('Please notify the system administrator or webmaster', 'wp_phpbb3_bridge');		
+			}
+		}
+
+		return array('error' => $error, 'message' => $message, 'action' => $action);
+	}
 }
 
 /**
@@ -49,8 +227,8 @@ class phpbb
 	 *
 	 * @var string
 	 */
-	public static $absolute_path;
-	public static $absolute_board;
+	public static $absolute_phpbb_script_path;
+	public static $absolute_wordpress_script_path;
 
 	/**
 	 * Static Constructor.
@@ -58,7 +236,7 @@ class phpbb
 	public static function initialise()
 	{
 		global $wpdb;
-		$wpdb = phpbb_get_wp_db();
+		$wpdb = self::wp_phpbb_get_wp_db();
 		
 		global $auth, $config, $db, $template, $user, $cache;
 
@@ -80,6 +258,37 @@ class phpbb
 
 		// enhance phpbb $config data with WP $config data
 		self::wp_get_config();
+	}
+
+	/**
+	 * Load the correct database class file.
+	 *
+	 * This function is used to load the database class file either at runtime or by
+	 * wp-admin/setup-config.php. We must globalize $wpdb to ensure that it is
+	 * defined globally by the inline code in wp-db.php.
+	 *
+	 * @since 2.5.0
+	 * @global $wpdb WordPress Database Object
+	 * 
+	 * Based off : wordpress 3.1.3
+	 * File : wordpress/wp-includes/load.php
+	 */
+	public static function wp_phpbb_get_wp_db()
+	{
+		global $wpdb;
+
+		require_once(ABSPATH . WPINC . '/wp-db.php');
+
+		if (@file_exists(WP_CONTENT_DIR . '/db.php'))
+		{
+			require_once(WP_CONTENT_DIR . '/db.php');
+		}
+
+		$wpdb = new wpdb(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST);
+
+		$wpdb ->set_prefix(WP_TABLE_PREFIX);
+
+		return $wpdb;
 	}
 
 	/**
@@ -176,7 +385,7 @@ class phpbb
 		$user_id = (int) $user_id;
 		$wpuser = array();
 
-		$users = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $wpdb->users WHERE ID = %d LIMIT 1", $user_id ) );
+		$users = $wpdb->get_row($wpdb->prepare("SELECT * FROM $wpdb->users WHERE ID = %d LIMIT 1", $user_id));
 		if (!empty($users))
 		{
 			foreach($users as $id => $value)
@@ -192,7 +401,7 @@ class phpbb
 			);
 		}
 
-		$usermeta = $wpdb->get_results( $wpdb->prepare("SELECT meta_key, meta_value FROM $wpdb->usermeta WHERE user_id = %d ", $user_id));
+		$usermeta = $wpdb->get_results($wpdb->prepare("SELECT meta_key, meta_value FROM $wpdb->usermeta WHERE user_id = %d ", $user_id));
 		if (!empty($usermeta))
 		{
 			foreach($usermeta as $key => $value)
@@ -229,11 +438,11 @@ class phpbb
 	*/
 	public static function wp_get_config()
 	{
-		$wp_phpbb_bridge_permissions_forum_id	= (isset(self::$config['wp_phpbb_bridge_permissions_forum_id'])	 && self::$config['wp_phpbb_bridge_permissions_forum_id']	!= 0) ? self::$config['wp_phpbb_bridge_permissions_forum_id']	: ((defined('WP_PHPBB_BRIDGE_PERMISSIONS_FORUM_ID')	 && WP_PHPBB_BRIDGE_PERMISSIONS_FORUM_ID  != false) ? WP_PHPBB_BRIDGE_PERMISSIONS_FORUM_ID	: 2);
-		$wp_phpbb_bridge_post_forum_id			= (isset(self::$config['wp_phpbb_bridge_post_forum_id'])		 && self::$config['wp_phpbb_bridge_post_forum_id']			!= 0) ? self::$config['wp_phpbb_bridge_post_forum_id']			: ((defined('WP_PHPBB_BRIDGE_POST_FORUM_ID')		 && WP_PHPBB_BRIDGE_POST_FORUM_ID		  != false) ? WP_PHPBB_BRIDGE_POST_FORUM_ID			: 2);
-		$wp_phpbb_bridge_left_column_width		= (isset(self::$config['wp_phpbb_bridge_left_column_width'])	 && self::$config['wp_phpbb_bridge_left_column_width']		!= 0) ? self::$config['wp_phpbb_bridge_left_column_width']		: ((defined('WP_PHPBB_BRIDGE_LEFT_COLUMN_WIDTH')	 && WP_PHPBB_BRIDGE_LEFT_COLUMN_WIDTH	  != false) ? WP_PHPBB_BRIDGE_LEFT_COLUMN_WIDTH		: 300);
-		$wp_phpbb_bridge_comments_avatar_width	= (isset(self::$config['wp_phpbb_bridge_comments_avatar_width']) && self::$config['wp_phpbb_bridge_comments_avatar_width']	!= 0) ? self::$config['wp_phpbb_bridge_comments_avatar_width']	: ((defined('WP_PHPBB_BRIDGE_COMMENTS_AVATAR_WIDTH') && WP_PHPBB_BRIDGE_COMMENTS_AVATAR_WIDTH != false) ? WP_PHPBB_BRIDGE_COMMENTS_AVATAR_WIDTH	: 32);
-		
+		$wp_phpbb_bridge_permissions_forum_id	= (isset(bridge::$config['wp_phpbb_bridge_permissions_forum_id'])	&& bridge::$config['wp_phpbb_bridge_permissions_forum_id']	!= 0) ? bridge::$config['wp_phpbb_bridge_permissions_forum_id']		: 0;
+		$wp_phpbb_bridge_post_forum_id			= (isset(bridge::$config['wp_phpbb_bridge_post_forum_id'])			&& bridge::$config['wp_phpbb_bridge_post_forum_id']			!= 0) ? bridge::$config['wp_phpbb_bridge_post_forum_id']			: 0;
+		$wp_phpbb_bridge_left_column_width		= (isset(bridge::$config['wp_phpbb_bridge_left_column_width'])		&& bridge::$config['wp_phpbb_bridge_left_column_width']		!= 0) ? bridge::$config['wp_phpbb_bridge_left_column_width']		: 300;
+		$wp_phpbb_bridge_comments_avatar_width	= (isset(bridge::$config['wp_phpbb_bridge_comments_avatar_width'])	&& bridge::$config['wp_phpbb_bridge_comments_avatar_width']	!= 0) ? bridge::$config['wp_phpbb_bridge_comments_avatar_width']	: 32;
+
 		self::$config = array_merge(self::$config, array(
 			// For the moment the ID of you forum where to use permissions ( like $auth->acl_get('f_reply') )
 			'wp_phpbb_bridge_permissions_forum_id'	=> (int) $wp_phpbb_bridge_permissions_forum_id,
@@ -250,6 +459,9 @@ class phpbb
 			// Display a block with tag clouds, it's a WP widget
 			// Display the search block, it's a WP widget
 		));
+
+		self::$absolute_phpbb_script_path		= (isset(bridge::$config['phpbb_script_path'])		&& bridge::$config['phpbb_script_path']		!= 0) ? bridge::$config['phpbb_script_path']		: '';
+		self::$absolute_wordpress_script_path	= (isset(bridge::$config['wordpress_script_path'])	&& bridge::$config['wordpress_script_path']	!= 0) ? bridge::$config['wordpress_script_path']	: '';
 	}
 
 	/**
@@ -263,7 +475,7 @@ class phpbb
 	*/
 	public static function append_sid($script, $params = false, $is_amp = true, $session_id = false)
 	{
-		return append_sid( PHPBB_ROOT_PATH . $script . '.' . PHP_EXT, $params, $is_amp, $session_id);
+		return append_sid(PHPBB_ROOT_PATH . $script . '.' . PHP_EXT, $params, $is_amp, $session_id);
 	}
 
 	/**
@@ -283,7 +495,7 @@ class phpbb
 		$time = gmdate('H:i:s', $gmepoch + $zone_offset);
 
 		list($h, $m, $s) = explode(':', $time);
-		$midnight = ( (int) $h > 12) ? ' pm' : ' am';
+		$midnight = ((int) $h > 12) ? ' pm' : ' am';
 
 		self::$template->assign_vars(array(
 			'CURRENT_DATE'	=> sprintf(self::$user->lang['CURRENT_TIME'], self::$user->format_date(time() + $zone_offset, $date[0], true)),
@@ -316,8 +528,8 @@ class phpbb
 		$wp_title .= get_bloginfo('name', 'display');
 
 		// Add the blog description for the home/front page.
-		$site_description = get_bloginfo( 'description', 'display' );
-		if ( $site_description && (is_home() || is_front_page()))
+		$site_description = get_bloginfo('description', 'display');
+		if ($site_description && (is_home() || is_front_page()))
 		{
 			$wp_title .= " | $site_description";
 		}
@@ -797,24 +1009,6 @@ class phpbb
 	}
 
 	/**
-	* Set the custom template path for titania
-	*/
-	public static function set_custom_template()
-	{
-		phpbb::$user->theme['template_path'] = self::$config->style;
-		phpbb::$template->set_custom_template(TITANIA_ROOT . 'styles/' . self::$config->style . '/' . 'template', 'titania_' . self::$config->style);
-		phpbb::$user->theme['template_storedb'] = phpbb::$template->orig_tpl_storedb = false;
-
-		// Inherit from the boards prosilver (currently required for the Captcha)
-		if (self::$config->style !== 'default')
-		{
-			phpbb::$user->theme['template_inherits_id'] = phpbb::$template->orig_tpl_inherits_id = 1; // Doesn't seem to matter what number I put in here...
-			phpbb::$user->theme['template_inherit_path'] = 'default';
-			phpbb::$template->inherit_root = TITANIA_ROOT . 'styles/default/template';
-		}
-	}
-
-	/**
 	* Generate login box or verify password
 	*/
 	function login_box($redirect = '', $l_explain = '', $l_success = '', $admin = false, $s_display = true)
@@ -1018,166 +1212,6 @@ class phpbb
 
 		self::page_footer(true, 'login_body.html');
 	}
-}
-
-/**
- * Pagination routine, generates page number sequence
- * 
- * Based off : phpbb3.0.8
- * File : phpbb/includes/functions.php
- */
-function wp_generate_pagination($base_url, $num_items, $per_page, $on_page)
-{
-
-	$seperator = '<span class="page-sep">' . phpbb::$user->lang['COMMA_SEPARATOR'] . '</span>';
-	$total_pages = ceil($num_items / $per_page);
-
-	if ($total_pages == 1 || !$num_items)
-	{
-		return false;
-	}
-
-	global $paged;
-	$paged = $on_page;
-
-
-	$url_delim = (strpos($base_url, '?') === false) ? '?' : ((strpos($base_url, '?') === strlen($base_url) - 1) ? '' : '&amp;');
-
-	$page_string = ($on_page == 1) ? '<strong>1</strong>' : '<a href="' . $base_url . '">1</a>';
-	$max_pages = min(ceil($num_items / $total_pages), 4);
-	if ($total_pages > 5)
-	{
-		$start_cnt = min(max(1, $on_page - $max_pages), $total_pages - 5);
-		$end_cnt = max(min($total_pages, $on_page + $max_pages), 6);
-
-		$page_string .= ($start_cnt > 1) ? ' ... ' : $seperator;
-
-		for ($i = $start_cnt + 1; $i < $end_cnt; $i++)
-		{
-			$page_string .= ($i == $on_page) ? '<strong>' . $i . '</strong>' : '<a href="' . $base_url . "{$url_delim}cpage=" . $i . '">' . $i . '</a>';
-			if ($i < $end_cnt - 1)
-			{
-				$page_string .= $seperator;
-			}
-		}
-
-		$page_string .= ($end_cnt < $total_pages) ? ' ... ' : $seperator;
-	}
-	else
-	{
-		$page_string .= $seperator;
-
-		for ($i = 2; $i < $total_pages; $i++)
-		{
-			$page_string .= ($i == $on_page) ? '<strong>' . $i . '</strong>' : '<a href="' . $base_url . "{$url_delim}cpage=" . $i . '">' . $i . '</a>';
-			if ($i < $total_pages)
-			{
-				$page_string .= $seperator;
-			}
-		}
-	}
-
-	$page_string .= ($on_page == $total_pages) ? '<strong>' . $total_pages . '</strong>' : '<a href="' . $base_url . "{$url_delim}cpage=" . $total_pages . '">' . $total_pages . '</a>';
-
-	return $page_string;
-}
-
-/**
- * Generate topic pagination
- * 
- * Based off : phpbb3.0.8
- * File : phpbb/includes/functions_display.php
- */
-function wp_topic_generate_pagination($url, $replies, $per_page)
-{
-	if (($replies + 1) > $per_page)
-	{
-		$total_pages = ceil(($replies + 1) / $per_page);
-		$pagination = '';
-
-		$times = 1;
-		for ($j = 0; $j < $replies + 1; $j += $per_page)
-		{
-			$pagination .= '<a href="' . $url . ($j == 0 ? '' : '&amp;cpage=' . $times) . '">' . $times . '</a>';
-			if ($times == 1 && $total_pages > 5)
-			{
-				$pagination .= ' ... ';
-
-				// Display the last three pages
-				$times = $total_pages - 3;
-				$j += ($total_pages - 4) * $per_page;
-			}
-			else if ($times < $total_pages)
-			{
-				$pagination .= '<span class="page-sep">' . phpbb::$user->lang['COMMA_SEPARATOR'] . '</span>';
-			}
-			$times++;
-		}
-	}
-	else
-	{
-		$pagination = '';
-	}
-
-	return $pagination;
-}
-
-/**
- * Capture the output of a function, which simply echo's a string. 
- * 	Capture the echo into a variable without actually echo'ing the string. 
- * 	You can do so by leveraging PHP's output buffering functions. Here's how you do it:
- *
- * @param string $tag The name of the action to be executed.
- * @param mixed $arg,... Optional additional arguments which are passed on to the functions hooked to the action.
- * @return null Will return null if $tag does not exist in $wp_filter array
- */
-function wp_do_action($tag)
-{
-	// Retrieve arguments list
-    $_args = func_get_args();
-
-    // Delete the first argument which is the class name
-    $_className = array_shift($_args);
-
-	ob_start();
-
-	call_user_func_array($tag, $_args);
-
-	$echo = ob_get_contents();
-
-	ob_end_clean();
-
-	return $echo;
-}
-
-/**
- * Load the correct database class file.
- *
- * This function is used to load the database class file either at runtime or by
- * wp-admin/setup-config.php. We must globalize $wpdb to ensure that it is
- * defined globally by the inline code in wp-db.php.
- *
- * @since 2.5.0
- * @global $wpdb WordPress Database Object
- * 
- * Based off : wordpress 3.1.3
- * File : wordpress/wp-includes/load.php
- */
-function phpbb_get_wp_db()
-{
-	global $wpdb;
-
-	require_once(ABSPATH . WPINC . '/wp-db.php');
-	if ( file_exists(WP_CONTENT_DIR . '/db.php'))
-	{
-		require_once(WP_CONTENT_DIR . '/db.php');
-	}
-
-	$wpdb = new wpdb(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST);
-
-	$wpdb ->set_prefix(WP_TABLE_PREFIX);
-
-	return $wpdb;
 }
 
 ?>

@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.8 :: BRIDGE phpBB & WordPress -> root/language/en/mods :: [en][English]
- * @version: $Id: wp_phpbb_bridge.php, v0.0.3-pl1 2011/07/02 11:07:02 leviatan21 Exp $
+ * @version: $Id: wp_phpbb_bridge.php, v0.0.4 2011/07/04 11:07:04 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -51,11 +51,11 @@ $lang = array_merge($lang, array(
 
 	// Navbar
 	'WP_TITLE_WEB'				=> 'Web',
-	'WP_TITLE_WEB_EXPLAIN '		=> 'Click aqui para ir a la web',
+	'WP_TITLE_WEB_EXPLAIN '		=> 'Click here to go to the Web',
 	'WP_TITLE_BLOG'				=> 'Blog',
-	'WP_TITLE_BLOG_EXPLAIN'		=> 'Click aqui para ir al blog',
-	'WP_TITLE_FORUM'			=> 'Foro',
-	'WP_TITLE_FORUM_EXPLAIN'	=> 'Click aqui para ir al foro',
+	'WP_TITLE_BLOG_EXPLAIN'		=> 'Click here to go to the Blog',
+	'WP_TITLE_FORUM'			=> 'Forum',
+	'WP_TITLE_FORUM_EXPLAIN'	=> 'Click here to go to the Forum',
 	'WP_ADMIN_PANEL'			=> 'Site Admin',
 
 	// Sidebar
@@ -128,13 +128,13 @@ $lang = array_merge($lang, array(
 	'WP_LOGGED_IN'						=> 'Logged in as',
 	'WP_LOGGED_AS_OUT'					=> '<a href="%1$s">%2$s</a>. <a href="%3$s" title="Log out of this account">Log out?</a>',
 	'WP_REQUIRED_FIELDS'				=> 'Required fields are marked as :',
-	'WP_USERNAME_REQUIRED_NOTE'			=> '* Por favor, complete el campo "%s" con su nombre o apodo.',
-	'WP_EMAIL_REQUIRED_NOTE'			=> '* Por favor, complete el campo "%s" con una dirección de email válida.',
-	'WP_EMAIL_REQUIRED_MINLENGTH'		=> '* El el campo "%s" debe contener al menos 10 Caracteres.',
-	'WP_WEBSITE_REQUIRED_NOTE'			=> '* Por favor, complete el campo "%s" con una url válida.',
-	'WP_WEBSITE_REQUIRED_MINLENGTH'		=> '* El el campo "%s" debe contener al menos 10 Caracteres.',
-	'WP_MESSAGE_REQUIRED_NOTE'			=> '* Por favor, complete el campo "%s" con un comentario válido.',
-	'WP_MESSAGE_REQUIRED_MINLENGTH'		=> '* El el campo "%s" debe contener al menos 20 Caracteres.',
+	'WP_USERNAME_REQUIRED_NOTE'			=> '* Please, fill the field "Username" with your name or nickname.',
+	'WP_EMAIL_REQUIRED_NOTE'			=> '* Please, fill the field "E-mail address" with a valid email.',
+	'WP_EMAIL_REQUIRED_MINLENGTH'		=> '* The field "E-mail address" must contain at least 10 characters.',
+	'WP_WEBSITE_REQUIRED_NOTE'			=> '* Please, fill the field "Website" with a valid url.',
+	'WP_WEBSITE_REQUIRED_MINLENGTH'		=> '* The field "Website" must contain at least 10 characters.',
+	'WP_MESSAGE_REQUIRED_NOTE'			=> '* Please, fill the field "Message body" with a valid comment.',
+	'WP_MESSAGE_REQUIRED_MINLENGTH'		=> '* The field "Message body" must contain at least 20 characters.',
 
 	'WP_EMAIL_NOTE'						=> 'Your email address will not be published.',
 	'WP_ALLOWED_TAGS'					=> 'You may use these <abbr title="HyperText Markup Language">HTML</abbr> tags and attributes: %s',
