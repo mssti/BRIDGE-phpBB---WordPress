@@ -212,14 +212,28 @@ B) Refresh the theme :
 Log on to the wordpress Administration Dashboard
 
 #####################################################################
-C) Install the theme :
+C) Install the Plugin :
 
-	C.1) Navigate to Appareance -> Themes 
-	C.2) Under Available Themes, look for Prosilver 
+	C.1) Navigate to Plugins 
+	C.2) Under Available plugins, look for "BRIDGE phpBB & WordPress"
 	C.3) Click on "Activate"
 
 #####################################################################
-D) Enjoy it !.]]>
+D) Configure the Plugin :
+
+	D.1) After enable the "BRIDGE phpBB & WordPress" Plugin you will see a new menu named "BRIDGE phpBB & WordPress Plugin Page"
+	D.2) click on "BRIDGE phpBB & WordPress Plugin Page"
+	D.3) fill the form
+
+#####################################################################
+E) Install the theme :
+
+	E.1) Navigate to Appareance -> Themes 
+	E.2) Under Available Themes, look for Prosilver 
+	E.3) Click on "Activate"
+
+#####################################################################
+F) Enjoy it !.]]>
 		</diy-instructions>
 	</action-group>
 </mod>

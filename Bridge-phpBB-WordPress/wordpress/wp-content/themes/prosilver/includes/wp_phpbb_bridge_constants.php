@@ -41,9 +41,9 @@ $wp_phpbb_bridge_config = array(
 	*
 	* @param	string	$phpbb_root_path
 	*/
-//	'phpbb_root_path' => '../phpBB/',
+	'phpbb_root_path' => '../phpBB/',
 	//	Example for localhost :	
-	'phpbb_root_path' => '../foro/',
+	//	'phpbb_root_path' => '../foro/',
 
 	/**
 	* Relative path from the server root (generate_board_url(true))
@@ -51,9 +51,9 @@ $wp_phpbb_bridge_config = array(
 	*
 	* @param	string	$phpbb_script_path
 	*/
-//	'phpbb_script_path' => 'phpBB/',
+	'phpbb_script_path' => 'phpBB/',
 	//	Example for localhost :	
-	'phpbb_script_path' => 'phpbb/quickinstall/boards/wp_phpbb_bridge/foro/',
+	//	'phpbb_script_path' => 'phpbb/quickinstall/boards/wp_phpbb_bridge/foro/',
 
 	/**
 	* Relative path from the server root (generate_board_url(true))
@@ -61,9 +61,9 @@ $wp_phpbb_bridge_config = array(
 	*
 	* @param	string	$wordpress_script_path
 	*/
-//	'wordpress_script_path' => 'wordpress/',
+	'wordpress_script_path' => 'wordpress/',
 	//	Example for localhost :	
-	'wordpress_script_path' => 'phpbb/quickinstall/boards/wp_phpbb_bridge/wordpress/',
+	//	'wordpress_script_path' => 'phpbb/quickinstall/boards/wp_phpbb_bridge/wordpress/',
 
 	/**
 	 * The ID of you forum where to use permissions ( like $auth->acl_get('f_reply') )
