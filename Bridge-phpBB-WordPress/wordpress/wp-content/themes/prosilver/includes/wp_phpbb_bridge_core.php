@@ -93,8 +93,8 @@ class bridge
 			// If no error, we can continue, but do some extra checks
 			if (!$wp_phpbb_bridge_settings['error'])
 			{
-			//	$wp_phpbb_bridge_constants['error'] = false;
-				$wp_phpbb3_bridge_path = $wp_phpbb_bridge_settings['phpbb_root_path'];
+				$wp_phpbb_bridge_constants['error'] = false;
+				$wp_phpbb3_bridge_path = get_option('wp_phpbb_root_path');
 			}
 		}
 
