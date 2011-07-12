@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.8 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/theme/prosilver
- * @version: $Id: wp_phpbb_bridge_constants.php, v0.0.4 2011/07/04 11:07:04 leviatan21 Exp $
+ * @version: $Id: wp_phpbb_bridge_constants.php, v0.0.5 2011/07/12 11:07:12 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -43,7 +43,7 @@ $wp_phpbb_bridge_config = array(
 	*/
 	'phpbb_root_path' => '../phpBB/',
 	//	Example for localhost :	
-	//	'phpbb_root_path' => '../foro/',
+//	'phpbb_root_path' => 'comunidad/',
 
 	/**
 	* Relative path from the server root (generate_board_url(true))
@@ -53,7 +53,7 @@ $wp_phpbb_bridge_config = array(
 	*/
 	'phpbb_script_path' => 'phpBB/',
 	//	Example for localhost :	
-	//	'phpbb_script_path' => 'phpbb/quickinstall/boards/wp_phpbb_bridge/foro/',
+//	'phpbb_script_path' => 'phpbb/quickinstall/boards/wp_phpbb_bridge/wordpress/comunidad/',
 
 	/**
 	* Relative path from the server root (generate_board_url(true))
@@ -63,7 +63,7 @@ $wp_phpbb_bridge_config = array(
 	*/
 	'wordpress_script_path' => 'wordpress/',
 	//	Example for localhost :	
-	//	'wordpress_script_path' => 'phpbb/quickinstall/boards/wp_phpbb_bridge/wordpress/',
+//	'wordpress_script_path' => 'phpbb/quickinstall/boards/wp_phpbb_bridge/wordpress/',
 
 	/**
 	 * The ID of you forum where to use permissions ( like $auth->acl_get('f_reply') )
@@ -74,6 +74,7 @@ $wp_phpbb_bridge_config = array(
 
 	/**
 	 * The ID of you forum where to post a new entry whenever is published in the Wordpress
+	 * (disabled by default)
 	 *
 	 * @param integer $wp_phpbb_bridge_post_forum_id
 	 */
@@ -82,9 +83,9 @@ $wp_phpbb_bridge_config = array(
 	/**
 	 * The left column width, in pixels
 	 *
-	 * @param integer $wp_phpbb_bridge_left_column_width
+	 * @param integer $wp_phpbb_bridge_widgets_column_width
 	 */
-	'wp_phpbb_bridge_left_column_width'		=> 300,
+	'wp_phpbb_bridge_widgets_column_width'	=> 300,
 
 	/**
 	 * The width size of avatars in comments, in pixels

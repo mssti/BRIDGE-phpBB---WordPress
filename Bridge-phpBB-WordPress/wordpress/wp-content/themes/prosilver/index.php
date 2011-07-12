@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.8 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/theme/prosilver
- * @version: $Id: index.php, v0.0.4 2011/07/04 11:07:04 leviatan21 Exp $
+ * @version: $Id: index.php, v0.0.5 2011/07/12 11:07:12 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -56,7 +56,7 @@ if (have_posts())
 			'U_NO_COMMENT_NO_PING'		=> (!('open' == $post-> comment_status) && !('open' == $post->ping_status))? phpbb::$user->lang['WP_NO_COMMENT_NO_PING'] : '',
 		);
 
-		$autor = phpbb::phpbb_the_autor_full($post->post_author);
+		$autor = phpbb::phpbb_the_autor_full($post->post_author, false);
 		$topicrow = array_merge($topicrow, $autor);
 
 		// Dump vars into template

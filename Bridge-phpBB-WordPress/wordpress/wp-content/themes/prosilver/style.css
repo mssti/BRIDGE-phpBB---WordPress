@@ -2,12 +2,12 @@
 Theme Name: Prosilver
 Theme URI: http://www.mssti.com/
 Description: proSilver (this is the default phpBB 3 style) <a href="http://www.mssti.com/">leviatan21</a>.
-Version: v0.0.4 2011/07/04 11:07:04
+Version: v0.0.5 2011/07/12 11:07:12
 Author: leviatan21
 Author URI: http://www.mssti.com/
 Tags: blue, phpbb, full width, two columns
 
-	Prosilver v0.0.4
+	Prosilver v0.0.5
 	http://www.mssti.com/
 
 	Based on style:	proSilver (this is the default phpBB 3 style)
@@ -27,23 +27,21 @@ Tags: blue, phpbb, full width, two columns
 	clear: both;
 	overflow: hidden;
 }
-.section-blog #container {
+.section-blog #wp-phpbb-bridge-container {
 	float: left;
-/*	margin: 1em -240px 1em 0;	*/
 	margin: 1em -0 1em 0;
+	padding: 0;
 	width: 100%;
 }
 .section-blog #content {
-/*	margin: 0 240px 0 0;	*/
 }
-.section-blog #primary {
+.section-blog #wp-phpbb-bridge-primary {
 	float: right;
 	margin: 1em 0 1em 0;
 	overflow: hidden;
-/*	width: 220px;	*/
 }
 
-.section-blog #container h2 {
+.section-blog #wp-phpbb-bridge-container h2 {
 	margin: 0 0 0.2em 0;
 }
 .section-blog div.rules {
@@ -154,6 +152,14 @@ Tags: blue, phpbb, full width, two columns
 }
 
 /** Footer **/
+/**
+.section-blog .copyright a {
+	background: url("images/phpbb.png") center left no-repeat;
+	display: inline-block;
+	line-height: 16px;
+	padding-left: 20px;
+}
+*/
 .section-blog a#site-generator {
 	background: url("images/wordpress.png") center left no-repeat;
 	display: inline-block;

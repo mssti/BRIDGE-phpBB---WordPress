@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.8 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/theme/prosilver
- * @version: $Id: functions.php, v0.0.4 2011/07/04 11:07:04 leviatan21 Exp $
+ * @version: $Id: functions.php, v0.0.5 2011/07/12 11:07:12 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -16,23 +16,23 @@
 // Hide WordPress Admin Bar
 add_filter('show_admin_bar', '__return_false');
 
+load_theme_textdomain('wp_phpbb3_bridge', TEMPLATEPATH . '/languages' );
+
 /**
  * Extra layout 2 columns
  */
 function wp_phpbb_stylesheet()
 {
-//	$blog_stylesheet = '<link rel="stylesheet" type="text/css" media="all" href="' . wp_do_action('bloginfo', 'stylesheet_url') . '" />' . "\n";
-
 	$blog_stylesheet = '<style type="text/css">
 /** Style on-the-fly **/
-.section-blog #container {
-	margin-right: -' . ((int) phpbb::$config['wp_phpbb_bridge_left_column_width'] + 10) . 'px;
+.section-blog #wp-phpbb-bridge-container {
+	margin-right: -' . ((int) phpbb::$config['wp_phpbb_bridge_widgets_column_width'] + 10) . 'px;
 }
 .section-blog #content {
-	margin-right: ' . ((int) phpbb::$config['wp_phpbb_bridge_left_column_width'] + 10) . 'px;
+	margin-right: ' . ((int) phpbb::$config['wp_phpbb_bridge_widgets_column_width'] + 10) . 'px;
 }
-.section-blog #primary {
-	width: ' . (int) phpbb::$config['wp_phpbb_bridge_left_column_width'] . 'px;
+.section-blog #wp-phpbb-bridge-primary {
+	width: ' . (int) phpbb::$config['wp_phpbb_bridge_widgets_column_width'] . 'px;
 }
 </style>' . "\n";
 
@@ -78,7 +78,6 @@ function wp_generate_pagination($base_url, $num_items, $per_page, $on_page)
 
 	global $paged;
 	$paged = $on_page;
-
 
 	$url_delim = (strpos($base_url, '?') === false) ? '?' : ((strpos($base_url, '?') === strlen($base_url) - 1) ? '' : '&amp;');
 
@@ -129,6 +128,8 @@ function wp_generate_pagination($base_url, $num_items, $per_page, $on_page)
  */
 function wp_topic_generate_pagination($url, $replies, $per_page)
 {
+	$url_delim = (strpos($url, '?') === false) ? '?' : ((strpos($url, '?') === strlen($url) - 1) ? '' : '&amp;');
+
 	if (($replies + 1) > $per_page)
 	{
 		$total_pages = ceil(($replies + 1) / $per_page);
@@ -137,7 +138,7 @@ function wp_topic_generate_pagination($url, $replies, $per_page)
 		$times = 1;
 		for ($j = 0; $j < $replies + 1; $j += $per_page)
 		{
-			$pagination .= '<a href="' . $url . ($j == 0 ? '' : '&amp;cpage=' . $times) . '">' . $times . '</a>';
+			$pagination .= '<a href="' . $url . ($j == 0 ? '' : "{$url_delim}cpage=" . $times) . '">' . $times . '</a>';
 			if ($times == 1 && $total_pages > 5)
 			{
 				$pagination .= ' ... ';
@@ -159,6 +160,17 @@ function wp_topic_generate_pagination($url, $replies, $per_page)
 	}
 
 	return $pagination;
+}
+
+/**
+ * After delete or trash an entry restur to the index page, instead the same page (that do not exist anymore)
+ */
+add_action('after_delete_post', 'wp_phpbb_trasheddelete_post_handler', 10, 1);
+add_action('trashed_post', 'wp_phpbb_trasheddelete_post_handler', 10, 1);
+function wp_phpbb_trasheddelete_post_handler($post_id)
+{
+    wp_redirect(get_option('siteurl'));
+    exit;
 }
 
 /**
@@ -198,8 +210,8 @@ function wp_phpbb_widgets_init()
 	register_sidebar(
 		array(
 			'id'			=> 'wp_phpbb-widget-area',
-			'name'			=> __('Primary Widget Area', 'wp_phpbb_bridge'),
-			'description'	=> __('The primary widget area.', 'wp_phpbb_bridge'),
+			'name'			=> __('Primary Widget Area', 'wp_phpbb3_bridge'),
+			'description'	=> __('The primary widget area.', 'wp_phpbb3_bridge'),
 			'before_widget'	=> "\n" . '<div class="panel bg3">' . "\r\t" . '<div class="inner"><span class="corners-top"><span></span></span>' . "\n\t\t",
 			'after_widget'	=> "\n\t" . '<span class="corners-bottom"><span></span></span></div>' . "\r" . '</div>' . "\n",
 			'before_title'	=> '<h3>',
@@ -210,50 +222,6 @@ function wp_phpbb_widgets_init()
 	unregister_widget('WP_Nav_Menu_Widget');
 
 	register_widget('WP_Widget_phpbb_recet_topics');
-
-/**
-//	register_widget('WP_Widget_Pages');
-//	unregister_widget('WP_Widget_Pages');
-
-//	register_widget('WP_Widget_Calendar');
-	unregister_widget('WP_Widget_Calendar');
-
-//	register_widget('WP_Widget_Archives');
-//	unregister_widget('WP_Widget_Archives');
-
-//	register_widget('WP_Widget_Links');
-	unregister_widget('WP_Widget_Links');
-
-//	register_widget('WP_Widget_Meta');
-//	unregister_widget('WP_Widget_Meta');
-
-//	register_widget('WP_Widget_Search');
-//	unregister_widget('WP_Widget_Search');
-
-//	register_widget('WP_Widget_Text');
-	unregister_widget('WP_Widget_Text');
-
-//	register_widget('WP_Widget_Categories');
-//	unregister_widget('WP_Widget_Categories');
-
-//	register_widget('WP_Widget_Recent_Posts');
-	unregister_widget('WP_Widget_Recent_Posts');
-
-//	register_widget('WP_Widget_Recent_Comments');
-	unregister_widget('WP_Widget_Recent_Comments');
-
-//	register_widget('WP_Widget_RSS');
-	unregister_widget('WP_Widget_RSS');
-
-//	register_widget('WP_Widget_Tag_Cloud');
-//	unregister_widget('WP_Widget_Tag_Cloud');
-
-//	register_widget('WP_Nav_Menu_Widget');
-	unregister_widget('WP_Nav_Menu_Widget');
-
-	unregister_widget('WP_Widget_phpbb_recet_topics');
-	register_widget('WP_Widget_phpbb_recet_topics');
-**/
 }
 
 // Register sidebars by running wp_phpbb_widgets_init() on the widgets_init hook.
@@ -282,11 +250,11 @@ class WP_Widget_phpbb_recet_topics extends WP_Widget
 		// Widget settings.
 		$widget_ops = array(
 			'classname' => 'wp_phpbb_recet_topics',
-			'description' => __('Allows you to display a list of recent topics within a specific forum id\'s.', 'wp_phpbb_bridge'),
+			'description' => __('Allows you to display a list of recent topics within a specific forum id\'s.', 'wp_phpbb3_bridge'),
 		);
 
 		// Create the widget
-		$this->WP_Widget('phpbb3-topics-widget', __('phpBB3 Topics Widget', 'wp_phpbb_bridge'), $widget_ops);
+		$this->WP_Widget('phpbb3-topics-widget', __('phpBB3 Topics Widget', 'wp_phpbb3_bridge'), $widget_ops);
 	}
 
 	function form($instance)
@@ -296,33 +264,33 @@ class WP_Widget_phpbb_recet_topics extends WP_Widget
 		?>
 		<div class="widget-content">
 			<p>
-				<label for="<?php echo $this->get_field_id('title'); ?>"><?php echo _e('Title:', 'wp_phpbb_bridge'); ?></label>
+				<label for="<?php echo $this->get_field_id('title'); ?>"><?php echo _e('Title:', 'wp_phpbb3_bridge'); ?></label>
 				<input id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo esc_attr($instance['title']); ?>" />
 			</p>
 			<p>
-				<label for="<?php echo $this->get_field_id('forums'); ?>"><?php echo _e('Forums:', 'wp_phpbb_bridge'); ?></label>
+				<label for="<?php echo $this->get_field_id('forums'); ?>"><?php echo _e('Forums:', 'wp_phpbb3_bridge'); ?></label>
 				<input name="<?php echo $this->get_field_name('forums'); ?>" type="text" id="<?php echo $this->get_field_id('forums'); ?>" value="<?php echo esc_attr($instance['forums']); ?>" />
-				<small><?php _e('Enter the id of the forum you like to get topics from. You can get topics from more than one forums by seperating the forums id with commas. ex: 3,5,6,12', 'wp_phpbb_bridge'); ?></small>
+				<small><?php _e('Enter the id of the forum you like to get topics from. You can get topics from more than one forums by seperating the forums id with commas. ex: 3,5,6,12', 'wp_phpbb3_bridge'); ?></small>
 			</p>
 			<p>
-				<label for="<?php echo $this->get_field_id('total'); ?>"><?php echo _e('Total results:', 'wp_phpbb_bridge'); ?></label>
+				<label for="<?php echo $this->get_field_id('total'); ?>"><?php echo _e('Total results:', 'wp_phpbb3_bridge'); ?></label>
 				<input name="<?php echo $this->get_field_name('total'); ?>" type="text" id="<?php echo $this->get_field_id('total'); ?>" value="<?php echo $instance['total']; ?>" />
 			</p>
 			<p>
 				<input class="checkbox" type="checkbox" id="<?php echo $this->get_field_id('showForum'); ?>" name="<?php echo $this->get_field_name('showForum'); ?>" value="1" <?php if ($instance['showForum']) { echo ' checked="checked" '; } ?> />
-				<label for="<?php echo $this->get_field_id('showForum'); ?>"><?php echo _e('Display forum name', 'wp_phpbb_bridge'); ?></label>
+				<label for="<?php echo $this->get_field_id('showForum'); ?>"><?php echo _e('Display forum name', 'wp_phpbb3_bridge'); ?></label>
 			</p>
 			<p>
 				<input class="checkbox" type="checkbox" id="<?php echo $this->get_field_id('showUsername'); ?>" name="<?php echo $this->get_field_name('showUsername'); ?>" value="1" <?php if ($instance['showUsername']) { echo ' checked="checked" '; } ?> />
-				<label for="<?php echo $this->get_field_id('showUsername'); ?>"><?php echo _e('Display author name', 'wp_phpbb_bridge'); ?></label>
+				<label for="<?php echo $this->get_field_id('showUsername'); ?>"><?php echo _e('Display author name', 'wp_phpbb3_bridge'); ?></label>
 			</p>
 			<p>
 				<input class="checkbox" type="checkbox" id="<?php echo $this->get_field_id('showTotalViews'); ?>" name="<?php echo $this->get_field_name('showTotalViews'); ?>" value="1" <?php if ($instance['showTotalViews']) { echo ' checked="checked" '; } ?> />
-				<label for="<?php echo $this->get_field_id('showTotalViews'); ?>"><?php echo _e('Display total views', 'wp_phpbb_bridge'); ?></label>
+				<label for="<?php echo $this->get_field_id('showTotalViews'); ?>"><?php echo _e('Display total views', 'wp_phpbb3_bridge'); ?></label>
 			</p>
 			<p>
 				<input class="checkbox" type="checkbox" id="<?php echo $this->get_field_id('showTotalPosts'); ?>" name="<?php echo $this->get_field_name('showTotalPosts'); ?>" value="1" <?php if ($instance['showTotalPosts']) { echo ' checked="checked" '; } ?> />
-				<label for="<?php echo $this->get_field_id('showTotalPosts'); ?>"><?php echo _e('Display total replies', 'wp_phpbb_bridge'); ?></label>
+				<label for="<?php echo $this->get_field_id('showTotalPosts'); ?>"><?php echo _e('Display total replies', 'wp_phpbb3_bridge'); ?></label>
 			</p>
 		</div>
 		<?php
@@ -363,7 +331,11 @@ class WP_Widget_phpbb_recet_topics extends WP_Widget
  * @param int $priority optional. Used to specify the order in which the functions associated with a particular action are executed (default: 10). Lower numbers correspond with earlier execution, and functions with the same priority are executed in the order in which they were added to the action.
  * @param int $accepted_args optional. The number of arguments the function accept (default 1).
  */
-add_action('publish_post', 'wp_phpbb_posting', 10, 2);
+$wp_phpbb_posting = (int) get_option('wp_phpbb_bridge_post_forum_id');
+if ($wp_phpbb_posting)
+{
+	add_action('publish_post', 'wp_phpbb_posting', 10, 2);
+}
 
 /**
  * Called whenever a new entry is published in the Wordpress.
@@ -377,11 +349,19 @@ function wp_phpbb_posting($post_ID, $post)
 	{
 		return false;
 	}
+
+	// Return if this entry was already posted ( means we are editting )
+	$phpbb_post_id = get_post_meta($post_ID, 'phpbb_post_id', true );
+	if (!empty($phpbb_post_id))
+	{
+		return false;
+	}
+
 	global $table_prefix, $wp_user;
 
 	if (!defined('IN_WP_PHPBB_BRIDGE'))
 	{
-		global $phpbb_root_path, $phpEx;
+		global $wp_phpbb_bridge_config, $phpbb_root_path, $phpEx;
 		global $auth, $config, $db, $template, $user, $cache;
 		include(TEMPLATEPATH . '/includes/wp_phpbb_bridge.php');
 	}
@@ -404,13 +384,18 @@ function wp_phpbb_posting($post_ID, $post)
 		return false;
 	}
 
-	include(PHPBB_ROOT_PATH . 'includes/functions_posting.' . PHP_EXT);
+	if (!function_exists('submit_post'))
+	{
+		include(PHPBB_ROOT_PATH . 'includes/functions_posting.' . PHP_EXT);
+	}
 	if (!class_exists('bitfield'))
 	{
-	//	include(PHPBB_ROOT_PATH . 'includes/bbcode.' . PHP_EXT);
 		include(PHPBB_ROOT_PATH . 'includes/functions_content.' . PHP_EXT);
 	}
-	include(PHPBB_ROOT_PATH . 'includes/message_parser.' . PHP_EXT);
+	if (!class_exists('parse_message'))
+	{
+		include(PHPBB_ROOT_PATH . 'includes/message_parser.' . PHP_EXT);
+	}
 	$message_parser = new parse_message();
 
 	// Define some initial variables
@@ -426,23 +411,17 @@ function wp_phpbb_posting($post_ID, $post)
 	// Get the post text
 	$message = $post->post_content;
 
-	// Get the post subject
-	$subject = $post->post_title;
-
 	// if have "read more", cut it!
-	if ($post->post_excerpt)
+	if (preg_match('/<!--more(.*?)?-->/', $message, $matches))
 	{
-		$message = $post->post_excerpt;
-
-		if (preg_match('/<!--more(.*?)?-->/', $message, $matches))
-		{
-			$message = explode($matches[0], $message, 2);
-			$message = $message[0];
-		}
+		list($main, $extended) = explode($matches[0], $message, 2);
+		// Strip leading and trailing whitespace
+		$main = preg_replace('/^[\s]*(.*)[\s]*$/', '\\1', $main);
+		$message = $main . "\n\n" . '[url=' . $entry_link . ']' . phpbb::$user->lang['WP_READ_MORE'] . '[/url]';
 	}
 
-	// Sanitize the post text
-	$message = utf8_normalize_nfc($message, '', true);
+	// Get the post subject
+	$subject = $post->post_title;
 
 	// Add a Post prefix for the blog (if we have a language string filled)
 	if (phpbb::$user->lang['WP_POST_BLOG_PREFIX'] != '')
@@ -451,24 +430,23 @@ function wp_phpbb_posting($post_ID, $post)
 	}
 
 	// Add a Post tail for the blog (if we have a language string filled)
-	if (phpbb::$user->lang['WP_POST_BLOG_TAIL'] != '' && ($entry_tags || $entry_cats))
+	if (phpbb::$user->lang['WP_POST_BLOG_TAIL'] != '')
 	{
-		$entry_tags = get_the_tag_list(phpbb::$user->lang['WP_TITLE_TAGS'] . ': ', ', ', '<br />');
+		$entry_tags = get_the_tag_list(phpbb::$user->lang['WP_TITLE_TAGS'] . ': ', ', ', "\n\n");
 		$entry_cats = sprintf(phpbb::$user->lang['WP_POSTED_IN'] , get_the_category_list(', '));
 
-		$message_tail .= phpbb::$user->lang['WP_POST_BLOG_TAIL'] . (($entry_tags) ? $entry_tags : '') . (($entry_tags && $entry_cats) ? " | " : '') . (($entry_cats) ? $entry_cats : '') . "\n";
-	}
-
-	// if have "read more", again add the link to the entry
-	if ($post->post_excerpt)
-	{
-		$message_tail .= '[url=' . $entry_link . ']' . phpbb::$user->lang['WP_READ_MORE'] . '[/url]';
+		if ($entry_tags || $entry_cats)
+		{
+			$message_tail .= phpbb::$user->lang['WP_POST_BLOG_TAIL'] . (($entry_tags) ? $entry_tags : '') . (($entry_tags && $entry_cats) ? " | " : '') . (($entry_cats) ? $entry_cats : '') . "\n";
+		}
 	}
 
 	$message = (($message_prefix) ? $message_prefix . "\n\n" : '') . $message . (($message_tail) ? "\n\n" . $message_tail : '');
 
+	// Sanitize the post text
+	$message = utf8_normalize_nfc(request_var('message', $message, true));
 	// Sanitize the post subject
-	$subject = utf8_normalize_nfc($subject, '', true);
+	$subject = utf8_normalize_nfc(request_var('subject', $subject, true));
 
 	// Add a subject prefix for the blog (if we have a language string filled)
 	if (phpbb::$user->lang['WP_SUBJECT_BLOG_PREFIX'] != '')
@@ -479,15 +457,25 @@ function wp_phpbb_posting($post_ID, $post)
 	$subject = $subject_prefix . $subject;
 
 	// Setup the settings we need to send to submit_post
+	global $data;
 	$data = wp_phpbb_post_data($message, $subject, $topic_id, $post_id, phpbb::$user->data, $forum_row, $message_parser);
 
 	submit_post('post', $subject, phpbb::$user->data['username'], POST_NORMAL, $poll, $data, true);
+
+	// Update post meta data and add the phpbb post ID
+	$phpbb_post_id = (isset($data['post_id']) && $data['post_id']) ? $data['post_id'] : 0;
+	if ($phpbb_post_id != 0)
+	{
+		global $wpdb;
+		$wpdb->insert( $wpdb->postmeta, array( 'post_id' => $post_ID, 'meta_key' => 'phpbb_post_id', 'meta_value' => $phpbb_post_id ) );
+	}
 }
 
 // Setup the settings we need to send to submit_post
 function wp_phpbb_post_data($message, $subject, $topic_id, $post_id, $user_row, $forum_row, $message_parser)
 {
 	$message = wp_phpbb_html_to_bbcode($message);
+
 	$message_parser->message = $message;
 	$message_parser->parse(true, true, true);
 
@@ -547,7 +535,8 @@ function wp_phpbb_html_to_bbcode(&$string)
 {
 	// Strip slashes !
 	$string = stripslashes($string);
-	$string = strip_tags($string, '<p><a><img><br><strong><em><blockquote><b><u><i><ul><ol><li><code>');
+
+//	$string = strip_tags($string, '<p><a><img><br><strong><em><blockquote><b><u><i><ul><ol><li><code>');
 
 	$from = array(
 		'~<i>(.*?)</i>~is',
@@ -580,27 +569,30 @@ function wp_phpbb_html_to_bbcode(&$string)
 		'[quote]\\2[/quote]',
 		'[img]\\1[/img]',
 		'[url=\\1]\\2[/url]',
-		'\\2', 		//	'\\2[br][br]',
-		'',			//	'[br]',
+		'\\2', 	//	'\\2[br][br]',
+		"\n",		//	'[br]',
 		"\n" . '[*]\\2',
 		'[list]\\2[/list]',
 		'[list=1]\\2[/list]',
 	);
 
 	$string = preg_replace($from, $to, $string); 
-//	$string = str_replace("<br />", "[br]", $string); 
-	$string = str_replace("&nbsp;", " ", $string); 
-
-	// kill any remaining
-	$string = htmlspecialchars(strip_tags($string)); 
 
 	// prettify estranged tags
+	$string = str_replace("&nbsp;", " ", $string); 
 	$string = str_replace('&amp;lt;', '<', $string);
 	$string = str_replace('&amp;gt;', '>', $string);
 	$string = str_replace('&lt;', '<', $string);
 	$string = str_replace('&gt;', '>', $string);
 	$string = str_replace('&quot;', '"', $string);
 	$string = str_replace('&amp;', '&', $string);
+
+	$string = htmlspecialchars($string); 
+	// kill any remaining
+	$string = strip_tags($string); 
+
+	// Other control characters
+//	$string = preg_replace('#(?:[\x00-\x1F\x7F]+|(?:\xC2[\x80-\x9F])+)#', '', $string);
 
 	return $string;
 } 

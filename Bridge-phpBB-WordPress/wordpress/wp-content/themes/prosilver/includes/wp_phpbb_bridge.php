@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.8 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/theme/prosilver
- * @version: $Id: wp_phpbb_bridge.php, v0.0.4 2011/07/04 11:07:04 leviatan21 Exp $
+ * @version: $Id: wp_phpbb_bridge.php, v0.0.5 2011/07/12 11:07:12 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -32,7 +32,7 @@ define('WP_TABLE_PREFIX', $table_prefix);
 $wp_user = wp_get_current_user();
 
 // Version number (only used for the installer)
-@define('WP_PHPBB_BRIDGE_VERSION', '0.0.4');
+@define('WP_PHPBB_BRIDGE_VERSION', '0.0.5');
 
 // Without this we cannot include phpBB 3.0.x scripts.
 if (!defined('IN_PHPBB'))
@@ -55,7 +55,7 @@ if (!file_exists(WP_PHPBB_BRIDGE_ROOT . 'includes/wp_phpbb_bridge_core.' . PHP_E
 require(WP_PHPBB_BRIDGE_ROOT . 'includes/wp_phpbb_bridge_core.' . PHP_EXT);
 
 // Initialise settings
-bridge::read_config_file();
+bridge::set_config();
 
 // Include common phpBB files and functions.
 if (!file_exists(PHPBB_ROOT_PATH . 'common.' . PHP_EXT))

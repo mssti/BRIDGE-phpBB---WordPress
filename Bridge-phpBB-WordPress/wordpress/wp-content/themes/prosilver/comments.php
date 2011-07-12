@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.8 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/theme/prosilver
- * @version: $Id: comments.php, v0.0.4 2011/07/04 11:07:04 leviatan21 Exp $
+ * @version: $Id: comments.php, v0.0.5 2011/07/12 11:07:12 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -82,13 +82,13 @@ function wp_phpbb_comment_loop($comment, $args)
 
 		// Generate urls for letting the moderation control panel being accessed in different modes
 		'S_POST_ACTIONS'	=> (current_user_can('edit_comment', $comment_id) || current_user_can('moderate_comments')),
-		'U_POST_EDIT'		=> admin_url("comment.php?action=editcomment&amp;c=$comment_id"),
-		'U_POST_DELETE'		=> (!EMPTY_TRASH_DAYS) ? admin_url("comment.php?action=deletecomment&amp;p=$post_id&amp;c=$comment_id&amp;$del_nonce") : '',
-		'U_POST_TRASH'		=> (EMPTY_TRASH_DAYS) ? admin_url("comment.php?action=trashcomment&amp;p=$post_id&amp;c=$comment_id&amp;$del_nonce") : '',
-		'U_POST_SPAM'		=> ($status != 'spam') ? admin_url("comment.php?action=spamcomment&amp;p=$post_id&amp;c=$comment_id&amp;$del_nonce") : '',
-		'U_POST_UNSPAM'		=> ($status =='spam') ? admin_url("comment.php?action=unspamcomment&amp;p=$post_id&amp;c=$comment_id&amp;$del_nonce") : '',
-		'U_POST_APPROVE'	=> ($status == 'unapproved') ? admin_url("comment.php?action=approvecomment&amp;p=$post_id&amp;c=$comment_id&amp;$approve_nonce") : '',
-		'U_POST_UNAPPROVE'	=> ($status != 'unapproved') ? admin_url("comment.php?action=unapprovecomment&amp;p=$post_id&amp;c=$comment_id&amp;$approve_nonce") : '',
+		'U_POST_EDIT'		=> admin_url("comment.php?action=editcomment&amp;c=$comment_id&amp;noredir=1"),
+		'U_POST_DELETE'		=> (!EMPTY_TRASH_DAYS) ? admin_url("comment.php?action=deletecomment&amp;p=$post_id&amp;c=$comment_id&amp;noredir=1&amp;$del_nonce") : '',
+		'U_POST_TRASH'		=> (EMPTY_TRASH_DAYS) ? admin_url("comment.php?action=trashcomment&amp;p=$post_id&amp;c=$comment_id&amp;noredir=1&amp;$del_nonce") : '',
+		'U_POST_SPAM'		=> ($status != 'spam') ? admin_url("comment.php?action=spamcomment&amp;p=$post_id&amp;c=$comment_id&amp;noredir=1&amp;$del_nonce") : '',
+		'U_POST_UNSPAM'		=> ($status =='spam') ? admin_url("comment.php?action=unspamcomment&amp;p=$post_id&amp;c=$comment_id&amp;noredir=1&amp;$del_nonce") : '',
+		'U_POST_APPROVE'	=> ($status == 'unapproved') ? admin_url("comment.php?action=approvecomment&amp;p=$post_id&amp;c=$comment_id&amp;noredir=1&amp;$approve_nonce") : '',
+		'U_POST_UNAPPROVE'	=> ($status != 'unapproved') ? admin_url("comment.php?action=unapprovecomment&amp;p=$post_id&amp;c=$comment_id&amp;noredir=1&amp;$approve_nonce") : '',
 
 		'MINI_POST_IMG'		=> phpbb::$user->img('icon_post_target', 'POST'),
 		'U_MINI_POST'		=> apply_filters('the_permalink', get_permalink()) . "#comment-$comment_id",

@@ -30,7 +30,7 @@
 
 		</author-group>
 
-		<mod-version>0.0.4</mod-version>
+		<mod-version>0.0.5</mod-version>
 
 		<installation>
 			<level>easy</level>
@@ -39,6 +39,15 @@
 		</installation>
 
 		<history>
+			<entry>
+				<date>2011-07-12</date>
+				<rev-version>0.0.5</rev-version>
+				<changelog lang="en">
+					<change> Updte to WP 3.2 </change>
+					<change> Several improvements</change>
+					<change> Several fix (Thanks to Netgen)</change>
+				</changelog>
+			</entry>
 			<entry>
 				<date>2011-06-26</date>
 				<rev-version>0.0.4</rev-version>
@@ -190,6 +199,13 @@ if (!function_exists('make_clickable'))
 		<diy-instructions lang="en"><![CDATA[IMPORTANT ! 
 
 #####################################################################
+OPEN :
+wordpress/wp-content/themes/prosilver/includes/wp_phpbb_bridge_constants.php
+
+EDIT :
+edit settings as required
+
+#####################################################################
 Log on to the phpBB Administration Control Panel
 
 #####################################################################
@@ -223,7 +239,7 @@ D) Configure the Plugin :
 
 	D.1) After enable the "BRIDGE phpBB & WordPress" Plugin you will see a new menu named "BRIDGE phpBB & WordPress Plugin Page"
 	D.2) click on "BRIDGE phpBB & WordPress Plugin Page"
-	D.3) fill the form
+	D.3) fill the form and submit
 
 #####################################################################
 E) Install the theme :

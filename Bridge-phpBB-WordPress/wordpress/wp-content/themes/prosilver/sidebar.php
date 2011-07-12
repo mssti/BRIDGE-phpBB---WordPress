@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.8 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/theme/prosilver
- * @version: $Id: sidebar.php, v0.0.4 2011/07/04 11:07:04 leviatan21 Exp $
+ * @version: $Id: sidebar.php, v0.0.5 2011/07/12 11:07:12 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -20,7 +20,7 @@ if (!defined('IN_WP_PHPBB_BRIDGE'))
 
 if (is_active_sidebar('wp_phpbb-widget-area'))
 {
-	$dynamic_sidebar = wp_do_action('dynamic_sidebar', 'primary-widget-area');
+	$dynamic_sidebar = wp_do_action('dynamic_sidebar', 'wp_phpbb-widget-area');
 
 	if ($dynamic_sidebar)
 	{

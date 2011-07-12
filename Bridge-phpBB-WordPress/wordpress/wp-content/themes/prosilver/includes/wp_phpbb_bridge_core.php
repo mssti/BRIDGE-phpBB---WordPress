@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.8 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/theme/prosilver
- * @version: $Id: wp_phpbb_bridge_core.php, v0.0.4 2011/07/04 11:07:04 leviatan21 Exp $
+ * @version: $Id: wp_phpbb_bridge_core.php, v0.0.5 2011/07/12 11:07:12 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -32,14 +32,18 @@ class bridge
 	 *
 	 * @param boolean $force	force to update WP settings
 	 */
-	public static function read_config_file($force = false)
+	public static function set_config($force = false)
 	{
-		$wp_phpbb_bridge_constants = $wp_phpbb_bridge_settings = array('error' => false, 'message' => '', 'action' => '');
+		global $wp_phpbb_bridge_config;
 
+		// Some default options
+		$wp_phpbb_bridge_settings = array('error' => false, 'message' => '', 'action' => '');
 		$plugins = (array) get_option('active_plugins', array());
 		$theme	 = get_option('template');
-		$active	 = get_option('wp_phpbb3_bridge');
-		$path	 = get_option('wp_phpbb_root_path');
+		// bypass our own settings
+		$active	 = get_option('wp_phpbb_bridge', $wp_phpbb_bridge_config['phpbb_bridge']);
+		// bypass our own settings
+		$path	 = get_option('phpbb_root_path', $wp_phpbb_bridge_config['phpbb_root_path']);
 
 		// Measn the plugin is not enabbled yet!
 		// or the plugin is not set yet!
@@ -52,72 +56,28 @@ class bridge
 			if (current_user_can('manage_options') && !in_array('wp_phpbb3_bridge_options.php', $plugins))
 			{
 				$redir = admin_url('plugins.php');
-				$wp_phpbb_bridge_settings['action'] = '<a href="' . $redir . '" title="' . esc_attr__('Activate Bridge', '') . '">Activate Bridge</a>';
+				$wp_phpbb_bridge_settings['action'] = '<a href="' . $redir . '" title="' . esc_attr__('Activate Bridge', 'wp_phpbb3_bridge') . '">' . __('Activate Bridge', 'wp_phpbb3_bridge') . '</a>';
 			}
 
 			wp_die($wp_phpbb_bridge_settings['message'] . '<br />' . $wp_phpbb_bridge_settings['action']);
 		}
 
-		global $wp_phpbb_bridge_config;
+		// Check against WP settings
+		$wp_phpbb_bridge_settings = self::wp_phpbb_bridge_check($active, $path, $theme);
 
-		// First, we check against our own settings
-		if (isset($wp_phpbb_bridge_config) && (isset($wp_phpbb_bridge_config['phpbb_root_path']) && isset($wp_phpbb_bridge_config['phpbb_bridge'])))
+		// If checks fails, display the proper message
+		if ($wp_phpbb_bridge_settings['error'])
 		{
-			$wp_phpbb_bridge_constants = self::wp_phpbb_bridge_check($wp_phpbb_bridge_config['phpbb_bridge'], $wp_phpbb_bridge_config['phpbb_root_path'], $theme);
-
-			// If no error, Now we know that the bridge is enabled and the path is fine
-			// we can continue, but do some extra checks
-			if (!$wp_phpbb_bridge_constants['error'])
-			{
-				if ($force && ($active != $wp_phpbb_bridge_config['phpbb_bridge'] || $path != $wp_phpbb_bridge_config['phpbb_root_path']))
-				{
-					update_option('wp_phpbb3_bridge', $wp_phpbb_bridge_config['phpbb_bridge']);
-					update_option('wp_phpbb_root_path', $wp_phpbb_bridge_config['phpbb_root_path']);
-				}
-				// Means that the bridge is disabled by the Dashboard settings, so we can't continue
-				else if (!$force && ($active != $wp_phpbb_bridge_config['phpbb_bridge'] || $path != $wp_phpbb_bridge_config['phpbb_root_path']))
-				{
-					$wp_phpbb_bridge_constants['error'] = true;
-				}
-
-				$wp_phpbb3_bridge_path = $wp_phpbb_bridge_config['phpbb_root_path'];
-			}
-		}
-
-		// Second, we check against WP settings
-		//	But only if the previous check fails
-		if ($wp_phpbb_bridge_constants['error'])
-		{
-			$wp_phpbb_bridge_settings = self::wp_phpbb_bridge_check(get_option('wp_phpbb3_bridge'), get_option('wp_phpbb_root_path'), $theme);
-
-			// If no error, we can continue, but do some extra checks
-			if (!$wp_phpbb_bridge_settings['error'])
-			{
-				$wp_phpbb_bridge_constants['error'] = false;
-				$wp_phpbb3_bridge_path = get_option('wp_phpbb_root_path');
-			}
-		}
-
-		// If both checks fails, display the proper message
-		if ($wp_phpbb_bridge_constants['error'] || $wp_phpbb_bridge_settings['error'])
-		{
-			if ($wp_phpbb_bridge_settings['error'])
-			{
-				wp_die(__('<h2>Error in WordPress Settings</h2>', 'wp_phpbb3_bridge') . '<br />' . $wp_phpbb_bridge_settings['message'] . '<br />' . $wp_phpbb_bridge_settings['action']);
-			}
-			if ($wp_phpbb_bridge_constants['error'])
-			{
-				wp_die(__('<h2>Error in phpBB Constants</h2>', 'wp_phpbb3_bridge') . '<br />' . $wp_phpbb_bridge_constants['message'] . '<br />' . $wp_phpbb_bridge_settings['action']);
-			}
+			wp_die(__('<h2>Error in WordPress Settings</h2>', 'wp_phpbb3_bridge') . '<br />' . $wp_phpbb_bridge_settings['message'] . '<br />' . $wp_phpbb_bridge_settings['action']);
 		}
 
 		if (defined('WP_ADMIN') && WP_ADMIN == true)
 		{
-			define('PHPBB_ROOT_PATH', '../' . $wp_phpbb3_bridge_path);
+			define('PHPBB_ROOT_PATH', '../' . $path);
 		}
 		else
 		{
-			define('PHPBB_ROOT_PATH', $wp_phpbb3_bridge_path);
+			define('PHPBB_ROOT_PATH', $path);
 		}
 
 		self::$config = $wp_phpbb_bridge_config;
@@ -126,7 +86,7 @@ class bridge
 		global $phpbb_root_path, $phpEx;
 
 		$phpbb_root_path = PHPBB_ROOT_PATH;
-		$phpEx = PHP_EXT;			
+		$phpEx = PHP_EXT;
 	}
 
 	/**
@@ -151,10 +111,15 @@ class bridge
 
 		if ($path)
 		{
+			if (defined('WP_ADMIN') && WP_ADMIN == true)
+			{
+				$path =  '../' . $path;
+			}
+
 			if (!@file_exists($path . 'config.php') || (@!is_dir($path) && @is_file($path)))
 			{
 				$error = true;
-				$message .= __("Could not find path to your former board. Please check your settings and try again.<br />» <samp>$path</samp> was specified as the source path.<br /><br />Cannot activate bridge.", 'wp_phpbb3_bridge');
+				$message .= sprintf(__("Could not find path to your board. Please check your settings and try again.<br /><samp>%s</samp> was specified as the source path.<br /><br />Cannot activate bridge.", 'wp_phpbb3_bridge'), $path);
 			}
 		}
 
@@ -168,7 +133,7 @@ class bridge
 				$redir = admin_url('admin.php');
 				$redir = add_query_arg(array('page' => 'wp_phpbb3_bridge', 'wp_phpbb3_bridge' => '1', 'wp_phpbb_root_path' => stripslashes($wp_phpbb_bridge_config['phpbb_root_path'])), $redir);
 
-				$action .= '<a href="' . $redir . '" title="' . esc_attr__('Configure Bridge', '') . '">Configure Bridge</a>';
+				$action .= '<a href="' . $redir . '" title="' . esc_attr__('Configure Bridge', 'wp_phpbb3_bridge') . '">' . __('Configure Bridge', 'wp_phpbb3_bridge') . '</a>';
 			}
 			else
 			{
@@ -184,7 +149,7 @@ class bridge
 			if (current_user_can('switch_themes'))
 			{
 				$redir = admin_url('themes.php');
-				$action .= '<a href="' . $redir . '" title="' . esc_attr__('Activate theme', '') . '">Activate theme</a>';
+				$action .= '<a href="' . $redir . '" title="' . esc_attr__('Activate theme', 'wp_phpbb3_bridge') . '">' . __('Activate theme', 'wp_phpbb3_bridge') . '</a>';
 			}
 			else
 			{
@@ -223,7 +188,7 @@ class phpbb
 	public static $user;
 
 	/**
-	 * Absolute Wordpress and Board Path
+	 * Absolute Wordpress and phpBB Path
 	 *
 	 * @var string
 	 */
@@ -246,6 +211,10 @@ class phpbb
 		self::$template	= &$template;
 		self::$user		= &$user;
 //		self::$cache	= &$cache;
+
+		// Set the absolute wordpress/phpbb path
+		self::$absolute_phpbb_script_path = generate_board_url(true) . '/' . get_option('phpbb_script_path', bridge::$config['phpbb_script_path']);
+		self::$absolute_wordpress_script_path = generate_board_url(true) . '/' . get_option('wordpress_script_path', bridge::$config['wordpress_script_path']);
 
 		// Start session management
 		if (!defined('PHPBB_INCLUDED'))
@@ -386,6 +355,7 @@ class phpbb
 		$wpuser = array();
 
 		$users = $wpdb->get_row($wpdb->prepare("SELECT * FROM $wpdb->users WHERE ID = %d LIMIT 1", $user_id));
+
 		if (!empty($users))
 		{
 			foreach($users as $id => $value)
@@ -402,6 +372,7 @@ class phpbb
 		}
 
 		$usermeta = $wpdb->get_results($wpdb->prepare("SELECT meta_key, meta_value FROM $wpdb->usermeta WHERE user_id = %d ", $user_id));
+
 		if (!empty($usermeta))
 		{
 			foreach($usermeta as $key => $value)
@@ -440,18 +411,18 @@ class phpbb
 	{
 		$wp_phpbb_bridge_permissions_forum_id	= (isset(bridge::$config['wp_phpbb_bridge_permissions_forum_id'])	&& bridge::$config['wp_phpbb_bridge_permissions_forum_id']	!= 0) ? bridge::$config['wp_phpbb_bridge_permissions_forum_id']		: 0;
 		$wp_phpbb_bridge_post_forum_id			= (isset(bridge::$config['wp_phpbb_bridge_post_forum_id'])			&& bridge::$config['wp_phpbb_bridge_post_forum_id']			!= 0) ? bridge::$config['wp_phpbb_bridge_post_forum_id']			: 0;
-		$wp_phpbb_bridge_left_column_width		= (isset(bridge::$config['wp_phpbb_bridge_left_column_width'])		&& bridge::$config['wp_phpbb_bridge_left_column_width']		!= 0) ? bridge::$config['wp_phpbb_bridge_left_column_width']		: 300;
+		$wp_phpbb_bridge_widgets_column_width	= (isset(bridge::$config['wp_phpbb_bridge_widgets_column_width'])	&& bridge::$config['wp_phpbb_bridge_widgets_column_width']	!= 0) ? bridge::$config['wp_phpbb_bridge_widgets_column_width']		: 300;
 		$wp_phpbb_bridge_comments_avatar_width	= (isset(bridge::$config['wp_phpbb_bridge_comments_avatar_width'])	&& bridge::$config['wp_phpbb_bridge_comments_avatar_width']	!= 0) ? bridge::$config['wp_phpbb_bridge_comments_avatar_width']	: 32;
 
 		self::$config = array_merge(self::$config, array(
 			// For the moment the ID of you forum where to use permissions ( like $auth->acl_get('f_reply') )
-			'wp_phpbb_bridge_permissions_forum_id'	=> (int) $wp_phpbb_bridge_permissions_forum_id,
+			'wp_phpbb_bridge_permissions_forum_id'	=> (int) get_option('wp_phpbb_bridge_permissions_forum_id', $wp_phpbb_bridge_permissions_forum_id),
 			// For the moment the ID of you forum where to post a new entry whenever is published in the Wordpress
-			'wp_phpbb_bridge_post_forum_id'			=> (int) $wp_phpbb_bridge_post_forum_id,
+			'wp_phpbb_bridge_post_forum_id'			=> (int) get_option('wp_phpbb_bridge_post_forum_id', $wp_phpbb_bridge_post_forum_id),
 			// The left column width, in pixels
-			'wp_phpbb_bridge_left_column_width'		=> (int) $wp_phpbb_bridge_left_column_width,
+			'wp_phpbb_bridge_widgets_column_width'	=> (int) get_option('wp_phpbb_bridge_widgets_column_width', $wp_phpbb_bridge_widgets_column_width),
 			// The width size of avatars in comments, in pixels
-			'wp_phpbb_bridge_comments_avatar_width'	=> (int) $wp_phpbb_bridge_comments_avatar_width,
+			'wp_phpbb_bridge_comments_avatar_width'	=> (int) get_option('wp_phpbb_bridge_comments_avatar_width', $wp_phpbb_bridge_comments_avatar_width),
 			// Display a block with latest topics, it's a WP widget
 			// Display a block with a list of pages, it's a WP widget
 			// Display a block with a list of archives, it's a WP widget
@@ -459,9 +430,42 @@ class phpbb
 			// Display a block with tag clouds, it's a WP widget
 			// Display the search block, it's a WP widget
 		));
+	}
 
-		self::$absolute_phpbb_script_path		= (isset(bridge::$config['phpbb_script_path'])		&& bridge::$config['phpbb_script_path']		!= 0) ? bridge::$config['phpbb_script_path']		: '';
-		self::$absolute_wordpress_script_path	= (isset(bridge::$config['wordpress_script_path'])	&& bridge::$config['wordpress_script_path']	!= 0) ? bridge::$config['wordpress_script_path']	: '';
+	/**
+	* Include a phpBB includes file
+	*
+	* @param string $file The name of the file
+	* @param string|bool $function_check Bool false to ignore; string function name to check if the function exists (and not load the file if it does)
+	* @param string|bool $class_check Bool false to ignore; string class name to check if the class exists (and not load the file if it does)
+	* 
+	* Based off : Titania 0.3.11
+	* File : titania/includes/core/phpbb.php
+	*/
+	public static function _include($file, $function_check = false, $class_check = false)
+	{
+		if ($function_check !== false)
+		{
+			if (function_exists($function_check))
+			{
+				return;
+			}
+		}
+
+		if ($class_check !== false)
+		{
+			if (class_exists($class_check))
+			{
+				return;
+			}
+		}
+
+		// Make that phpBB itself understands out paths
+		global $phpbb_root_path, $phpEx;
+	//	$phpbb_root_path = PHPBB_ROOT_PATH;
+	//	$phpEx = PHP_EXT;
+
+		include(PHPBB_ROOT_PATH . 'includes/' . $file . '.' . PHP_EXT);
 	}
 
 	/**
@@ -472,10 +476,14 @@ class phpbb
 	* @param mixed $is_amp
 	* @param mixed $session_id
 	* @return string
+	* 
+	* Based off : Titania 0.3.11
+	* File : titania/includes/core/phpbb.php
 	*/
 	public static function append_sid($script, $params = false, $is_amp = true, $session_id = false)
 	{
-		return append_sid(PHPBB_ROOT_PATH . $script . '.' . PHP_EXT, $params, $is_amp, $session_id);
+		return append_sid(self::$absolute_phpbb_script_path . $script . '.' . PHP_EXT, $params, $is_amp, $session_id);
+	//	return append_sid(PHPBB_ROOT_PATH . $script . '.' . PHP_EXT, $params, $is_amp, $session_id);
 	}
 
 	/**
@@ -724,6 +732,11 @@ class phpbb
 
 		self::$db->sql_freeresult($result);
 
+		if (!isset($topic_list) || !sizeof($topic_list))
+		{
+			return;
+		}
+
 		// Output the topics
 		for ($i = 0, $end = sizeof($topic_list); $i < $end; ++$i)
 		{
@@ -801,17 +814,11 @@ class phpbb
 
 		if (!$row)
 		{
-			return '';
+			return array();
 		}
 
-		if (!function_exists('get_user_avatar'))
-		{
-			include(PHPBB_ROOT_PATH . 'includes/functions_display.' . PHP_EXT);
-		}
-		if (!class_exists('bbcode'))
-		{
-			include(PHPBB_ROOT_PATH . 'includes/bbcode.' . PHP_EXT);
-		}
+		self::_include('functions_display', 'get_user_avatar');
+		self::_include('bbcode', false, 'bbcode');
 
 		$user_sig = '';
 		$bbcode_bitfield = '';
@@ -842,6 +849,10 @@ class phpbb
 		{
 			$row['user_avatar_width'] = $row['user_avatar_height'] = self::$config['wp_phpbb_bridge_comments_avatar_width'];
 		}
+
+		// IT'S A HACK! for images like avatar and rank
+		global $phpbb_root_path;
+		$phpbb_root_path = self::$absolute_phpbb_script_path;
 
 		$user_cache = array(
 			'author_full'		=> ($poster_id != ANONYMOUS) ? get_username_string('full', $poster_id, $row['username'], $row['user_colour']) : get_username_string('full', $poster_id, $wp_poster_data->user_nicename, $row['user_colour']),
@@ -883,6 +894,9 @@ class phpbb
 		);
 
 		get_user_rank($row['user_rank'], $row['user_posts'], $user_cache['rank_title'], $user_cache['rank_image'], $user_cache['rank_image_src']);
+
+		// Undo HACK! for images like avatar and rank
+		$phpbb_root_path = PHPBB_ROOT_PATH;
 
 		if ((!empty($row['user_allow_viewemail']) && self::$auth->acl_get('u_sendemail')) || self::$auth->acl_get('a_email'))
 		{
@@ -968,10 +982,10 @@ class phpbb
 		{
 			self::$template->assign_vars($autor);
 		}
-		else
-		{
+//		else
+//		{
 			return $autor;
-		}
+//		}
 	}
 
 	/**
@@ -1010,15 +1024,15 @@ class phpbb
 
 	/**
 	* Generate login box or verify password
+	* 
+	* Based off : Titania 0.3.11
+	* File : titania/includes/core/phpbb.php
 	*/
 	function login_box($redirect = '', $l_explain = '', $l_success = '', $admin = false, $s_display = true)
 	{
 		global $phpbb_root_path, $phpEx;
 
-		if (!class_exists('phpbb_captcha_factory'))
-		{
-			include($phpbb_root_path . 'includes/captcha/captcha_factory.' . $phpEx);
-		}
+		self::_include('captcha/captcha_factory', 'phpbb_captcha_factory');
 		self::$user->add_lang('ucp');
 
 		$err = '';

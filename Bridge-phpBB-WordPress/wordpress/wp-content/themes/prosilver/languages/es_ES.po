@@ -1,0 +1,108 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: BRIDGE phpBB & WordPress 0.0.5\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-07-12 17:17-0300\n"
+"PO-Revision-Date: 2011-07-12 17:17-0300\n"
+"Last-Translator: \n"
+"Language-Team: leviatan21 <info@mssti.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-KeywordsList: _;gettext;gettext_noop;__;_e\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-Language: Spanish\n"
+"X-Poedit-SearchPath-0: D:\\MisWebs\\phpbb\\quickinstall\\boards\\wp_phpbb_bridge\\wordpress\\wp-content\\themes\\prosilver\n"
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\themes\prosilver/functions.php:213
+msgid "Primary Widget Area"
+msgstr "Barra de Widgets"
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\themes\prosilver/functions.php:214
+msgid "The primary widget area."
+msgstr "Barra lateral de Widgets"
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\themes\prosilver/functions.php:253
+msgid "Allows you to display a list of recent topics within a specific forum id's."
+msgstr "Le permite mostrar una lista de los últimos temas de un foro específico."
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\themes\prosilver/functions.php:257
+msgid "phpBB3 Topics Widget"
+msgstr "Widget Temas de phpBB"
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\themes\prosilver/functions.php:267
+msgid "Title:"
+msgstr "Título"
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\themes\prosilver/functions.php:271
+msgid "Forums:"
+msgstr "Título:"
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\themes\prosilver/functions.php:273
+msgid "Enter the id of the forum you like to get topics from. You can get topics from more than one forums by seperating the forums id with commas. ex: 3,5,6,12"
+msgstr "Introduzca el identificador del foro del que desea mostrar temas. Puede mostrar los temas de más de un foro, separando los ID's de los foros con comas. por ejemplo: 3,5,6,12"
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\themes\prosilver/functions.php:276
+msgid "Total results:"
+msgstr "Cantidad de reultados:"
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\themes\prosilver/functions.php:281
+msgid "Display forum name"
+msgstr "Mostrar el título del foro"
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\themes\prosilver/functions.php:285
+msgid "Display author name"
+msgstr "Mostrar el nombre del autor "
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\themes\prosilver/functions.php:289
+msgid "Display total views"
+msgstr "Mostrar cantidad de visitas"
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\themes\prosilver/functions.php:293
+msgid "Display total replies"
+msgstr "Mostrar cantidad de respuestas"
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\themes\prosilver/includes/wp_phpbb_bridge_core.php:59
+msgid "Activate Bridge"
+msgstr "Activar el Puente"
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\themes\prosilver/includes/wp_phpbb_bridge_core.php:71
+msgid "<h2>Error in WordPress Settings</h2>"
+msgstr "Error en la configuraciones de WordPress"
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\themes\prosilver/includes/wp_phpbb_bridge_core.php:109
+msgid "The \"BRIDGE phpBB & WordPress\" is deactivated"
+msgstr "El \"PUENTE phpBB & WordPress\" está desactivado"
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\themes\prosilver/includes/wp_phpbb_bridge_core.php:122
+#, php-format
+msgid "Could not find path to your board. Please check your settings and try again.<br /><samp>%s</samp> was specified as the source path.<br /><br />Cannot activate bridge."
+msgstr "No se puede encontrar la ruta a su foro. Por favor verifique sus parámetros e intente de nuevo.<br />La ruta especificada fue <samp>%s</samp>.<br /><br />No se puede activar el puente."
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\themes\prosilver/includes/wp_phpbb_bridge_core.php:136
+msgid "Configure Bridge"
+msgstr "Configurar el Puente"
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\themes\prosilver/includes/wp_phpbb_bridge_core.php:140
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\themes\prosilver/includes/wp_phpbb_bridge_core.php:156
+msgid "Please notify the system administrator or webmaster"
+msgstr "Por favor notifique a La Administración del Sitio o webmaster."
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\themes\prosilver/includes/wp_phpbb_bridge_core.php:147
+msgid "The \"Prosilver\" theme is deactivated"
+msgstr "El tema \"Prosilver\" está desactivado"
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\themes\prosilver/includes/wp_phpbb_bridge_core.php:152
+msgid "Activate theme"
+msgstr "Activar el Tema"
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\themes\prosilver/includes/wp_phpbb_bridge_core.php:630
+msgid "l, F jS, Y"
+msgstr "l, F jS, Y"
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\themes\prosilver/includes/wp_phpbb_bridge_core.php:635
+msgid "F, Y"
+msgstr "F, Y"
+
+#~ msgid "<h2>Error in phpBB Constants</h2>"
+#~ msgstr "<h2>Error en las constantes de phpBB</h2>"

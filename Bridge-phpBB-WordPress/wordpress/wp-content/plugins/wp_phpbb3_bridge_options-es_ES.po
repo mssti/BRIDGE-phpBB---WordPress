@@ -1,0 +1,146 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: BRIDGE phpBB & WordPress\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-07-12 15:40-0300\n"
+"PO-Revision-Date: 2011-07-12 16:15-0300\n"
+"Last-Translator: \n"
+"Language-Team: leviatan21 <info@mssti.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-KeywordsList: _;gettext;gettext_noop;__;_e\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-Language: Spanish\n"
+"X-Poedit-SearchPath-0: D:\\MisWebs\\phpbb\\quickinstall\\boards\\wp_phpbb_bridge\\wordpress\\wp-content\\plugins\n"
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\plugins/wp_phpbb3_bridge_options.php:73
+msgid "You do not have sufficient permissions to access this page."
+msgstr "No tienes suficientes permisos para acceder a esta página"
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\plugins/wp_phpbb3_bridge_options.php:118
+#, php-format
+msgid "Could not find path to your board. Please check your settings and try again.<br /><samp>%s</samp> was specified as the source path.<br /><br />Cannot activate bridge."
+msgstr "No se pudo encontrar un camino al foro. Verifique la configuración y vuelva a intentarlo<br /><samp>%s</samp> se especificó como la ruta de origen.<br /><br />No se puede activar el puente."
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\plugins/wp_phpbb3_bridge_options.php:132
+#, php-format
+msgid "Could not find \"Server root path to phpBB\". Please check your settings and try again.<br /><samp>%s</samp> was specified as the source path.<br /><br />Cannot activate bridge."
+msgstr "No se pudo encontrar \"ruta a la raíz de servidor de phpBB\". Verificque la configuración y vuelva a intentarlo.<br /><samp>%s</samp> se especificó como la ruta de origen.<br /><br />No se puede activar el puente."
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\plugins/wp_phpbb3_bridge_options.php:146
+#, php-format
+msgid "Could not find \"Server root path to WordPress\". Please check your settings and try again.<br /><samp>%s</samp> was specified as the source path.<br /><br />Cannot activate bridge."
+msgstr "No se pudo encontrar \"ruta a la raíz del servidor de WordPress \". Verificque la configuración y vuelva a intentarlo.<br /><samp>%s</samp> se especificó como la ruta de origen. <br /> <br /> No se puede activar el puente."
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\plugins/wp_phpbb3_bridge_options.php:168
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\plugins/akismet/admin.php:134
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\plugins/wp-phpbb-bridge/admin.php:91
+msgid "Options saved."
+msgstr "Opciones guardadas."
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\plugins/wp_phpbb3_bridge_options.php:179
+msgid "Enable Bridge:"
+msgstr "Habilitar Puente:"
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\plugins/wp_phpbb3_bridge_options.php:182
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\plugins/wp-phpbb-bridge/admin.php:144
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\plugins/wp-phpbb-bridge/admin.php:168
+msgid "Yes"
+msgstr "Si"
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\plugins/wp_phpbb3_bridge_options.php:184
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\plugins/wp-phpbb-bridge/admin.php:151
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\plugins/wp-phpbb-bridge/admin.php:175
+msgid "No"
+msgstr "No"
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\plugins/wp_phpbb3_bridge_options.php:186
+msgid "This will make the Bridge unavailable to use."
+msgstr "Esto hará que el puente no está disponible para su uso."
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\plugins/wp_phpbb3_bridge_options.php:192
+msgid "Path to phpBB:"
+msgstr "Ruta a phpBB:"
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\plugins/wp_phpbb3_bridge_options.php:197
+msgid "The path where phpBB is located <strong>relative</strong> to the domain name."
+msgstr "La ruta dónde está ubicado phpBB3, relativa al nombre de dominio."
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\plugins/wp_phpbb3_bridge_options.php:199
+msgid "<b>Example :</b> <code>../phpBB/</code>&nbsp;<b>The Blog is at:</b> <code>http://www.mydomain.tld/wordpress/</code><b>The Forum is at:</b> <code>http://www.example.com/phpBB/</code>"
+msgstr "<b>Ejemplo :</b> <code>../phpBB/</code>&nbsp;<b>El Blog está en:</b> <code>http://www.mydomain.tld/wordpress/</code><b>El Foro está en:</b> <code>http://www.example.com/phpBB/</code>"
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\plugins/wp_phpbb3_bridge_options.php:205
+msgid "Server root path to phpBB:"
+msgstr "Ruta a la raíz del servidor de phpBB"
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\plugins/wp_phpbb3_bridge_options.php:210
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\plugins/wp_phpbb3_bridge_options.php:223
+msgid "Relative path from the server root."
+msgstr "Ruta relativa al la raíz del servidor."
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\plugins/wp_phpbb3_bridge_options.php:212
+msgid "<b>Example :</b> <code>phpBB/</code>&nbsp;<b>The Blog is at:</b> <code>http://www.mydomain.tld/wordpress/</code><b>The Forum is at:</b> <code>http://www.example.com/phpBB/</code>"
+msgstr "<b>Ejemplo :</b> <code>phpBB/</code>&nbsp;<b>El Blog está en:</b> <code>http://www.mydomain.tld/wordpress/</code><b>El Foro está en:</b> <code>http://www.example.com/phpBB/</code>"
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\plugins/wp_phpbb3_bridge_options.php:218
+msgid "Server root path to WordPress:"
+msgstr "Ruta a la raíz del servidor de WordPress:"
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\plugins/wp_phpbb3_bridge_options.php:225
+msgid "<b>Example :</b> <code>wordpress/</code>&nbsp;<b>The Blog is at:</b> <code>http://www.mydomain.tld/wordpress/</code><b>The Forum is at:</b> <code>http://www.example.com/phpBB/</code>"
+msgstr "<b>Ejemplo  :</b> <code>wordpress/</code>&nbsp;<b>El Blog está en:</b> <code>http://www.mydomain.tld/wordpress/</code><b>El Foro está en:</b> <code>http://www.example.com/phpBB/</code>"
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\plugins/wp_phpbb3_bridge_options.php:231
+msgid "Permissions forum ID:"
+msgstr "ID del Foro de permisos:"
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\plugins/wp_phpbb3_bridge_options.php:236
+msgid "The number of your Forum (not Category) where to use permissions."
+msgstr "El número del foro (no de categoría), de donde se tomarán los permisos. "
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\plugins/wp_phpbb3_bridge_options.php:242
+msgid "Post forum ID:"
+msgstr "ID del Foro a publicar:"
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\plugins/wp_phpbb3_bridge_options.php:247
+msgid "The number of you forum where to post a new entry whenever is published in the Wordpress."
+msgstr "El número del foro, donde se publicará cada nueva entrada que se publica en el Wordpress."
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\plugins/wp_phpbb3_bridge_options.php:253
+msgid "Widgets column width:"
+msgstr "Ancho de la columna e Widgets:"
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\plugins/wp_phpbb3_bridge_options.php:258
+msgid "The right column width, in pixels."
+msgstr "El ancho de columna de la derecha, en píxeles."
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\plugins/wp_phpbb3_bridge_options.php:264
+msgid "Comments avatars width:"
+msgstr "Ancho de avatares en comentarios:"
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\plugins/wp_phpbb3_bridge_options.php:269
+msgid "The width size of avatars in comments, in pixels."
+msgstr "El ancho de los avatares en comentarios, en píxeles."
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\plugins/wp_phpbb3_bridge_options.php:306
+msgid "The \"Prosilver\" theme is deactivated"
+msgstr "El tema \"Prosilver\" está desactivado"
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\plugins/wp_phpbb3_bridge_options.php:311
+msgid "Activate theme"
+msgstr "Activar tema"
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\plugins/wp_phpbb3_bridge_options.php:315
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\plugins/wp_phpbb3_bridge_options.php:333
+msgid "Please notify the system administrator or webmaster"
+msgstr "Por favor notifique a La Administración del Sitio o webmaster."
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\plugins/wp_phpbb3_bridge_options.php:324
+msgid "The \"Prosilver\" theme is activated"
+msgstr "El Tema \"Prosilver\" está activado"
+
+#: D:\MisWebs\phpbb\quickinstall\boards\wp_phpbb_bridge\wordpress\wp-content\plugins/wp_phpbb3_bridge_options.php:329
+msgid "Deactivate theme"
+msgstr "Desactivar el tema"

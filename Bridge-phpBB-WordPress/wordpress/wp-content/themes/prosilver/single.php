@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.8 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/theme/prosilver
- * @version: $Id: single.php, v0.0.4 2011/07/04 11:07:04 leviatan21 Exp $
+ * @version: $Id: single.php, v0.0.5 2011/07/12 11:07:12 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -39,6 +39,7 @@ if (have_posts())
 			'S_POST_ACTIONS'	=> (current_user_can('delete_post', $post_id) || current_user_can('edit_post', $post_id)), //	'publish_posts' or 'edit_posts' is for create
 			'U_POST_EDIT'		=> get_edit_post_link($post_id),
 			'U_POST_DELETE'		=> current_user_can('delete_post', $post_id) ? '' : '',
+
 			// This both links looks similar, but the return is quite differente according the EMPTY_TRASH_DAYS 
 			'U_POST_DELETE'		=> (!EMPTY_TRASH_DAYS) ? get_delete_post_link($post_id) : '',
 			'U_POST_TRASH'		=> (EMPTY_TRASH_DAYS) ? get_delete_post_link($post_id) : '',
@@ -52,19 +53,19 @@ if (have_posts())
 			'POST_CATS'			=> sprintf(phpbb::$user->lang['WP_POSTED_IN'], get_the_category_list(', ')),
 			'U_FOLLOW_FEED'		=> sprintf(phpbb::$user->lang['WP_FOLLOW_FEED'], get_post_comments_feed_link($post_id)),
 			// Both Comments and Pings are open
-			'U_YES_COMMENT_YES_PING'	=> (('open' == $post-> comment_status) && ('open' == $post->ping_status)) ? sprintf(phpbb::$user->lang['WP_YES_COMMENT_YES_PING'], get_permalink(), get_trackback_url()) : '',
+			'U_YES_COMMENT_YES_PING'	=> (('open' == $post->comment_status) && ('open' == $post->ping_status)) ? sprintf(phpbb::$user->lang['WP_YES_COMMENT_YES_PING'], get_permalink(), get_trackback_url()) : '',
 			// Only Pings are Open
-			'U_NO_COMMENT_YES_PING'		=> (!('open' == $post-> comment_status) && ('open' == $post->ping_status)) ? sprintf(phpbb::$user->lang['WP_NO_COMMENT_YES_PING'], get_trackback_url()) : '',
+			'U_NO_COMMENT_YES_PING'		=> (!('open' == $post->comment_status) && ('open' == $post->ping_status)) ? sprintf(phpbb::$user->lang['WP_NO_COMMENT_YES_PING'], get_trackback_url()) : '',
 			// Comments are open, Pings are not
-			'U_YES_COMMENT_NO_PING'		=> (('open' == $post-> comment_status) && !('open' == $post->ping_status)) ? phpbb::$user->lang['WP_YES_COMMENT_NO_PING'] : '',
+			'U_YES_COMMENT_NO_PING'		=> (('open' == $post->comment_status) && !('open' == $post->ping_status)) ? phpbb::$user->lang['WP_YES_COMMENT_NO_PING'] : '',
 			// Neither Comments, nor Pings are open
-			'U_NO_COMMENT_NO_PING'		=> (!('open' == $post-> comment_status) && !('open' == $post->ping_status))? phpbb::$user->lang['WP_NO_COMMENT_NO_PING'] : '',
+			'U_NO_COMMENT_NO_PING'		=> (!('open' == $post->comment_status) && !('open' == $post->ping_status))? phpbb::$user->lang['WP_NO_COMMENT_NO_PING'] : '',
 		);
 
 		$topic_title = $postrow['POST_SUBJECT'];
 		$topic_link = $postrow['U_MINI_POST'];
 
-		$autor = phpbb::phpbb_the_autor_full($post->post_author);
+		$autor = phpbb::phpbb_the_autor_full($post->post_author, true);
 		$postrow = array_merge($postrow, $autor);
 
 		// Dump vars into template
@@ -99,13 +100,13 @@ if (have_posts())
 			'COMMENT_TO_POST_ID'		=> $post_id,
 			'REQUIRED_FIELDS'			=> get_option('require_name_email'),
 
-		//	'LA_USERNAME_REQUIRED_NOTE'		=> addslashes(sprintf(phpbb::$user->lang['WP_USERNAME_REQUIRED_NOTE'], phpbb::$user->lang['USERNAME'])),
-			'LA_EMAIL_REQUIRED_NOTE'		=> addslashes(sprintf(phpbb::$user->lang['WP_EMAIL_REQUIRED_NOTE'], phpbb::$user->lang['EMAIL_ADDRESS'])),
-			'LA_EMAIL_REQUIRED_MINLENGTH'	=> addslashes(sprintf(phpbb::$user->lang['WP_EMAIL_REQUIRED_MINLENGTH'], phpbb::$user->lang['EMAIL_ADDRESS'])),
-			'LA_WEBSITE_REQUIRED_NOTE'		=> addslashes(sprintf(phpbb::$user->lang['WP_WEBSITE_REQUIRED_NOTE'], phpbb::$user->lang['WEBSITE'])),
-			'LA_WEBSITE_REQUIRED_MINLENGTH'	=> addslashes(sprintf(phpbb::$user->lang['WP_WEBSITE_REQUIRED_MINLENGTH'], phpbb::$user->lang['WEBSITE'])),
-			'LA_MESSAGE_REQUIRED_NOTE'		=> addslashes(sprintf(phpbb::$user->lang['WP_MESSAGE_REQUIRED_NOTE'], phpbb::$user->lang['MESSAGE_BODY'])),
-			'LA_MESSAGE_REQUIRED_MINLENGTH'	=> addslashes(sprintf(phpbb::$user->lang['WP_MESSAGE_REQUIRED_MINLENGTH'], phpbb::$user->lang['MESSAGE_BODY'])),
+			'LA_USERNAME_REQUIRED_NOTE'		=> addslashes(phpbb::$user->lang['WP_USERNAME_REQUIRED_NOTE']),
+			'LA_EMAIL_REQUIRED_NOTE'		=> addslashes(phpbb::$user->lang['WP_EMAIL_REQUIRED_NOTE']),
+			'LA_EMAIL_REQUIRED_MINLENGTH'	=> addslashes(phpbb::$user->lang['WP_EMAIL_REQUIRED_MINLENGTH']),
+			'LA_WEBSITE_REQUIRED_NOTE'		=> addslashes(phpbb::$user->lang['WP_WEBSITE_REQUIRED_NOTE']),
+			'LA_WEBSITE_REQUIRED_MINLENGTH'	=> addslashes(phpbb::$user->lang['WP_WEBSITE_REQUIRED_MINLENGTH']),
+			'LA_MESSAGE_REQUIRED_NOTE'		=> addslashes(phpbb::$user->lang['WP_MESSAGE_REQUIRED_NOTE']),
+			'LA_MESSAGE_REQUIRED_MINLENGTH'	=> addslashes(phpbb::$user->lang['WP_MESSAGE_REQUIRED_MINLENGTH']),
 
 			'L_COMMENT_ALLOWED_TAGS'		=> sprintf(phpbb::$user->lang['WP_ALLOWED_TAGS'], ' <code>' . allowed_tags() . '</code>'),
 		));
