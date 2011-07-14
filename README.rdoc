@@ -1,6 +1,6 @@
 = BRIDGE phpBB & WordPress
 * Release Version none
-* Developer Version 0.0.5
+* Developer Version 0.0.5-PL1
 
 The source code, issue tracker and wiki can be found at:
 
@@ -16,8 +16,8 @@ Not available yet
 
 == REQUIREMENTS:
 
-* phpBB 3.0.8
-* WordPress 3.2
+* phpBB 3.0.9
+* WordPress 3.2.1
 
 == DOCUMENTATION:
 
