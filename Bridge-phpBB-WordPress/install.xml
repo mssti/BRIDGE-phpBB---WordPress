@@ -30,7 +30,7 @@
 
 		</author-group>
 
-		<mod-version>0.0.5</mod-version>
+		<mod-version>0.0.5-PL1</mod-version>
 
 		<installation>
 			<level>easy</level>
@@ -41,9 +41,19 @@
 		<history>
 			<entry>
 				<date>2011-07-12</date>
+				<rev-version>0.0.5-PL1</rev-version>
+				<changelog lang="en">
+					<change> [CHAGE] Improve post from WP to phpBB (html to bbcode)</change>
+					<change> [FIX] Link to registry in comments when WP require</change>
+					<change> [FEATURE] Not only post a new entry, also update a previous posted entry in phpbb</change>
+					<change> [FEATURE] Different css classes for body according the page</change>
+				</changelog>
+			</entry>
+			<entry>
+				<date>2011-07-12</date>
 				<rev-version>0.0.5</rev-version>
 				<changelog lang="en">
-					<change> Updte to WP 3.2 </change>
+					<change> Update to WP 3.2 </change>
 					<change> Several improvements</change>
 					<change> Several fix (Thanks to Netgen)</change>
 				</changelog>

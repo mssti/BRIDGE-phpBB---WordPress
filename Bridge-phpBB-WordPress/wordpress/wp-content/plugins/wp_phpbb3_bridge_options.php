@@ -280,7 +280,7 @@ function wp_phpbb3_bridge_options_page()
 	<div class="wrap">(*)
 		<span class="description">
 			If you are not sure what is the full path to your phpBB3 then create a file "ie: mypath.php" into the folder phpBB3 and enter the following code in it:
-			 <code>echo $_SERVER['SCRIPT_FILENAME'];</code>
+			 <code>echo $_SERVER['SCRIPT_FILENAME'];</code> You will get someting like this :<br /><code><?php echo $_SERVER['SCRIPT_FILENAME']; ?></code>
 			 <br />
 			 The above code will return to you the full path to phpBB3 + the file name "mypath.php".
 			 <br />

@@ -56,7 +56,7 @@ $lang = array_merge($lang, array(
 	'WP_TITLE_BLOG_EXPLAIN'		=> 'Click here to go to the Blog',
 	'WP_TITLE_FORUM'			=> 'Forum',
 	'WP_TITLE_FORUM_EXPLAIN'	=> 'Click here to go to the Forum',
-	'WP_ADMIN_PANEL'			=> 'Site Admin',
+	'WP_ADMIN_PANEL'			=> 'Dashboard',
 
 	// Sidebar
 	'WP_AUTHOR_TITLE'			=> 'Author',
@@ -73,14 +73,14 @@ $lang = array_merge($lang, array(
 	'WP_TITLE_RECENT_TOPICS'	=> 'Recent Topics',
 
 	// Search
-	'WP_TITLE_SEARCH'				=> 'Blog Search',
+//	'WP_TITLE_SEARCH'				=> 'Blog Search',
 	'WP_SEARCH_NOT_FOUND'			=> 'Not Found',
 	'WP_SEARCH_NOT_FOUND_EXPLAIN'	=> 'Sorry, but you are looking for something that isn’t here.',
 	'WP_JUMP_TO_POST'				=> 'Jump to entrie',
 
 	// WP entries
 	'WP_POST_NOT_FOUND_EXPLAIN'	=> 'Apologies, but no results were found for the requested archive. Perhaps searching will help find a related post.',
-	'WP_READ_MORE'				=> 'Read full enry »',
+	'WP_READ_MORE'				=> 'Read full entry »',
 	'WP_POSTED_IN'				=> 'Posted in: %s',
 	'WP_FOLLOW_FEED'			=> 'You can follow any responses to this entry through the <a href="%s">RSS 2.0</a> feed.',
 	'WP_YES_COMMENT_YES_PING'	=> 'You can <a href="%1$s#respond">leave a response</a>, or <a href="%2$s" rel="trackback">trackback</a> from your own site.',

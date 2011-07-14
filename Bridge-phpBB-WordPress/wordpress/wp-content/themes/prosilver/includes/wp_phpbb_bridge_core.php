@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.8 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/theme/prosilver
- * @version: $Id: wp_phpbb_bridge_core.php, v0.0.5 2011/07/12 11:07:12 leviatan21 Exp $
+ * @version: $Id: wp_phpbb_bridge_core.php, v0.0.5-PL1 2011/07/13 11:07:13 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -556,7 +556,7 @@ class phpbb
 			'PHPBB_IN_WEB'		=> false,
 			'PHPBB_IN_BLOG'		=> true,
 			'PHPBB_IN_PASTEBIN'	=> false,
-			'SCRIPT_NAME'		=> 'blog',
+			'SCRIPT_NAME'		=> 'blog ' . self::wp_location(),
 			'IN_HOME'			=> is_home(),
 
 		//	'U_WEB'				=> append_sid($web_path),
@@ -581,6 +581,72 @@ class phpbb
 		{
 			self::wp_notes();
 		}
+	}
+
+	public static function wp_location()
+	{
+		$m = get_query_var('m');
+		$year = get_query_var('year');
+		$monthnum = get_query_var('monthnum');
+		$day = get_query_var('day');
+		$search = get_query_var('s');
+		$location = 'index';
+
+		// If there is a post
+		if (is_single() || (is_home() && !is_front_page()) || (is_page() && !is_front_page()))
+		{
+			$location = 'single';
+		}
+
+		// If there's a category or tag
+		if (is_category() || is_tag())
+		{
+			$location = 'category';
+		}
+
+		// If there's a taxonomy
+		if (is_tax())
+		{
+			$location = 'taxonomy';
+		}
+
+		// If there's an author
+		if (is_author())
+		{
+			$location = 'author';
+		}
+
+		// If there's a post type archive
+		if ( is_post_type_archive() )
+		{
+			$location = 'archive';
+		}
+
+		// If there's a month
+		if (is_archive() && !empty($m))
+		{
+			$location = 'archive month';
+		}
+
+		// If there's a year
+		if (is_archive() && !empty($year))
+		{
+			$location = 'archive year';
+		}
+
+		// If it's a search
+		if (is_search())
+		{
+			$location = 'search';
+		}
+
+		// If it's a 404 page
+		if (is_404())
+		{
+			$location = 'error';
+		}
+
+		return $location;
 	}
 
 	/**
@@ -1001,8 +1067,8 @@ class phpbb
 			'body' => ($template_body !== false) ? $template_body : 'wordpress/index_body.html',
 		));
 
-		// Do the phpBB page footer at least
-		page_footer();
+		// Do the phpBB page footer at least but do not run cron jobs
+		page_footer(false);
 	}
 
 	public static function wp_page_footer()

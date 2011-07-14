@@ -350,13 +350,6 @@ function wp_phpbb_posting($post_ID, $post)
 		return false;
 	}
 
-	// Return if this entry was already posted ( means we are editting )
-	$phpbb_post_id = get_post_meta($post_ID, 'phpbb_post_id', true );
-	if (!empty($phpbb_post_id))
-	{
-		return false;
-	}
-
 	global $table_prefix, $wp_user;
 
 	if (!defined('IN_WP_PHPBB_BRIDGE'))
@@ -399,11 +392,22 @@ function wp_phpbb_posting($post_ID, $post)
 	$message_parser = new parse_message();
 
 	// Define some initial variables
-	$topic_id = $post_id = 0;
+	$mode = 'post';
+	$forum_id = $topic_id = $post_id = 0;
 	$poll = array();
 	$message_prefix = '';
 	$message_tail = '';
 	$subject_prefix = '';
+
+	// We are ading a new entry or we are editting ?
+	$phpbb_post_id = get_post_meta($post_ID, 'phpbb_post_id', true );	//	$phpbb_post_id=array('forum_id' => 2, 'topic_id' => 47, 'post_id' => 74);
+	if (!empty($phpbb_post_id))
+	{
+		$mode = 'edit';
+		$forum_id = $phpbb_post_id['forum_id'];
+		$topic_id = $phpbb_post_id['topic_id'];
+		$post_id = $phpbb_post_id['post_id'];
+	}
 
 	// Get the post link
 	$entry_link = get_permalink($post_ID);
@@ -460,14 +464,18 @@ function wp_phpbb_posting($post_ID, $post)
 	global $data;
 	$data = wp_phpbb_post_data($message, $subject, $topic_id, $post_id, phpbb::$user->data, $forum_row, $message_parser);
 
-	submit_post('post', $subject, phpbb::$user->data['username'], POST_NORMAL, $poll, $data, true);
+	submit_post($mode, $subject, phpbb::$user->data['username'], POST_NORMAL, $poll, $data, true);
 
 	// Update post meta data and add the phpbb post ID
-	$phpbb_post_id = (isset($data['post_id']) && $data['post_id']) ? $data['post_id'] : 0;
-	if ($phpbb_post_id != 0)
+	if ($mode == 'post')
 	{
-		global $wpdb;
-		$wpdb->insert( $wpdb->postmeta, array( 'post_id' => $post_ID, 'meta_key' => 'phpbb_post_id', 'meta_value' => $phpbb_post_id ) );
+		$phpbb_forum_id = (isset($data['forum_id']) && $data['forum_id']) ? $data['forum_id'] : 0;
+		$phpbb_topic_id = (isset($data['topic_id']) && $data['topic_id']) ? $data['topic_id'] : 0;
+		$phpbb_post_id = (isset($data['post_id']) && $data['post_id']) ? $data['post_id'] : 0;
+		if ($phpbb_forum_id != 0 && $phpbb_topic_id != 0 && $phpbb_post_id != 0)
+		{
+			add_post_meta($post_ID, 'phpbb_post_id', array('forum_id' => $phpbb_forum_id, 'topic_id' => $phpbb_topic_id, 'post_id' => $phpbb_post_id), true);
+		}
 	}
 }
 
@@ -529,54 +537,144 @@ function wp_phpbb_post_data($message, $subject, $topic_id, $post_id, $user_row, 
 /**
  * Function convert HTML to BBCode 
  * 	Cut down from DeViAnThans3's version Originally (C) DeViAnThans3 - 2005 (GPL v2)
+ * 	and from rss.php & feed.php
  * 	We have made several changes and fixes. 
  */
 function wp_phpbb_html_to_bbcode(&$string)
 {
 	// Strip slashes !
-	$string = stripslashes($string);
+//	$string = stripslashes($string);
 
 //	$string = strip_tags($string, '<p><a><img><br><strong><em><blockquote><b><u><i><ul><ol><li><code>');
 
 	$from = array(
-		'~<i>(.*?)</i>~is',
-		'~<span.*?font-style: italic.*?' . '>(.*?)</span>~is',
-		'~<span.*?text-decoration: underline.*?' . '>(.*?)</span>~is',
-		'~<em(.*?)>(.*?)</em>~is',
-		'~<b(.*?)>(.*?)</b>~is',
-		'~<strong(.*?)>(.*?)</strong>~is',
-		'~<u(.*?)>(.*?)</u>~is',
-		'~<code(.*?)>(.*?)</code>~is',
-		'~<blockquote(.*?)>(.*?)</blockquote>~is',
-		'~<img.*?src="(.*?)".*?' . '>~is',
-		'~<a.*?href="(.*?)".*?' . '>(.*?)</a>~is',
-		'~<p(.*?)>(.*?)</p>~is',
-		'~<br(.*?)>~is',
-		'~<li(.*?)>(.*?)</li>~is',
-		'~<ul(.*?)>(.*?)</ul>~is',
-		'~<ol(.*?)>(.*?)</ol>~is',
+		"#<a.*?href=\'(.*?)\'.*?>(.*?)<\/a>#is",
+		'#<a.*?href=\"(.*?)\".*?>(.*?)<\/a>#is',
+
+		'#<img.*?src="(.*?)".*?\/>#is',
+		'#<img.*?src="(.*?)".*?>#is',
+
+		'#<code.*?>#is',
+		'#<\/code>#is',
+
+		'#<blockquote.*?>#is',
+		'#<\/blockquote>#is',
+
+		'#<(span|div) style=\"font-size: ([\-\+]?\d+)(px|em|\%);\">(.*?)<\/(span|div)>#is',
+
+		'#<li.*?>#is',
+		'#<\/li>#is',
+		'#<ul.*?>#is',
+		'#<\/ul>#is',
+		'#<ol.*?>#is',
+		'#<\/ol>#is',
+
+		'#<(i|em).*?>#is',
+		'#<\/(i|em)>#is',
+		'#<(span|div) style=\"font-style: italic;.*?\">(.*?)<\/(span|div)>#is',
+
+		'#<(b|strong).*?>#is',
+		'#<\/(b|strong)>#is',
+
+		'#<(u|ins).*?>#is',
+		'#<\/(u|ins)>#is',
+		'#<(span|div) style=\"text-decoration: underline;.*?\">(.*?)<\/(span|div)>#is',
+
+		'#<(span|div) style=\"color: \#(.*?);\">(.*?)<\/(span|div)>#is',
+		'#<font.*?color=\"([a-z\-]+)\".*?>(.*?)<\/font>#is',
+		'#<font.*?color=\"\#(.*?)\".*?>(.*?)<\/font>#is',
+
+		'#<p.*?>#is',
+		'#<\/p>#is',
+		'#<br.*?>#is',
+
+		// treat "del" and "strike" as undeline
+		'#<(del|strike).*?>#is',
+		'#<\/(del|strike)>#is',
 	);
 
 	$to = array(
-		'[i]\\1[/i]',
-		'[i]\\1[/i]',
-		'[u]\\1[/u]',
-		'[i]\\2[/i]',
-		'[b]\\2[/b]',
-		'[b]\\2[/b]',
-		'[u]\\2[/u]',
-		'[code]\\2[/code]',
-		'[quote]\\2[/quote]',
-		'[img]\\1[/img]',
 		'[url=\\1]\\2[/url]',
-		'\\2', 	//	'\\2[br][br]',
-		"\n",		//	'[br]',
-		"\n" . '[*]\\2',
-		'[list]\\2[/list]',
-		'[list=1]\\2[/list]',
+		'[url=\\1]\\2[/url]',
+
+		'[img]\\1[/img]',
+		'[img]\\1[/img]',
+
+		'[code]',
+		'[/code]',
+
+		'[quote]',
+		'[/quote]',
+
+		"[size=\\2]\\4[/size]",
+
+		'[*]',
+		'',
+		'[list]',
+		'[/list]',
+		'[list=1]',
+		'[/list]',
+
+		'[i]',
+		'[/i]',
+		'[i]\\2[/i]',
+
+		'[b]',
+		'[/b]',
+
+		'[u]',
+		'[/u]',
+		'[u]\\2[/u]',
+
+		'[color=#\\2]\\3[/color]',
+		'[color=\\1]\\2[/color]',
+		'[color=#\\1]\\2[/color]',
+
+		'',
+		"\n",
+		"\n",
+
+		'[u]',
+		'[/u]',
 	);
 
-	$string = preg_replace($from, $to, $string); 
+	$string = preg_replace($from, $to, $string);
+
+	// Remove all JavaScript Event Handlers
+	$string = preg_replace('#(onabort|onblur|onchange|onclick|ondblclick|onerror|onfocus|onkeydown|onkeypress|onkeyup|onload|onmousedown|onmousemove|onmouseout|onmouseover|onmouseup|onreset|onresize|onselect|onsubmit|onunload)="(.*?)"#si', '', $string);
+
+	// Remove embed and objects, but leaving a link to the video
+	// Use (<|&lt;) and (>|&gt;) because can be contained into [code][/code]
+	$string = preg_replace('/(<|&lt;)object[^>]*?>.*?(value|src)=(.*?)(^|[\n\t (>]).*?object(>|&gt;)/', ' <a href=$3 target="_blank"><strong>object</strong></a>',$string);
+	$string = preg_replace('/(<|&lt;)embed[^>]*?>.*?(value|src)=(.*?)(^|[\n\t (>]).*?embed(>|&gt;)/', ' <a href=$3 target="_blank"><strong>embed</strong></a>',$string);
+
+	// Potentially Malicious HTML Tags ?
+	// Remove some specials html tag, because somewhere there are a mod to allow html tags ;)
+	// Use (<|&lt;) and (>|&gt;) because can be contained into [code][/code]
+	$string = preg_replace(
+		array (
+			'@(<|&lt;)head[^>]*?(>|&gt;).*?(<|&lt;)/head(>|&gt;)@siu',
+			'@(<|&lt;)style[^>]*?(>|&gt;).*?(<|&lt;)/style(>|&gt;)@siu',
+			'@(<|&lt;)script[^>]*?.*?(<|&lt;)/script(>|&gt;)@siu',
+			'@(<|&lt;)applet[^>]*?.*?(<|&lt;)/applet(>|&gt;)@siu',
+			'@(<|&lt;)noframes[^>]*?.*?(<|&lt;)/noframes(>|&gt;)@siu',
+			'@(<|&lt;)noscript[^>]*?.*?(<|&lt;)/noscript(>|&gt;)@siu',
+			'@(<|&lt;)noembed[^>]*?.*?(<|&lt;)/noembed(>|&gt;)@siu',
+			'@(<|&lt;)iframe([^[]+)iframe(>|&gt;)@iu',
+			'@(<|&lt;)/?((frameset)|(frame)|(iframe))@iu',
+		),
+		array (
+			'[code]head[/code]',
+			'[code]style[/code]',
+			'[code]script[/code]',
+			'[code]applet[/code]',
+			'[code]noframes[/code]',
+			'[code]noscript[/code]',
+			'[code]noembed[/code]',
+			'[code]iframe[/code]',
+			'[code]frame[/code]',
+		),
+	$string);
 
 	// prettify estranged tags
 	$string = str_replace("&nbsp;", " ", $string); 
@@ -587,9 +685,9 @@ function wp_phpbb_html_to_bbcode(&$string)
 	$string = str_replace('&quot;', '"', $string);
 	$string = str_replace('&amp;', '&', $string);
 
-	$string = htmlspecialchars($string); 
+//	$string = htmlspecialchars($string); 
 	// kill any remaining
-	$string = strip_tags($string); 
+	$string = strip_tags($string);
 
 	// Other control characters
 //	$string = preg_replace('#(?:[\x00-\x1F\x7F]+|(?:\xC2[\x80-\x9F])+)#', '', $string);
