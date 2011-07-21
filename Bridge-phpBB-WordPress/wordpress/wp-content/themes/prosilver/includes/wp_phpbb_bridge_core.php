@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.8 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/theme/prosilver
- * @version: $Id: wp_phpbb_bridge_core.php, v0.0.5-PL1 2011/07/13 11:07:13 leviatan21 Exp $
+ * @version: $Id: wp_phpbb_bridge_core.php, v0.0.6 2011/07/13 11:07:13 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -571,7 +571,7 @@ class phpbb
 			'S_REGISTER_ENABLED'=> (self::$config['require_activation'] != USER_ACTIVATION_DISABLE && get_option('users_can_register')) ? true : false,
 			'U_LOGIN_LOGOUT'	=> (!is_user_logged_in()) ? get_option('siteurl') . '/?action=login' : get_option('siteurl') . '/?action=logout',
 			'L_LOGIN_LOGOUT'	=> (!is_user_logged_in()) ? self::$user->lang['LOGIN'] : sprintf(self::$user->lang['LOGOUT_USER'], self::$user->data['username']),
-			'U_WP_ACP'			=> (self::$user->data['user_type'] == USER_FOUNDER) ? admin_url() : '',
+			'U_WP_ACP'			=> (self::$user->data['user_type'] == USER_FOUNDER || current_user_can('level_8')) ? admin_url() : '',
 
 			'T_THEME_PATH'		=> "{$web_path}styles/" . self::$user->theme['theme_path'] . '/theme',
 			'T_STYLESHEET_LINK'	=> (!self::$user->theme['theme_storedb']) ? "{$web_path}styles/" . self::$user->theme['theme_path'] . '/theme/stylesheet.css' : append_sid("{$web_path}style." . PHP_EXT, 'id=' . self::$user->theme['style_id'] . '&amp;lang=' . self::$user->data['user_lang']),
@@ -643,7 +643,7 @@ class phpbb
 		// If it's a 404 page
 		if (is_404())
 		{
-			$location = 'error';
+			$location = 'wp-error';
 		}
 
 		return $location;
@@ -981,6 +981,8 @@ class phpbb
 
 			if ($bday_year)
 			{
+				$now = getdate(time() + self::$user->timezone + self::$user->dst - date('Z'));
+
 				$diff = $now['mon'] - $bday_month;
 				if ($diff == 0)
 				{

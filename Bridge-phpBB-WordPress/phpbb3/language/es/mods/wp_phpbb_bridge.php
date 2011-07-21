@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.8 :: BRIDGE phpBB & WordPress -> root/language/es/mods :: [es][Spanish]
- * @version: $Id: wp_phpbb_bridge.php, v0.0.5 2011/07/12 11:07:12 leviatan21 Exp $
+ * @version: $Id: wp_phpbb_bridge.php, v0.0.6 2011/07/21 11:07:21 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -150,7 +150,7 @@ $lang = array_merge($lang, array(
 
 	// pbpbb posting 
 	'WP_SUBJECT_BLOG_PREFIX'			=> '[BLOG]: ',
-	'WP_POST_BLOG_PREFIX'				=> 'Esta es una [b]entrada del Blog [/b]. Para leer el tema original, haga clic » %1$s HERE %2$s',
+	'WP_POST_BLOG_PREFIX'				=> 'Esta es una [b]entrada del Blog [/b]. Para leer el tema original, haga clic » %1$s AQUI %2$s',
 	'WP_POST_BLOG_TAIL'					=> '[b]Detalles de la entrada: [/b]',
 ));
 

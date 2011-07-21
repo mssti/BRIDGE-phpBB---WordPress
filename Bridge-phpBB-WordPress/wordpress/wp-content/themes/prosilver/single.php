@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.8 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/theme/prosilver
- * @version: $Id: single.php, v0.0.5 2011/07/12 11:07:12 leviatan21 Exp $
+ * @version: $Id: single.php, v0.0.6 2011/07/12 11:07:12 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -36,9 +36,8 @@ if (have_posts())
 			'POST_ID'			=> $post_id,
 			'POST_DATE'			=> phpbb::$user->format_date($post_date_time, false, true),
 			// Generate urls for letting the moderation control panel being accessed in different modes
-			'S_POST_ACTIONS'	=> (current_user_can('delete_post', $post_id) || current_user_can('edit_post', $post_id)), //	'publish_posts' or 'edit_posts' is for create
+			'S_POST_ACTIONS'	=> (current_user_can('delete_post', $post_id) || current_user_can('edit_post', $post_id)) ? true : false, //	'publish_posts' or 'edit_posts' is for create
 			'U_POST_EDIT'		=> get_edit_post_link($post_id),
-			'U_POST_DELETE'		=> current_user_can('delete_post', $post_id) ? '' : '',
 
 			// This both links looks similar, but the return is quite differente according the EMPTY_TRASH_DAYS 
 			'U_POST_DELETE'		=> (!EMPTY_TRASH_DAYS) ? get_delete_post_link($post_id) : '',
@@ -171,7 +170,8 @@ function wp_phpbb_query_filter($query)
 {
 	$query_comment = array(
 		'from' 	=> array(
-			'is_registered' => "AND (comment_approved = '1' OR (user_id = " . trim(phpbb::$user->data['wp_user']['ID']) . " AND comment_approved = '0'))",
+			// Do not delete extra spaces after "(" amd before ")"
+			'is_registered' => "AND (comment_approved = '1' OR ( user_id = " . trim(phpbb::$user->data['wp_user']['ID']) . " AND comment_approved = '0' ) )",
 			'is_anonymous' => "WHERE comment_approved = '1' AND"
 		),
 		'to'	=> array(
@@ -180,12 +180,20 @@ function wp_phpbb_query_filter($query)
 		),
 	);
 
+	/**
+	From : query=(SELECT * FROM wp_comments WHERE comment_post_ID = 1 AND (comment_approved = '1' OR ( user_id = 1 AND comment_approved = '0' ) ) ORDER BY comment_date_gmt)
+	To :   query=(SELECT * FROM wp_comments WHERE comment_post_ID = 1 ORDER BY comment_date_gmt)
+	**/
 	if (strpos($query, $query_comment['from']['is_registered']) !== false)
 	{
 		$query = str_replace($query_comment['from']['is_registered'], $query_comment['to']['is_registered'], $query);
 		remove_filter('query', 'query_filter');
 	}
 
+	/**
+	From : query=(SELECT * FROM wp_comments WHERE comment_approved = '1' AND comment_post_ID = 1 ORDER BY comment_date_gmt ASC )
+	To :   query=(SELECT * FROM wp_comments WHERE comment_post_ID = 1 ORDER BY comment_date_gmt ASC )
+	**/
 	if (strpos($query, $query_comment['from']['is_anonymous']) !== false)
 	{
 		$query = str_replace($query_comment['from']['is_anonymous'], $query_comment['to']['is_anonymous'], $query);

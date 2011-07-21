@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.8 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/theme/prosilver
- * @version: $Id: comments.php, v0.0.5 2011/07/12 11:07:12 leviatan21 Exp $
+ * @version: $Id: comments.php, v0.0.6 2011/07/21 11:07:21 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -57,6 +57,8 @@ function wp_phpbb_comment_end_el()
 
 function wp_phpbb_comment_loop($comment, $args)
 {
+	$GLOBALS['comment'] = $comment;
+
 	// Retrieve the ID of the current item in the WordPress Loop
 	$comment_id = $comment->comment_ID;
 
@@ -106,7 +108,7 @@ function wp_phpbb_comment_loop($comment, $args)
 
 /**
  * Let us decide which comments text display and for who can see it
- * 	This works because the filter added at single.php : add_filter('query', 'query_filter');
+ * 	This works because the filter added at single.php : add_filter('query', 'wp_phpbb_query_filter');;
  * 	We do not user "add_filter('comment_text', 'filter_comment_text');" because we need some extra arguments
  *
  * @param (string) $comment_text : 

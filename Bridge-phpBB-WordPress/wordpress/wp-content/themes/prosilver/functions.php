@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.8 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/theme/prosilver
- * @version: $Id: functions.php, v0.0.5 2011/07/12 11:07:12 leviatan21 Exp $
+ * @version: $Id: functions.php, v0.0.6 2011/07/12 11:07:12 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -45,7 +45,7 @@ function wp_phpbb_stylesheet()
 function wp_phpbb_javascript()
 {
 	// javascript for general proposes
-	wp_register_script('javascript', get_bloginfo('stylesheet_directory') . '/js/javascript.js', false, '');
+	wp_register_script('javascript', get_bloginfo('stylesheet_directory') . '/js/javascript.js', false, '0.0.6');
 	wp_enqueue_script('javascript');
 	wp_print_scripts('javascript');
 
@@ -160,17 +160,6 @@ function wp_topic_generate_pagination($url, $replies, $per_page)
 	}
 
 	return $pagination;
-}
-
-/**
- * After delete or trash an entry restur to the index page, instead the same page (that do not exist anymore)
- */
-add_action('after_delete_post', 'wp_phpbb_trasheddelete_post_handler', 10, 1);
-add_action('trashed_post', 'wp_phpbb_trasheddelete_post_handler', 10, 1);
-function wp_phpbb_trasheddelete_post_handler($post_id)
-{
-    wp_redirect(get_option('siteurl'));
-    exit;
 }
 
 /**
@@ -332,9 +321,65 @@ class WP_Widget_phpbb_recet_topics extends WP_Widget
  * @param int $accepted_args optional. The number of arguments the function accept (default 1).
  */
 $wp_phpbb_posting = (int) get_option('wp_phpbb_bridge_post_forum_id');
+
 if ($wp_phpbb_posting)
 {
 	add_action('publish_post', 'wp_phpbb_posting', 10, 2);
+}
+
+/**
+ * After delete or trash an entry restur to the index page, instead the same page (that do not exist anymore)
+ */
+add_action('after_delete_post', 'wp_phpbb_trasheddelete_post_handler', 10, 1);
+add_action('trashed_post', 'wp_phpbb_trasheddelete_post_handler', 10, 1);
+function wp_phpbb_trasheddelete_post_handler($post_id)
+{
+	$wp_phpbb_posting = (int) get_option('wp_phpbb_bridge_post_forum_id');
+
+	// Handle delete mode...
+	if ($wp_phpbb_posting)
+	{
+		global $table_prefix, $wp_user;
+
+		if (!defined('IN_WP_PHPBB_BRIDGE'))
+		{
+			global $wp_phpbb_bridge_config, $phpbb_root_path, $phpEx;
+			global $auth, $config, $db, $template, $user, $cache;
+			include(TEMPLATEPATH . '/includes/wp_phpbb_bridge.php');
+		}
+
+		// We are ading a new entry or we are editting ?
+		$phpbb_post_id = get_post_meta($post_id, 'phpbb_post_id', true );	//	$phpbb_post_id=array('forum_id' => 2, 'topic_id' => 47, 'post_id' => 74);
+		if (!empty($phpbb_post_id))
+		{
+			$sql = 'SELECT f.*, t.*, p.*
+				FROM ' . FORUMS_TABLE . ' f, ' . TOPICS_TABLE . ' t, ' . POSTS_TABLE . ' p
+				WHERE p.post_id = ' . (int) $phpbb_post_id['post_id'] . '
+					AND t.topic_id = p.topic_id
+					AND f.forum_id = t.forum_id';
+			$result = phpbb::$db->sql_query($sql);
+			$post_data = phpbb::$db->sql_fetchrow($result);
+			phpbb::$db->sql_freeresult($result);
+		}
+		
+		if ($post_data)
+		{
+			if (!function_exists('delete_post'))
+			{
+				include(PHPBB_ROOT_PATH . 'includes/functions_posting.' . PHP_EXT);
+			}
+			delete_post($post_data['forum_id'], $post_data['topic_id'], $post_data['post_id'], $post_data);
+		}
+	}
+
+	if (defined('WP_ADMIN') && WP_ADMIN == true)
+	{
+	}
+	else
+	{
+    	wp_redirect(get_option('siteurl'));
+	    exit;
+	}    	
 }
 
 /**
@@ -364,15 +409,45 @@ function wp_phpbb_posting($post_ID, $post)
 		return false;
 	}
 
-	// To be sure, get some forum data from the first forum (should be forum id 2).
-	$sql = 'SELECT forum_id, forum_parents, forum_name
-			FROM ' . FORUMS_TABLE . '
-			WHERE forum_id = ' . phpbb::$config['wp_phpbb_bridge_post_forum_id'];
-	$result = phpbb::$db->sql_query($sql);
-	$forum_row = phpbb::$db->sql_fetchrow($result);
-	phpbb::$db->sql_freeresult($result);
+	// Define some initial variables
+	$mode = 'post';
+	$forum_id = $topic_id = $post_id = 0;
+	$poll = array();
+	$message_prefix = '';
+	$message_tail = '';
+	$subject_prefix = '';
 
-	if (!$forum_row)
+	// We need to know some basic information in all cases before we do anything.
+
+	// We are ading a new entry or we are editting ?
+	$phpbb_post_id = get_post_meta($post_ID, 'phpbb_post_id', true );	//	$phpbb_post_id=array('forum_id' => 2, 'topic_id' => 47, 'post_id' => 74);
+	if (!empty($phpbb_post_id))
+	{
+		$mode = 'edit';
+		$forum_id = $phpbb_post_id['forum_id'];
+		$topic_id = $phpbb_post_id['topic_id'];
+		$post_id = $phpbb_post_id['post_id'];	
+
+		$sql = 'SELECT f.*, t.*, p.*
+			FROM ' . FORUMS_TABLE . ' f, ' . TOPICS_TABLE . ' t, ' . POSTS_TABLE . ' p
+			WHERE p.post_id = ' . (int) $post_id . '
+				AND t.topic_id = p.topic_id
+				AND f.forum_id = t.forum_id';
+		$result = phpbb::$db->sql_query($sql);
+		$post_data = phpbb::$db->sql_fetchrow($result);
+		phpbb::$db->sql_freeresult($result);
+	}
+	else
+	{
+		$sql = 'SELECT *
+			FROM ' . FORUMS_TABLE . '
+			WHERE forum_id = ' . (int) phpbb::$config['wp_phpbb_bridge_post_forum_id'];
+		$result = phpbb::$db->sql_query($sql);
+		$post_data = phpbb::$db->sql_fetchrow($result);
+		phpbb::$db->sql_freeresult($result);
+	}
+
+	if (!$post_data)
 	{
 		return false;
 	}
@@ -390,24 +465,6 @@ function wp_phpbb_posting($post_ID, $post)
 		include(PHPBB_ROOT_PATH . 'includes/message_parser.' . PHP_EXT);
 	}
 	$message_parser = new parse_message();
-
-	// Define some initial variables
-	$mode = 'post';
-	$forum_id = $topic_id = $post_id = 0;
-	$poll = array();
-	$message_prefix = '';
-	$message_tail = '';
-	$subject_prefix = '';
-
-	// We are ading a new entry or we are editting ?
-	$phpbb_post_id = get_post_meta($post_ID, 'phpbb_post_id', true );	//	$phpbb_post_id=array('forum_id' => 2, 'topic_id' => 47, 'post_id' => 74);
-	if (!empty($phpbb_post_id))
-	{
-		$mode = 'edit';
-		$forum_id = $phpbb_post_id['forum_id'];
-		$topic_id = $phpbb_post_id['topic_id'];
-		$post_id = $phpbb_post_id['post_id'];
-	}
 
 	// Get the post link
 	$entry_link = get_permalink($post_ID);
@@ -462,7 +519,7 @@ function wp_phpbb_posting($post_ID, $post)
 
 	// Setup the settings we need to send to submit_post
 	global $data;
-	$data = wp_phpbb_post_data($message, $subject, $topic_id, $post_id, phpbb::$user->data, $forum_row, $message_parser);
+	$data = wp_phpbb_post_data($message, $subject, $topic_id, $post_id, phpbb::$user->data, $post_data, $message_parser);
 
 	submit_post($mode, $subject, phpbb::$user->data['username'], POST_NORMAL, $poll, $data, true);
 
@@ -480,58 +537,49 @@ function wp_phpbb_posting($post_ID, $post)
 }
 
 // Setup the settings we need to send to submit_post
-function wp_phpbb_post_data($message, $subject, $topic_id, $post_id, $user_row, $forum_row, $message_parser)
+function wp_phpbb_post_data($message, $subject, $topic_id, $post_id, $user_row, $post_data, $message_parser)
 {
 	$message = wp_phpbb_html_to_bbcode($message);
 
 	$message_parser->message = $message;
 	$message_parser->parse(true, true, true);
 
-	return array(
-		'topic_title'			=> $subject,
-		'topic_first_post_id'	=> 0,
-		'topic_last_post_id'	=> 0,
-		'topic_time_limit'		=> 0,
-		'topic_attachment'		=> 0,
+	$data = array(
 		'post_id'				=> $post_id,
 		'topic_id'				=> $topic_id,
-		'forum_id'				=> (int) $forum_row['forum_id'],
-		'icon_id'				=> 0,
+		'forum_id'				=> (int) $post_data['forum_id'],
+		'icon_id'				=> (isset($post_data['enable_sig'])) ? (bool) $post_data['enable_sig'] : true,
+		'topic_status'			=> 1,
+		'topic_title'			=> $subject,
 
-		'enable_sig'			=> true,
-		'enable_bbcode'			=> true,
-		'enable_smilies'		=> true,
-		'enable_urls'			=> true,
-		'enable_indexing'		=> true,
+		'topic_type'			=> POST_NORMAL,
+		'enable_sig'			=> (isset($post_data['enable_sig'])) ? $post_data['enable_sig'] : true,
+		'enable_bbcode'			=> (isset($post_data['enable_bbcode'])) ? $post_data['enable_bbcode'] : true,
+		'enable_smilies'		=> (isset($post_data['enable_smilies'])) ? $post_data['enable_smilies'] : true,
+		'enable_urls'			=> (isset($post_data['enable_urls'])) ? $post_data['enable_urls'] : true,
 		'post_time'				=> time(),
-		'post_checksum'			=> '',
-		'post_edit_reason'		=> '',
-		'post_edit_user'		=> 0,
-		'forum_parents'			=> $forum_row['forum_parents'],
-		'forum_name'			=> $forum_row['forum_name'],
 
-		'notify'				=> false,
-		'notify_set'			=> false,
+		'notify'				=> (isset($post_data['notify'])) ? $post_data['notify'] : false,
+		'notify_set'			=> (isset($post_data['notify_set'])) ? $post_data['notify_set'] : false,
 		'poster_id'				=> $user_row['user_id'],
-		'poster_ip'				=> '0.0.0.0',
 		'bbcode_bitfield'		=> $message_parser->bbcode_bitfield,
 		'bbcode_uid'			=> $message_parser->bbcode_uid,
 		'message'				=> $message_parser->message,
-		'message_md5'			=> (string) md5($message),
-		'attachment_data'		=> $message_parser->attachment_data,
-		'filename_data'			=> $message_parser->filename_data,
+		'message_md5'			=> (string) md5($message_parser->message),
 
-		'post_edit_locked'		=> false,
-		'topic_approved'		=> true,
-		'post_approved'			=> true,
-		'force_approved_state'	=> true,
+		'post_edit_locked'		=> (isset($post_data['post_edit_locked'])) ? $post_data['post_edit_locked'] : false,
+		'force_approved_state'	=> (isset($post_data['force_approved_state'])) ? $post_data['force_approved_state'] : true,
 
 		// Just in case 
-		'seo_desc'				=> '',
-		'seo_key'				=> '',
-		'seo_post_key'			=> '',
-		'topic_seo_title'		=> '',
+		'seo_desc'				=> (isset($post_data['seo_desc'])) ? $post_data['seo_desc'] : '',
+		'seo_key'				=> (isset($post_data['seo_key'])) ? $post_data['seo_key'] : '',
+		'seo_post_key'			=> (isset($post_data['seo_post_key'])) ? $post_data['seo_post_key'] : '',
+		'topic_seo_title'		=> (isset($post_data['topic_seo_title'])) ? $post_data['topic_seo_title'] : '',
 	);
+
+	// Merge the data we grabbed from the forums/topics/posts tables
+	$data = array_merge($post_data, $data);
+	return $data;
 }
 
 /**
