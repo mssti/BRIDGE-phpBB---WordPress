@@ -1,8 +1,8 @@
 <?php
 /**
  * 
- * @package: phpBB 3.0.8 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/theme/prosilver
- * @version: $Id: single.php, v0.0.6 2011/07/12 11:07:12 leviatan21 Exp $
+ * @package: phpBB 3.0.9 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/themes/phpBB
+ * @version: $Id: single.php, v0.0.7 2011/08/04 11:08:04 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -19,6 +19,7 @@ $postrow = $commentrow = $autor = array();
 
 $topic_title = $topic_link = '';
 
+$post_id = 0;
 if (have_posts())
 {
 	while (have_posts())
@@ -64,7 +65,7 @@ if (have_posts())
 		$topic_title = $postrow['POST_SUBJECT'];
 		$topic_link = $postrow['U_MINI_POST'];
 
-		$autor = phpbb::phpbb_the_autor_full($post->post_author, true);
+		$autor = phpbb::phpbb_the_autor_full($post->post_author, false, true);
 		$postrow = array_merge($postrow, $autor);
 
 		// Dump vars into template
@@ -142,6 +143,14 @@ if (have_posts())
 		'S_DISPLAY_NOTE'		=> (get_option('comment_registration') && phpbb::$user->data['user_id'] == ANONYMOUS) ? sprintf(phpbb::$user->lang['WP_LOGIN_NEED'], get_option('siteurl') . '/?action=login') : '',
 
 		// Icons
+		'REPLY_IMG'				=> ($post->comment_status == 'open') ? phpbb::$user->img('button_topic_reply', 'REPLY_TO_TOPIC') : phpbb::$user->img('button_topic_locked', 'TOPIC_LOCKED'),
+
+		'EDIT_IMG' 				=> phpbb::$user->img('icon_post_edit', 'EDIT_POST'),
+		'DELETE_IMG' 			=> phpbb::$user->img('icon_post_delete', 'DELETE_POST'),
+		'SPAM_IMG' 				=> phpbb::$user->img('icon_wp_spam', 'WP_COMMENT_SPAM_EXPLAIN'),
+		'UNSPAM_IMG'			=> phpbb::$user->img('icon_wp_nospam', 'WP_COMMENT_UNSPAM_EXPLAIN'),
+		'APPROVE_IMG'			=> phpbb::$user->img('icon_wp_approve', 'WP_COMMENT_APPROVE_EXPLAIN'),
+		'UNAPPROVE_IMG'			=> phpbb::$user->img('icon_wp_unapprove', 'POST_UNAPPROVED'),
 		'REPORTED_IMG'			=> phpbb::$user->img('icon_topic_reported', 'POST_REPORTED'),
 		'UNAPPROVED_IMG'		=> phpbb::$user->img('icon_topic_unapproved', 'POST_UNAPPROVED'),
 
@@ -152,9 +161,9 @@ if (have_posts())
 	));
 }
 
-phpbb::page_sidebar();
+phpbb::page_sidebar($post_id);
 
-phpbb::page_header(phpbb::$user->lang['INDEX']);
+phpbb::page_header();
 
 phpbb::page_footer();
 

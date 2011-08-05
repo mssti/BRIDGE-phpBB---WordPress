@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml-stylesheet type="text/xsl" href="modx.prosilver.en.xsl"?>
+<!--For security purposes, please check: http://www.phpbb.com/mods/ for the latest version of this MOD. Although MODs are checked before being allowed in the MODs Database there is no guarantee that there are no security problems within the MOD. No support will be given for MODs not found within the MODs Database which can be found at http://www.phpbb.com/mods/-->
+<mod xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.phpbb.com/mods/xml/modx-1.2.5.xsd">
+	<header>
+		<license><![CDATA[http://opensource.org/licenses/gpl-license.php GNU General Public License v2]]></license>
+
+		<title lang="en"><![CDATA[BRIDGE phpBB & WordPress - Add-on : localise button image]]></title>
+		<title lang="es"><![CDATA[BRIDGE phpBB & WordPress - Agregado : botón en idioma local]]></title>
+
+		<description lang="en"><![CDATA[Add the button "New Post" for replace the "New topic" into the Blog]]></description>
+		<description lang="es"><![CDATA[Agregar el botón "Nueva Entrasa" para reemplazar el botón "Nuevo tema" en el Blog]]></description>
+
+		<author-notes lang="en"><![CDATA[Please keep in mind that this MOD version is still in development, so not everything may be in place or working.
+
+* It is not recommended that you install this version on a live forum.
+* Report any bugs or problems you encounter to our issue tracker http://github.com/mssti/BRIDGE-phpBB---WordPress/issues
+* Also, good ideas and bug reports are always welcome.
+* Before adding this MOD to your forum, you should back up all files related to this MOD.
+]]></author-notes>
+		<author-notes lang="es"><![CDATA[Por favor, tenga en cuenta que este MOD aún se encuentra en etapa de desarrollo, por lo cual no todo puede estar correcto o funcionar a la perfección.
+
+* No es recomendable que usted instale esta versión en un foro en vivo.
+* Reporte cualquier error o problema que pueda encontrar en el Rastreador : http://github.com/mssti/BRIDGE-phpBB---WordPress/issues
+* También, buenas ideas y reportes serán siempre bienvenidos.
+* Antes de agregar este MOD a su foro, usted debería realizar una copia de seguridad de todos los archivos relacionados con este MOD.
+* Este MOD modifica la base de datos.
+]]></author-notes>
+
+		<author-group>
+			<author>
+				<realname><![CDATA[Gabriel]]></realname>
+				<username><![CDATA[leviatan21]]></username>
+				<homepage><![CDATA[http://www.mssti.com/phpbb3/]]></homepage>
+				<email><![CDATA[info@mssti.com]]></email>
+				<contributions-group>
+					<contributions status="current" from="2011-06-01" position="Developer"/>
+				</contributions-group>
+			</author>
+
+		</author-group>
+
+		<mod-version>0.0.7</mod-version>
+
+		<installation>
+			<level>easy</level>
+			<time>300</time>
+			<target-version>3.0.9</target-version>
+		</installation>
+
+		<history>
+			<entry>
+				<date>2011-08-01</date>
+				<rev-version>0.0.7</rev-version>
+				<changelog lang="en">
+					<change> For a changelog, read the main install file</change>
+				</changelog>
+				<changelog lang="es">
+					<change> Para el listado de cambios, lea el archivo instalador principal</change>
+				</changelog>
+			</entry>
+		</history>
+
+		<link-group>
+			<link type="parent" href="../install.xml" lang="en">Code change</link>
+		</link-group>
+	</header>
+
+	<action-group>
+
+		<copy>
+			<file from="root/styles/prosilver/imageset/*.*" to="styles/prosilver/imageset/*.*"/>
+		</copy>
+
+		<open src="includes/acp/acp_styles.php">
+			<edit>
+				<find><![CDATA[		// Execute overall actions]]></find>
+				<action type="before-add"><![CDATA[// MOD : WordPress - phpBB Integration Mod - START
+		$this->imageset_keys['buttons'][] = 'button_blogpost_new';
+// MOD : WordPress - phpBB Integration Mod - END
+
+]]></action>
+			</edit>
+		</open>
+
+		<open src="includes/acp/acp_language.php">
+			<edit>
+				<find><![CDATA[				$sql_ary = array();]]></find>
+				<action type="before-add"><![CDATA[// MOD : WordPress - phpBB Integration Mod - START
+				$valid_localized[] = 'button_blogpost_new';
+// MOD : WordPress - phpBB Integration Mod - END
+
+]]></action>
+			</edit>
+		</open>
+
+		<open src="language/en/acp/styles.php">
+			<edit>
+				<find><![CDATA[	'IMG_USER_ICON1'	=> 'Definida por usuario 1',]]></find>
+				<action type="after-add"><![CDATA[// MOD : WordPress - phpBB Integration Mod - START
+	'IMG_BUTTON_BLOGPOST_NEW'	=> 'New Blog Post',
+// MOD : WordPress - phpBB Integration Mod - END
+]]></action>
+				<comment lang="en"><![CDATA[You will have to make this change to ALL languages you have installed, I use "en" as an example.
+				You can customize the string as you wish.]]></comment>
+				<comment lang="es"><![CDATA[Usted debe realizar este cambio en TODOS los idiomas que tenga instalados, yo uso "en" como un ejemplo.
+				Usted puede personalizar el texto como desee.]]></comment>
+			</edit>
+		</open>
+
+		<open src="styles/prosilver/imageset/en/imageset.cfg">
+			<edit>
+				<find><![CDATA[# Images]]></find>
+				<action type="after-add"><![CDATA[
+# MOD : WordPress - phpBB Integration Mod - START
+img_button_blogpost_new = button_blogpost_new.gif*25*96
+# MOD : WordPress - phpBB Integration Mod - END
+]]></action>
+				<comment lang="en"><![CDATA[You will have to make this change to ALL themes you have installed, based off Prosilver. I use "Prosilver" as an example.
+				You will have to make this change to ALL languages you have installed. I use "en" as an example.
+				You can add it at the bottom of the imageset.cfg file]]></comment>
+				<comment lang="es"><![CDATA[Usted debe hacer este cambio en TODOS los temas que tiene instalado, basados de Prosilver. Yo uso "Prosilver" como ejemplo.
+				Usted debe realizar este cambio en TODOS los idiomas que tenga instalados, yo uso "en" como un ejemplo.
+				Puede hacer el agregado al final del archivo imageset.cfg]]></comment>
+			</edit>
+		</open>
+
+		<diy-instructions lang="en"><![CDATA[IMPORTANT ! 
+
+#####################################################################
+Log on to the phpBB Administration Control Panel
+
+A) Refresh the theme :
+
+	A.1) Navigate to "Styles" Tab.
+	A.2) Under "Style components " click on "Theme".
+	A.3) Under "Actions" click on "Refresh".
+	A.4) in the next screen, click on "Yes" ( Repeat last 2 steps to each instaled style ).
+
+#####################################################################
+B) Enjoy it !.]]>
+		</diy-instructions>
+				<diy-instructions lang="es"><![CDATA[IMPORTANTE ! 
+
+#####################################################################
+Identificarse en el Panel de control del Administrador
+
+#####################################################################
+A) Actualizar el Tema :
+
+	A.1) Navegue hasta la solapa "ESTILOS"
+	A.2) Debajo de "COMPONENTES DE ESTILO" hacer click en "Tema".
+	A.3) En "Acciones" hacer click en "Actualizar".
+	A.4) En la siguente pantalla, haga click en "SI" ( Repita los 2 últimos pasos para cada estilo Instalado ).
+
+#####################################################################
+B) Disfruten !.]]></diy-instructions>
+	</action-group>
+</mod>

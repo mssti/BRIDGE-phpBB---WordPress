@@ -1,0 +1,113 @@
+
+		<div id="quickreply">
+			<script type="text/javascript">
+			// <![CDATA[
+			var $jQ_validation=jQuery;
+
+			$jQ_validation("#reply-button").click(function (){
+				$jQ_validation("#quickreply").slideToggle("fast");
+			});
+
+			$jQ_validation(document).ready(function(){
+				$jQ_validation("#quickreply").hide();
+				$jQ_validation("#commentform").validate({
+					rules: {
+					<!-- IF not S_USER_LOGGED_IN -->
+						author: {
+							required: true
+						},
+						email: {
+							required: true,
+							minlength: 10
+						},
+						url: {
+							required: true,
+							minlength: 10
+						},
+					<!-- ENDIF -->
+						comment: {
+							required: true,
+							minlength: 20
+						}
+					},
+					messages: {
+					<!-- IF not S_USER_LOGGED_IN -->
+						author: {
+							required: '{LA_USERNAME_REQUIRED_NOTE}',
+						},
+						email: {
+							required: '{LA_EMAIL_REQUIRED_NOTE}',
+							minlength: '{LA_EMAIL_REQUIRED_MINLENGTH}'
+						},
+						url: {
+							required: '{LA_WEBSITE_REQUIRED_NOTE}',
+							minlength: '{LA_WEBSITE_REQUIRED_MINLENGTH}'
+						},
+					<!-- ENDIF -->
+						comment: {
+							required: '{LA_MESSAGE_REQUIRED_NOTE}',
+							minlength: '{LA_MESSAGE_REQUIRED_MINLENGTH}'
+						}
+					}
+				});
+			});
+			// ]]>
+			</script>
+
+		<!-- IF S_DISPLAY_NOTE -->
+			{S_DISPLAY_NOTE}
+		<!-- ELSE -->
+			<form action="{U_ACTION}" method="post" id="commentform">
+				<table class="tablebg" width="100%" cellspacing="1">
+					<tr>
+						<th align="center" colspan="2">{L_POST_REPLY}</th>
+					</tr>
+					<!-- IF S_USER_LOGGED_IN -->
+					<tr>
+						<td class="row1" width="22%"><b class="genmed">{L_WP_LOGGED_IN}:</b></td>
+						<td  class="row2" width="78%">
+							{S_LOGGED_AS}
+							<input id="author" name="author" type="hidden" value="{COMMENT_AUTHOR}" size="60" maxlength="255" class="text autowidth" />
+							<input id="email" name="email" type="hidden" value="{COMMENT_AUTHOR_EMAIL}" size="60" maxlength="255" class="text autowidth" />
+							<input id="url" name="url" type="hidden" value="{COMMENT_AUTHOR_ULR}" size="60" maxlength="255" class="text autowidth" />
+						</td>
+					</tr>
+					<!-- ELSE -->
+					<tr>
+						<td class="row1" width="22%"><b class="genmed">{L_USERNAME}:</b><!-- IF REQUIRED_FIELDS --><span class="required">*</span><!-- ENDIF --></td>
+						<td  class="row2" width="78%"><input id="author" name="author" type="text" value="{COMMENT_AUTHOR}" size="60" maxlength="255" class="text autowidth" /></td>
+					</tr>
+					<tr>
+						<td class="row1" width="22%"><b class="genmed">{L_EMAIL_ADDRESS}:</b><br />{L_WP_EMAIL_NOTE}</td>
+						<td  class="row2" width="78%"><input id="email" name="email" type="text" value="{COMMENT_AUTHOR_EMAIL}" size="60" maxlength="255" class="text autowidth" /><!-- IF REQUIRED_FIELDS --><span class="required">*</span><!-- ENDIF --></td>
+					</tr>
+					<tr>
+						<td class="row1" width="22%"><b class="genmed">{L_WEBSITE}:</b></td>
+						<td  class="row2" width="78%"><input id="url" name="url" type="text" value="{COMMENT_AUTHOR_ULR}" size="60" maxlength="255" class="text autowidth" /><!-- IF REQUIRED_FIELDS --><span class="required">*</span><!-- ENDIF --></td>
+					</tr>
+					<!-- ENDIF -->
+					<tr>
+						<td class="row1" valign="top" width="22%"><b class="genmed">{L_MESSAGE_BODY}:</label><span class="required">*</span></td>
+						<td class="row2" valign="top" align="left" width="78%">
+							<div id="message-box">
+								<textarea name="comment" id="comment" rows="10" cols="76" tabindex="4" style="width: 99%; height: 150px; min-width: 99%; max-width: 99%;">{MESSAGE}</textarea>
+								<br /><br /><p>{L_COMMENT_ALLOWED_TAGS}</p>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<td class="row1" width="22%"><b class="genmed">{L_WP_REQUIRED_FIELDS}</b></td>
+						<td  class="row2" width="78%"><span class="required">*</span></td>
+					</tr>
+					<tr>
+						<td class="cat" colspan="2" align="center">
+							<input type="submit" name="submit" id="submit" value="{L_SUBMIT}"  class="btnmain"/>
+							<input type="hidden" name="comment_post_ID" id="comment_post_ID" value="{COMMENT_TO_POST_ID}" />
+							{S_REPLYTO}
+							{S_UNFILTEREDHTML}
+						</td>
+					</tr>
+				</table>
+			</form>
+		<!-- ENDIF -->
+		</div><!-- #quickreply //-->

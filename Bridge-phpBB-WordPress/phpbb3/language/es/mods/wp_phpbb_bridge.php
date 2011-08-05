@@ -129,12 +129,12 @@ $lang = array_merge($lang, array(
 	'WP_LOGGED_AS_OUT'					=> '<a href="%1$s">%2$s</a>. <a href="%3$s" title="Salir de esta cuenta">Desconectarme ?</a>',
 	'WP_REQUIRED_FIELDS'				=> 'Los campos obligatorios están marcados como :',
 	'WP_USERNAME_REQUIRED_NOTE'			=> '* Por favor, complete el campo "Nombre de Usuario" con su nombre o apodo.',
-	'WP_EMAIL_REQUIRED_NOTE'			=> '* Por favor, complete el campo "%s" con una dirección de email válida.',
-	'WP_EMAIL_REQUIRED_MINLENGTH'		=> '* El el campo "%s" debe contener al menos 10 Caracteres.',
-	'WP_WEBSITE_REQUIRED_NOTE'			=> '* Por favor, complete el campo "%s" con una url válida.',
-	'WP_WEBSITE_REQUIRED_MINLENGTH'		=> '* El el campo "%s" debe contener al menos 10 Caracteres.',
-	'WP_MESSAGE_REQUIRED_NOTE'			=> '* Por favor, complete el campo "%s" con un comentario válido.',
-	'WP_MESSAGE_REQUIRED_MINLENGTH'		=> '* El el campo "%s" debe contener al menos 20 Caracteres.',
+	'WP_EMAIL_REQUIRED_NOTE'			=> '* Por favor, complete el campo "Dirección de email" con una dirección de email válida.',
+	'WP_EMAIL_REQUIRED_MINLENGTH'		=> '* El el campo "Dirección de email" debe contener al menos 10 Caracteres.',
+	'WP_WEBSITE_REQUIRED_NOTE'			=> '* Por favor, complete el campo "Sitio web" con una url válida.',
+	'WP_WEBSITE_REQUIRED_MINLENGTH'		=> '* El el campo "Sitio web" debe contener al menos 10 Caracteres.',
+	'WP_MESSAGE_REQUIRED_NOTE'			=> '* Por favor, complete el campo "Cuerpo del mensaje" con un comentario válido.',
+	'WP_MESSAGE_REQUIRED_MINLENGTH'		=> '* El el campo "Cuerpo del mensaje" debe contener al menos 20 Caracteres.',
 
 	'WP_EMAIL_NOTE'						=> 'El Correo electrónico no será publicado.',
 	'WP_ALLOWED_TAGS'					=> 'Puede usar las siguientes etiquetas y atributos <abbr title=\"HyperText Markup Language\">HTML</abbr>: %s',
@@ -150,7 +150,7 @@ $lang = array_merge($lang, array(
 
 	// pbpbb posting 
 	'WP_SUBJECT_BLOG_PREFIX'			=> '[BLOG]: ',
-	'WP_POST_BLOG_PREFIX'				=> 'Esta es una [b]entrada del Blog [/b]. Para leer el tema original, haga clic » %1$s AQUI %2$s',
+	'WP_POST_BLOG_PREFIX'				=> 'Esta es una [b]entrada del Blog[/b]. Para leer el tema original, haga clic » %1$s AQUI %2$s',
 	'WP_POST_BLOG_TAIL'					=> '[b]Detalles de la entrada: [/b]',
 ));
 

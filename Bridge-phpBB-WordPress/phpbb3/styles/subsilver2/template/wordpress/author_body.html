@@ -1,0 +1,60 @@
+			<td valign="top" class="<!-- IF not DYNAMIC_SIDEBAR -->postprofile<!-- ELSE -->row2<!-- ENDIF -->" id="profile{POSTER_ID}">
+				<table cellspacing="4" align="center" width="150">
+			<!-- IF RANK_TITLE -->
+				<tr>
+					<td class="postdetails">{RANK_TITLE}</td>
+				</tr>
+			<!-- ENDIF -->
+			<!-- IF RANK_IMG -->
+				<tr>
+					<td>{RANK_IMG}</td>
+				</tr>
+			<!-- ENDIF -->
+			<!-- IF POSTER_AVATAR -->
+				<tr>
+					<td>
+						<!-- IF U_POST_AUTHOR --><a href="{U_POST_AUTHOR}">{POSTER_AVATAR}</a><!-- ELSE -->{POSTER_AVATAR}<!-- ENDIF --><br />
+						<!-- IF not U_POST_AUTHOR --><strong>{POST_AUTHOR_FULL}</strong><!-- ELSE -->{POST_AUTHOR_FULL}<!-- ENDIF -->
+					</td>
+				</tr>
+			<!-- ENDIF -->
+			<!-- IF not S_IS_BOT -->
+				<tr>
+					<td>
+					<!-- IF U_POST_AUTHOR --><a href="{U_POST_AUTHOR}">{PROFILE_IMG}</a> <!-- ENDIF -->
+					<!-- IF U_PM --><a href="{U_PM}" title="{L_PRIVATE_MESSAGE}">{PM_IMG}</a> <!-- ENDIF -->
+					<!-- IF U_EMAIL --><a href="{U_EMAIL}" title="{L_SEND_EMAIL_USER} {POST_AUTHOR}">{EMAIL_IMG}</a> <!-- ENDIF -->
+					<!-- IF U_WWW --><a href="{U_WWW}" title="{L_VISIT_WEBSITE}: {U_WWW}">{WWW_IMG}</a> <!-- ENDIF -->
+					<!-- IF U_MSN --><a href="{U_MSN}" onclick="popup(this.href, 550, 320); return false;" title="{L_MSNM}">{MSN_IMG}</a> <!-- ENDIF -->
+					<!-- IF U_ICQ --><a href="{U_ICQ}" onclick="popup(this.href, 550, 320); return false;" title="{L_ICQ}">{ICQ_IMG}</a> <!-- ENDIF -->
+					<!-- IF U_YIM --><a href="{U_YIM}" onclick="popup(this.href, 780, 550); return false;" title="{L_YIM}">{YIM_IMG}</a> <!-- ENDIF -->
+					<!-- IF U_AIM --><a href="{U_AIM}" onclick="popup(this.href, 550, 320); return false;" title="{L_AIM}">{AIM_IMG}</a> <!-- ENDIF -->
+					<!-- IF U_JABBER --><a href="{U_JABBER}" onclick="popup(this.href, 550, 320); return false;" title="{L_JABBER}">{JABBER_IMG}</a> <!-- ENDIF -->
+					</td>
+				</tr>
+			<!-- ENDIF -->
+
+			<!-- IF not (RANK_TITLE or RANK_IMG or POSTER_AVATAR) -->
+				<tr>
+					<td></td>
+				</tr>
+			<!-- ENDIF -->
+				</table>
+
+				<span class="postdetails">
+					<!-- IF POSTER_JOINED --><br /><b>{L_JOINED}:</b> {POSTER_JOINED}<!-- ENDIF -->
+					<!-- IF POSTER_FROM --><br /><b>{L_LOCATION}:</b> {POSTER_FROM}<!-- ENDIF -->
+					<!-- IF POSTER_POSTS != '' --><br /><b>{L_WP_FORUM_POSTS}:</b> {POSTER_POSTS}<!-- IF U_FORUM_POSTS_AUTHOR --> | <a href="{U_FORUM_POSTS_AUTHOR}">{L_WP_SEARCH_USER_POSTS}</a><!-- ENDIF --><!-- ENDIF -->
+					<!-- IF S_POSTS_AUTHOR --><br /><b>{L_WP_BLOG_POSTS}:</b> {S_POSTS_AUTHOR}<!-- IF U_BLOG_POSTS_AUTHOR --> | <a href="{U_BLOG_POSTS_AUTHOR}">{L_WP_SEARCH_USER_POSTS}</a><!-- ENDIF --><!-- ENDIF -->
+
+					<!-- IF S_PROFILE_FIELD1 -->
+						<!-- Use a construct like this to include admin defined profile fields. Replace FIELD1 with the name of your field. -->
+						<br /><b>{PROFILE_FIELD1_NAME}:</b> {PROFILE_FIELD1_VALUE}
+					<!-- ENDIF -->
+
+					<!-- BEGIN custom_fields -->
+						<br /><b>{custom_fields.PROFILE_FIELD_NAME}:</b> {custom_fields.PROFILE_FIELD_VALUE}
+					<!-- END custom_fields -->
+				</span>
+
+			</td>

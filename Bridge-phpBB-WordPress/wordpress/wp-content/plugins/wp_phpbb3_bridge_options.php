@@ -78,11 +78,11 @@ function wp_phpbb3_bridge_options_page()
 
 	// Include the constant for the path to phpBB
 	define('IN_WP_PHPBB_BRIDGE', true);
-	if (!file_exists(WP_CONTENT_DIR . '/themes/prosilver/includes/wp_phpbb_bridge_constants.php'))
+	if (!file_exists(WP_CONTENT_DIR . '/themes/phpBB/includes/wp_phpbb_bridge_constants.php'))
 	{
-		wp_die('<p>No "Bridge" constant found. Check the "' . WP_CONTENT_DIR . '/themes/prosilver/includes/wp_phpbb_bridge_constants.php" file.</p>');
+		wp_die('<p>No "Bridge" constant found. Check the "' . WP_CONTENT_DIR . '/themes/phpBB/includes/wp_phpbb_bridge_constants.php" file.</p>');
 	}
-	require(WP_CONTENT_DIR . '/themes/prosilver/includes/wp_phpbb_bridge_constants.php');
+	require(WP_CONTENT_DIR . '/themes/phpBB/includes/wp_phpbb_bridge_constants.php');
 
 	// Some default options
 	$submit	= (isset($_POST['submit'])) ? true : false;
@@ -299,14 +299,14 @@ function wp_phpbb3_bridge_template($active = true)
 	$error	 = false;
 	$message = '';
 	$action	 = '';
-	$theme	 = strtolower(get_option('template'));
+	$theme	 = get_option('template'); //strtolower(get_option('template'));
 
 	if ($active)
 	{
-		if ($theme != 'prosilver')
+		if ($theme != 'phpBB')
 		{
 			$error = true;
-			$message .= __('The "Prosilver" theme is deactivated', 'wp_phpbb3_bridge_options');
+			$message .= __('The "phpBB" theme is deactivated', 'wp_phpbb3_bridge_options');
 
 			if (current_user_can('switch_themes'))
 			{
@@ -321,10 +321,10 @@ function wp_phpbb3_bridge_template($active = true)
 	}
 	else
 	{
-		if ($theme == 'prosilver')
+		if ($theme == 'phpBB')
 		{
 			$error = true;
-			$message .= __('The "Prosilver" theme is activated', 'wp_phpbb3_bridge_options');
+			$message .= __('The "phpBB" theme is activated', 'wp_phpbb3_bridge_options');
 
 			if (current_user_can('switch_themes'))
 			{

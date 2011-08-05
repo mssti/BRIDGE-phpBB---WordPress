@@ -8,8 +8,19 @@
 					<!-- IF not S_USER_LOGGED_IN and S_REGISTER_ENABLED and not (S_SHOW_COPPA or S_REGISTRATION) --><li class="icon-register rightside"><a href="{U_REGISTER}">{L_REGISTER}</a></li><!-- ENDIF -->
 				<!-- ENDIF -->
 			</ul>
-			<!-- IF S_CLOCK -->
-			<ul class="linklist leftside">
-				<li class="clock">{CURRENT_DATE} <span id="the_clock">{CURRENT_TIME}<script type='text/javascript'> get_the_clock(); </script></span></li>
+		<!-- IF S_CLOCK or  U_WP_ACP -->
+			<ul class="linklist">
+				<!-- IF S_CLOCK -->
+				<li class="clock leftside">{CURRENT_DATE} <span id="the_clock">{CURRENT_TIME}<script type='text/javascript'> get_the_clock(); </script></span></li>
+				<!-- ENDIF -->
+				<!-- IF U_WP_ACP -->
+				<li class="rightside">
+					<div class="topic-actions">
+						<div class="buttons">
+							<div class="<!-- IF BLOG_POST_IMG -->blogpostnew-icon<!-- ELSE --> post-icon<!-- ENDIF -->" title="{L_POST_TOPIC}"><a href="{U_POST_NEW_TOPIC}"><span></span>{L_POST_TOPIC}</a></div>
+						</div>
+					</div>
+				</li>
+				<!-- ENDIF -->
 			</ul>
-			<!-- ENDIF -->
+		<!-- ENDIF -->

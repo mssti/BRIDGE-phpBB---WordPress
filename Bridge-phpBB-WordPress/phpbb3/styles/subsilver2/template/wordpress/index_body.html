@@ -1,0 +1,47 @@
+<!-- INCLUDE overall_header.html -->
+
+<table width="100%" cellspacing="0" cellpadding="0" border="0">
+<tr>
+	<td valign="top">
+	<div id="pagecontent">
+	<!-- IF WP_NOTES_IS_404 or WP_NOTES_IS_CATEGORY or WP_NOTES_IS_MONTH or WP_NOTES_IS_YEAR or WP_NOTES_IS_SEARCH or WP_NOTES_IS_PAGED -->
+		<div class="forumrules">
+			<!-- IF WP_NOTES_IS_404 -->
+			<h3>{L_WP_ERROR_GENERAL}</h3><br />
+			{WP_NOTES_IS_404}
+			<!-- ENDIF -->
+			<!-- IF WP_NOTES_IS_CATEGORY -->{WP_NOTES_IS_CATEGORY}<!-- ENDIF -->
+			<!-- IF WP_NOTES_IS_MONTH -->{WP_NOTES_IS_MONTH}<!-- ENDIF -->
+			<!-- IF WP_NOTES_IS_YEAR -->{WP_NOTES_IS_YEAR}<!-- ENDIF -->
+			<!-- IF WP_NOTES_IS_SEARCH -->{WP_NOTES_IS_SEARCH}<!-- ENDIF -->
+			<!-- IF WP_NOTES_IS_PAGED -->{WP_NOTES_IS_PAGED}<!-- ENDIF -->
+		</div><!-- .forumrules //-->
+		<br />
+	<!-- ENDIF -->
+
+	<!-- IF WIDGET_TEXT -->
+		<div class="panel" id="wp_widget_text">
+			<div class="inner"><span class="corners-top"><span></span></span>
+			{WIDGET_TEXT}
+			<span class="corners-bottom"><span></span></span></div>
+		</div><!-- .panel //-->
+		<br />
+	<!-- ENDIF -->
+
+	<!-- IF IN_SINGLE -->
+		<!-- INCLUDE wordpress/viewtopic_body.html -->
+	<!-- ELSE -->
+		<!-- INCLUDE wordpress/topiclist_body.html -->
+	<!-- ENDIF -->
+	
+	</div><!-- #pagecontent //-->
+	</td>
+<!-- IF DYNAMIC_SIDEBAR or (IN_HOME and S_RECENT_TOPICS) -->
+	<td><img width="4" alt="" src="images/spacer.gif"></td>
+	<td style="width: {DYNAMIC_SIDEBAR_W}px;" valign="top">
+	<!-- INCLUDE wordpress/left_sidebar_body.html -->
+	</td>
+<!-- ENDIF -->
+</tr>
+</table>
+<!-- INCLUDE overall_footer.html -->

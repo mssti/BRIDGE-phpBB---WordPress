@@ -1,13 +1,28 @@
-		<ul class="linklist <!-- IF PREVIOUS_ENTRIE or NEXT_ENTRIE -->navlinks<!-- ENDIF -->">
-			<!-- IF U_WEB --><li class="icon-home"><a href="{U_WEB}" title="{L_WP_TITLE_WEB_EXPLAIN}" >{L_WP_TITLE_WEB}</a></li><!-- ENDIF -->
-			<!-- IF U_INDEX --><li class="icon-home"><a href="{U_INDEX}" title="{L_WP_TITLE_FORUM_EXPLAIN}" >{L_WP_TITLE_FORUM}</a></li><!-- ENDIF -->
-			<!-- IF U_BLOG --><li class="icon-home"><a href="{U_BLOG}" title="{L_WP_TITLE_BLOG_EXPLAIN}" >{L_WP_TITLE_BLOG}</a></li><!-- ENDIF -->
-		</ul>
+			<ul class="linklist <!-- IF PREVIOUS_ENTRIE or NEXT_ENTRIE -->navlinks<!-- ENDIF -->">
+				<!-- IF U_WEB --><li class="icon-home"><a href="{U_WEB}" title="{L_WP_TITLE_WEB_EXPLAIN}" >{L_WP_TITLE_WEB}</a></li><!-- ENDIF -->
+				<!-- IF U_INDEX --><li class="icon-home"><a href="{U_INDEX}" title="{L_WP_TITLE_FORUM_EXPLAIN}" >{L_WP_TITLE_FORUM}</a></li><!-- ENDIF -->
+				<!-- IF U_BLOG --><li class="icon-home"><a href="{U_BLOG}" title="{L_WP_TITLE_BLOG_EXPLAIN}" >{L_WP_TITLE_BLOG}</a></li><!-- ENDIF -->
+
+				<!-- IF U_WP_ACP -->
+				<li class="rightside">
+					<div class="topic-actions">
+						<div class="buttons">
+							<div class="<!-- IF BLOG_POST_IMG -->blogpostnew-icon<!-- ELSE --> post-icon<!-- ENDIF -->" title="{L_POST_TOPIC}"><a href="{U_POST_NEW_TOPIC}"><span></span>{L_POST_TOPIC}</a></div>
+						</div>
+					</div>
+				</li>
+				<!-- ENDIF -->
+			</ul>
+
 		<!-- IF PREVIOUS_ENTRIE or NEXT_ENTRIE -->
-		<ul class="linklist leftside">
-			<li>{PREVIOUS_ENTRIE}</li>
-		</ul>
-		<ul class="linklist rightside">
-			<li>{NEXT_ENTRIE}</li>
-		</ul>
+			<!-- IF PREVIOUS_ENTRIE -->
+			<ul class="linklist leftside">
+				<li>{PREVIOUS_ENTRIE}</li>
+			</ul>
+			<!-- ENDIF -->
+			<!-- IF NEXT_ENTRIE -->
+			<ul class="linklist rightside">
+				<li>{NEXT_ENTRIE}</li>
+			</ul>
+			<!-- ENDIF -->
 		<!-- ENDIF -->

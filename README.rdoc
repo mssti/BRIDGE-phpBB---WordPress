@@ -1,6 +1,6 @@
 = BRIDGE phpBB & WordPress
 * Release Version none
-* Developer Version 0.0.5-PL1
+* Developer Version [DEV]0.0.7
 
 The source code, issue tracker and wiki can be found at:
 
@@ -26,9 +26,9 @@ Not available yet
 == DEPLOYMENT:
 
 Please keep in mind that this version is still in development, so not everything may be in place or working.
-
+* Topic at phpbb : http://www.phpbb.com/community/viewtopic.php?f=70&t=2133699
 * It is not recommended that you install this version on a live forum.
-* Report any bugs or problems you encounter to our issue tracker http://github.com/mssti/BRIDGE-phpBB---WordPress/issues
+* Report any bugs or problems you encounter to our issue tracker : http://github.com/mssti/BRIDGE-phpBB---WordPress/issues
 * Also, good ideas and bug reports are always welcome.
 * Before adding this MOD to your forum, you should back up all files related to this MOD.
 

@@ -1,0 +1,24 @@
+/*  BRIDGE phpBB & WordPress Style Sheet
+    --------------------------------------------------------------
+	Style name:		subsilver2
+	Based on style:	subSilver (the default phpBB 2 style)
+
+	Copyright 2011 leviatan21 ( http://www.mssti.com/ )
+   --------------------------------------------------------------
+*/
+
+/* Layout
+ ------------ */
+p.author {
+	margin: 0 0 0 0;
+	border-bottom: none;
+}
+p.author .avatar {
+    margin-right: 5px;
+}
+#commentform #message-box {
+	width: 100%;
+}
+.tablebg {
+	width :100%;
+}

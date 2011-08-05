@@ -1,0 +1,26 @@
+	<!-- IF U_WP_ACP --><p class="datetime"><a href="{U_POST_NEW_TOPIC}"><!-- IF BLOG_POST_IMG -->{BLOG_POST_IMG}<!-- ELSE -->{POST_IMG}<!-- ENDIF --></a></p><!-- ENDIF -->
+	<!-- IF U_WEB or U_INDEX or U_BLOG -->
+	<table class="tablebg" width="100%" cellspacing="1" cellpadding="0" style="margin-top: 5px;">
+	<tr>
+		<td class="row1" valign="middle">
+			<p class="breadcrumbs">
+				<!-- IF U_WEB --><a href="{U_WEB}" title="{L_WP_TITLE_WEB_EXPLAIN}" ><img src="{T_THEME_PATH}/images/icon_home.gif" width="12" height="13" alt="*" /> {L_WP_TITLE_WEB}</a> &nbsp; <!-- ENDIF -->
+				<!-- IF U_INDEX --><a href="{U_INDEX}" title="{L_WP_TITLE_FORUM_EXPLAIN}" ><img src="{T_THEME_PATH}/images/icon_home.gif" width="12" height="13" alt="*" /> {L_WP_TITLE_FORUM}</a> &nbsp; <!-- ENDIF -->
+				<!-- IF U_BLOG --><a href="{U_BLOG}" title="{L_WP_TITLE_BLOG_EXPLAIN}" ><img src="{T_THEME_PATH}/images/icon_home.gif" width="12" height="13" alt="*" /> {L_WP_TITLE_BLOG}</a> &nbsp; <!-- ENDIF -->
+			</p>
+		</td>
+	</tr>
+	</table>
+	<br clear="all" />
+	<!-- ENDIF -->
+
+	<!-- IF PREVIOUS_ENTRIE or NEXT_ENTRIE -->
+	<table width="100%" cellspacing="1">
+	<tr>
+		<!-- IF PREVIOUS_ENTRIE --><td align="{S_CONTENT_FLOW_BEGIN}" valign="middle" nowrap="nowrap">{PREVIOUS_ENTRIE}</td><!-- ENDIF -->
+		<!-- IF NEXT_ENTRIE --><td class="gensmall" width="100%" align="{S_CONTENT_FLOW_END}" nowrap="nowrap">{NEXT_ENTRIE}</td><!-- ENDIF -->
+	</tr>
+	</table>
+	<br clear="all" />
+	<!-- ENDIF -->
+

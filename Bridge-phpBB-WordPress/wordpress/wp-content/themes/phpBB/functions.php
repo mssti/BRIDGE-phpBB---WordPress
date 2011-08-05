@@ -1,8 +1,8 @@
 <?php
 /**
  * 
- * @package: phpBB 3.0.8 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/theme/prosilver
- * @version: $Id: functions.php, v0.0.6 2011/07/12 11:07:12 leviatan21 Exp $
+ * @package: phpBB 3.0.9 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/themes/phpBB
+ * @version: $Id: functions.php, v0.0.7 2011/08/04 11:08:04 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -195,23 +195,43 @@ function wp_do_action($tag)
  */
 function wp_phpbb_widgets_init()
 {
-	// Register Single Sidebar
-	register_sidebar(
-		array(
-			'id'			=> 'wp_phpbb-widget-area',
-			'name'			=> __('Primary Widget Area', 'wp_phpbb3_bridge'),
-			'description'	=> __('The primary widget area.', 'wp_phpbb3_bridge'),
-			'before_widget'	=> "\n" . '<div class="panel bg3">' . "\r\t" . '<div class="inner"><span class="corners-top"><span></span></span>' . "\n\t\t",
-			'after_widget'	=> "\n\t" . '<span class="corners-bottom"><span></span></span></div>' . "\r" . '</div>' . "\n",
-			'before_title'	=> '<h3>',
-			'after_title'	=> '</h3>' . "\n",
-		)
-	);
-	
-	unregister_widget('WP_Nav_Menu_Widget');
+	$base_subsilver = array('subsilver2');
 
-	register_widget('WP_Widget_phpbb_recet_topics');
+	if (class_exists('phpbb') && in_array(strtolower(phpbb::$config['wp_phpbb_bridge_template']), $base_subsilver))
+	{
+		// subsilver2 Register Single Sidebar
+		register_sidebar(
+			array(
+				'id'			=> 'wp_phpbb-widget-area',
+				'name'			=> __('Primary Widget Area', 'wp_phpbb3_bridge'),
+				'description'	=> __('The primary widget area.', 'wp_phpbb3_bridge'),
+				'before_widget'	=> "\n" . '<table class="tablebg" cellspacing="1">' . "\r\t",
+				'after_widget'	=> "\n\t" . '</td>' . "\r" . '</tr>' . "\r" . '</table><br clear="all" />' . "\n",
+				'before_title'	=> '<tr>' . "\r" . '<th>',
+				'after_title'	=> '</th>' . "\r" . '</tr>' . "\r" . '<tr>' . "\r" . '<td nowrap="nowrap" class="row2">' . "\n",
+			)
+		);
+	}
+	else
+	{
+		// prosilver Register Single Sidebar
+		register_sidebar(
+			array(
+				'id'			=> 'wp_phpbb-widget-area',
+				'name'			=> __('Primary Widget Area', 'wp_phpbb3_bridge'),
+				'description'	=> __('The primary widget area.', 'wp_phpbb3_bridge'),
+				'before_widget'	=> "\n" . '<div class="panel bg3">' . "\r\t" . '<div class="inner"><span class="corners-top"><span></span></span>' . "\n\t\t",
+				'after_widget'	=> "\n\t" . '<span class="corners-bottom"><span></span></span></div>' . "\r" . '</div>' . "\n",
+				'before_title'	=> '<h3>',
+				'after_title'	=> '</h3>' . "\n",
+			)
+		);
+	}
 }
+
+unregister_widget('WP_Nav_Menu_Widget');
+
+register_widget('WP_Widget_phpbb_recet_topics');
 
 // Register sidebars by running wp_phpbb_widgets_init() on the widgets_init hook.
 add_action('widgets_init', 'wp_phpbb_widgets_init');
@@ -348,6 +368,8 @@ function wp_phpbb_trasheddelete_post_handler($post_id)
 			include(TEMPLATEPATH . '/includes/wp_phpbb_bridge.php');
 		}
 
+		$post_data = array();
+
 		// We are ading a new entry or we are editting ?
 		$phpbb_post_id = get_post_meta($post_id, 'phpbb_post_id', true );	//	$phpbb_post_id=array('forum_id' => 2, 'topic_id' => 47, 'post_id' => 74);
 		if (!empty($phpbb_post_id))
@@ -412,7 +434,7 @@ function wp_phpbb_posting($post_ID, $post)
 	// Define some initial variables
 	$mode = 'post';
 	$forum_id = $topic_id = $post_id = 0;
-	$poll = array();
+	$post_data = $poll = array();
 	$message_prefix = '';
 	$message_tail = '';
 	$subject_prefix = '';
@@ -639,6 +661,8 @@ function wp_phpbb_html_to_bbcode(&$string)
 		// treat "del" and "strike" as undeline
 		'#<(del|strike).*?>#is',
 		'#<\/(del|strike)>#is',
+		
+		'#<dt><\/dt>#is',
 	);
 
 	$to = array(
@@ -684,6 +708,8 @@ function wp_phpbb_html_to_bbcode(&$string)
 
 		'[u]',
 		'[/u]',
+		
+		"\n",
 	);
 
 	$string = preg_replace($from, $to, $string);

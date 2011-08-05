@@ -1,0 +1,31 @@
+	<div id="menubar">
+		<table width="100%" cellspacing="0">
+		<tr>
+			<td class="genmed">
+				<!-- IF U_WP_ACP --><a href="{U_WP_ACP}"><img src="{T_THEME_PATH}/images/icon_mini_profile.gif" width="12" height="13" alt="*" /> {L_WP_ADMIN_PANEL}</a> &nbsp; <!-- ENDIF -->
+				<a href="{U_LOGIN_LOGOUT}"><img src="{T_THEME_PATH}/images/icon_mini_login.gif" width="12" height="13" alt="*" /> {L_LOGIN_LOGOUT}</a> &nbsp; 
+				<!-- IF not S_USER_LOGGED_IN and S_REGISTER_ENABLED and not (S_SHOW_COPPA or S_REGISTRATION) --> &nbsp; <a href="{U_REGISTER}"><img src="{T_THEME_PATH}/images/icon_mini_register.gif" width="12" height="13" alt="*" /> {L_REGISTER}</a><!-- ENDIF -->
+			</td>
+			<td class="genmed" align="{S_CONTENT_FLOW_END}">
+				<a href="{U_POST_NEW_TOPIC}"><!-- IF BLOG_POST_IMG -->{BLOG_POST_IMG}<!-- ELSE -->{POST_IMG}<!-- ENDIF --></a>
+			</td>
+		</tr>
+		</table>
+	</div>
+
+	<div id="datebar">
+		<table class="tablebg" width="100%" cellspacing="1" cellpadding="0" style="margin-top: 5px;">
+		<tr>
+			<td class="row1" valign="middle">
+				<!-- IF U_WEB or U_INDEX or U_BLOG -->
+				<p class="breadcrumbs">
+					<!-- IF U_WEB --><a href="{U_WEB}" title="{L_WP_TITLE_WEB_EXPLAIN}" ><img src="{T_THEME_PATH}/images/icon_home.gif" width="12" height="13" alt="*" /> {L_WP_TITLE_WEB}</a> &nbsp; <!-- ENDIF -->
+					<!-- IF U_INDEX --><a href="{U_INDEX}" title="{L_WP_TITLE_FORUM_EXPLAIN}" ><img src="{T_THEME_PATH}/images/icon_home.gif" width="12" height="13" alt="*" /> {L_WP_TITLE_FORUM}</a> &nbsp; <!-- ENDIF -->
+					<!-- IF U_BLOG --><a href="{U_BLOG}" title="{L_WP_TITLE_BLOG_EXPLAIN}" ><img src="{T_THEME_PATH}/images/icon_home.gif" width="12" height="13" alt="*" /> {L_WP_TITLE_BLOG}</a> &nbsp; <!-- ENDIF -->
+				</p>
+				<!-- ENDIF -->
+				<p class="datetime">{CURRENT_DATE} <span id="the_clock">{CURRENT_TIME}<script type='text/javascript'> get_the_clock(); </script></span></p>
+			</td>
+		</tr>
+		</table>
+	</div>

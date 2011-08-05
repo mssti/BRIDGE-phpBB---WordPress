@@ -1,0 +1,40 @@
+
+	<!-- IF POST_AUTHOR and DYNAMIC_SIDEBAR -->
+		<table width="100%" cellspacing="1" class="tablebg">
+		<tr>
+			<th>{L_WP_AUTHOR_TITLE}</th>
+		</tr>
+		<tr>
+			<!-- INCLUDE wordpress/author_body.html -->
+		</tr>
+		</table>
+		<br clear="all" />
+	<!-- ENDIF -->
+
+	<!-- IF DYNAMIC_SIDEBAR -->
+		{DYNAMIC_SIDEBAR}
+	<!-- ENDIF -->
+
+	<!-- IF IN_HOME and S_RECENT_TOPICS -->
+		<table class="tablebg" width="100%" cellspacing="1">
+		<tr>
+			<th>{L_RECENT_TOPICS}</th>
+		</tr>
+		<!-- BEGIN recettopicsrow -->
+		<!-- IF recettopicsrow.S_ROW_COUNT is even --><tr class="row1"><!-- ELSE --><tr class="row2"><!-- ENDIF -->
+			<td class="profile" width="100%" colspan="2">
+				<!-- IF recettopicsrow.FORUM_NAME -->{L_FORUM}: <a href="{recettopicsrow.U_VIEW_FORUM}">{LAST_POST_IMG} <strong>{recettopicsrow.FORUM_NAME}</strong></a><br /><!-- ENDIF -->
+				{L_TOPIC}: <a href="{recettopicsrow.U_VIEW_TOPIC}">{LAST_POST_IMG} <strong>{recettopicsrow.TOPIC_TITLE}</strong></a><br />
+				<!-- IF recettopicsrow.TOPIC_AUTHOR_FULL -->{L_AUTHOR}: {recettopicsrow.TOPIC_AUTHOR_FULL} {recettopicsrow.FIRST_POST_TIME}<br /><!-- ENDIF -->
+				<!-- IF recettopicsrow.REPLIES != '' -->{L_REPLIES}: {recettopicsrow.REPLIES}<br /><!-- ENDIF -->
+				<!-- IF recettopicsrow.VIEWS != '' -->{L_VIEWS}: {recettopicsrow.VIEWS}<br /><!-- ENDIF -->
+				{L_LAST_POST}: <!-- IF not S_IS_BOT --><a href="{recettopicsrow.U_LAST_POST}">{LAST_POST_IMG}</a> <!-- ENDIF -->{L_POST_BY_AUTHOR} {recettopicsrow.LAST_POST_AUTHOR_FULL} {recettopicsrow.LAST_POST_TIME}
+			</td>
+		</tr>
+		<!-- END recettopicsrow -->
+		<tr>
+			<td class="row3" colspan="2" height="1"><img src="images/spacer.gif" width="1" height="1" alt="" /></td>
+		</tr>
+		</table>
+		<br clear="all" />
+	<!-- ENDIF -->

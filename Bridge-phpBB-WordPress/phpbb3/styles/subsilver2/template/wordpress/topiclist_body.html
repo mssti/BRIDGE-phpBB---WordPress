@@ -1,0 +1,91 @@
+		<!-- BEGIN topicrow -->
+		<table class="tablebg" width="100%" cellspacing="1">
+			<tr>
+				<td class="cat" colspan="2">
+					<div class="gensmall" style="float: {S_CONTENT_FLOW_BEGIN};"><h2><a href="{topicrow.U_MINI_POST}">{topicrow.POST_SUBJECT}</a></h2></div>
+					<div style="float: {S_CONTENT_FLOW_END};"><!-- IF S_IS_BOT -->{topicrow.MINI_POST_IMG}<!-- ELSE --><a href="{topicrow.U_MINI_POST}">{topicrow.MINI_POST_IMG}</a><!-- ENDIF -->&nbsp;<b>{L_POSTED}:</b> {topicrow.POST_DATE}&nbsp;</div>
+				</td>
+			</tr>
+			<tr class="row1">
+				<td valign="top" colspan="2">
+					<table width="100%" cellspacing="5">
+						<tr>
+							<td>
+							<!-- IF topicrow.S_POST_UNAPPROVED or topicrow.S_POST_REPORTED -->
+								<table width="100%" cellspacing="0">
+								<tr>
+									<td class="gensmall"><!-- IF topicrow.S_POST_UNAPPROVED --><span class="postapprove">{UNAPPROVED_IMG} <a href="{postrow.U_MCP_APPROVE}">{L_POST_UNAPPROVED}</a></span><br /> <!-- ENDIF --> <!-- IF postrow.S_POST_REPORTED --><span class="postreported">{REPORTED_IMG} <a href="{topicrow.U_MCP_REPORT}">{L_POST_REPORTED}</a></span><!-- ENDIF --></td>
+								</tr>
+								</table>
+								<br clear="all" />
+							<!-- ENDIF -->
+								<div class="postbody">{topicrow.MESSAGE}</div>
+								<br clear="all" /><br />
+							<!-- IF not S_IS_BOT -->
+								<!-- IF topicrow.U_POST_EDIT or topicrow.U_POST_DELETE or topicrow.U_POST_TRASH -->
+								<table width="100%" cellspacing="0">
+									<tr valign="middle">
+										<td class="gensmall" align="right">
+										<!-- IF topicrow.U_POST_EDIT --><a href="{topicrow.U_POST_EDIT}" title="{L_WP_COMMENT_EDIT_EXPLAIN}">{EDIT_IMG}</a><!-- ENDIF -->
+										<!-- IF topicrow.U_POST_DELETE --><a href="{topicrow.U_POST_DELETE}" title="{L_WP_COMMENT_DELETE_EXPLAIN}">{DELETE_IMG}</a><!-- ENDIF -->
+										<!-- IF topicrow.U_POST_TRASH --><a href="{topicrow.U_POST_TRASH}" title="{L_WP_COMMENT_TRASH_EXPLAIN}">{DELETE_IMG}</a><!-- ENDIF -->
+										</td>
+									</tr>
+								</table>
+								<!-- ENDIF -->
+							<!-- ENDIF -->
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+			<!-- IF topicrow.POST_TAGS or topicrow.POST_CATS or topicrow.POST_EDIT or topicrow.POST_COMENT -->
+			<tr class="row2">
+				<td class="postmetadata alt notice">
+					<b>{L_POST_BY_AUTHOR}</b> <b class="postauthor"<!-- IF topicrow.POST_AUTHOR_COLOUR --> style="color: {topicrow.POST_AUTHOR_COLOUR}"<!-- ENDIF -->>{topicrow.POST_AUTHOR}</b><br />
+					<!-- IF topicrow.POST_TAGS -->{topicrow.POST_TAGS}<!-- ENDIF -->
+					<!-- IF topicrow.POST_CATS -->{topicrow.POST_CATS}<!-- ENDIF -->
+					<!-- IF topicrow.POST_COMENT --><!-- IF topicrow.POST_CATS --> | <!-- ENDIF -->{topicrow.POST_COMENT}<!-- IF topicrow.PAGINATION --><p class="gensmall datetime"> [ {GOTO_PAGE_IMG}{L_GOTO_PAGE}: {topicrow.PAGINATION} ]</p><!-- ENDIF --><!-- ENDIF -->
+					<!-- IF topicrow.U_FOLLOW_FEED --><br />{topicrow.U_FOLLOW_FEED}<!-- ENDIF -->
+					<!-- IF topicrow.U_YES_COMMENT_YES_PING --><br />{topicrow.U_YES_COMMENT_YES_PING}<!-- ENDIF -->
+					<!-- IF topicrow.U_NO_COMMENT_YES_PING --><br />{topicrow.U_NO_COMMENT_YES_PING}<!-- ENDIF -->
+					<!-- IF topicrow.U_YES_COMMENT_NO_PING --><br />{topicrow.U_YES_COMMENT_NO_PING}<!-- ENDIF -->
+					<!-- IF topicrow.U_NO_COMMENT_NO_PING --><br />{topicrow.U_NO_COMMENT_NO_PING}<!-- ENDIF -->
+				</td>
+			</tr>
+			<!-- ENDIF -->
+		</table>
+		<br clear="all" />
+		<!-- BEGINELSE -->
+
+		<!-- IF IN_SEARCH -->
+		<table width="100%" cellspacing="1">
+			<tr>
+				<th><h3>{L_WP_SEARCH_NOT_FOUND}</h3></th>
+			</tr>
+			<tr>
+				<td class="row2"><div class="entry postbody">{L_WP_SEARCH_NOT_FOUND_EXPLAIN}</div></td>
+			</tr>
+		</table>
+		<!-- ELSE -->
+		<table width="100%" cellspacing="1">
+			<tr>
+				<th>{L_WP_SEARCH_NOT_FOUND}</h3></th>
+			</tr>
+			<tr>
+				<td class="row2"><div class="entry postbody">{L_WP_POST_NOT_FOUND_EXPLAIN}</div></td>
+			</tr>
+		</table>
+		<!-- ENDIF -->
+
+		<!-- END topicrow -->
+
+		<!-- IF PREVIOUS_ENTRIE or NEXT_ENTRIE -->
+		<table width="100%" cellspacing="1">
+		<tr>
+			<!-- IF PREVIOUS_ENTRIE --><td align="{S_CONTENT_FLOW_BEGIN}" valign="middle" nowrap="nowrap">{PREVIOUS_ENTRIE}</td><!-- ENDIF -->
+			<!-- IF NEXT_ENTRIE --><td class="gensmall" width="100%" align="{S_CONTENT_FLOW_END}" nowrap="nowrap">{NEXT_ENTRIE}</td><!-- ENDIF -->
+		</tr>
+		</table>
+		<br clear="all" />
+		<!-- ENDIF -->

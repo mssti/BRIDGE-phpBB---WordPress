@@ -1,8 +1,8 @@
 <?php
 /**
  * 
- * @package: phpBB 3.0.8 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/theme/prosilver
- * @version: $Id: wp_phpbb_bridge_core.php, v0.0.6 2011/07/13 11:07:13 leviatan21 Exp $
+ * @package: phpBB 3.0.9 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/themes/phpBB/includes
+ * @version: $Id: wp_phpbb_bridge_core.php, v0.0.7 2011/08/04 11:08:04 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -141,10 +141,10 @@ class bridge
 			}
 		}
 
-		if ($theme != '' && $theme != 'prosilver')
+		if ($theme != '' && $theme != 'phpBB')
 		{
 			$error = true;
-			$message .= __('The "Prosilver" theme is deactivated', 'wp_phpbb3_bridge');
+			$message .= __('The "phpBB" theme is deactivated', 'wp_phpbb3_bridge');
 
 			if (current_user_can('switch_themes'))
 			{
@@ -210,7 +210,7 @@ class phpbb
 		self::$db		= &$db;
 		self::$template	= &$template;
 		self::$user		= &$user;
-//		self::$cache	= &$cache;
+		self::$cache	= &$cache;
 
 		// Set the absolute wordpress/phpbb path
 		self::$absolute_phpbb_script_path = generate_board_url(true) . '/' . get_option('phpbb_script_path', bridge::$config['phpbb_script_path']);
@@ -227,6 +227,9 @@ class phpbb
 
 		// enhance phpbb $config data with WP $config data
 		self::wp_get_config();
+
+		// enhance imageset
+		self::wp_imageset();
 	}
 
 	/**
@@ -515,10 +518,8 @@ class phpbb
 
 	/**
 	 * Page header function for phpBB stuff
-	 *
-	 * @param <string> $page_title
 	 */
-	public static function page_header($page_title = '')
+	public static function page_header()
 	{
 		// Determine board url - we may need it later
 		$board_url = generate_board_url(false) . '/';
@@ -545,11 +546,11 @@ class phpbb
 		// Add a page number if necessary:
 		if ($paged || $page) //if ($paged >= 2 || $page >= 2)
 		{
-			$wp_title .= ' | ' . sprintf(phpbb::$user->lang['WP_PAGE_NUMBER'], max($paged, $page));
+			$wp_title .= ' | ' . sprintf(self::$user->lang['WP_PAGE_NUMBER'], max($paged, $page));
 		}
 
 		// Do the phpBB page header stuff first
-		page_header(phpbb::$user->lang['INDEX']);
+		page_header($wp_title);
 
 		self::$template->assign_vars(array(
 			'PHPBB_IN_FORUM'	=> false,
@@ -564,6 +565,8 @@ class phpbb
 			'U_BLOG'			=> append_sid($blog_path),
 
 			'PAGE_TITLE'		=> $wp_title,
+			'SITENAME'			=> get_bloginfo('name', 'display'),
+			'SITE_DESCRIPTION'	=> get_bloginfo('description', 'display'),
 			'BLOG_HEADER'		=> self::wp_page_header(),
 			'S_DISPLAY_SEARCH'	=> false,
 			'S_CLOCK'			=> self::clock(),
@@ -572,11 +575,16 @@ class phpbb
 			'U_LOGIN_LOGOUT'	=> (!is_user_logged_in()) ? get_option('siteurl') . '/?action=login' : get_option('siteurl') . '/?action=logout',
 			'L_LOGIN_LOGOUT'	=> (!is_user_logged_in()) ? self::$user->lang['LOGIN'] : sprintf(self::$user->lang['LOGOUT_USER'], self::$user->data['username']),
 			'U_WP_ACP'			=> (self::$user->data['user_type'] == USER_FOUNDER || current_user_can('level_8')) ? admin_url() : '',
+			'U_POST_NEW_TOPIC'	=> (self::$user->data['user_type'] == USER_FOUNDER || current_user_can('level_8')) ? admin_url('post-new.php') : '',
+
+			'BLOG_POST_IMG'		=> (self::$user->img('button_blogpost_new', 'REPLY_TO_TOPIC') != '') ? self::$user->img('button_blogpost_new', 'REPLY_TO_TOPIC') : '',
+			'POST_IMG'			=> self::$user->img('button_topic_new', 'POST_NEW_TOPIC'),
+			'DYNAMIC_SIDEBAR_W'	=> (int) self::$config['wp_phpbb_bridge_widgets_column_width'],
 
 			'T_THEME_PATH'		=> "{$web_path}styles/" . self::$user->theme['theme_path'] . '/theme',
 			'T_STYLESHEET_LINK'	=> (!self::$user->theme['theme_storedb']) ? "{$web_path}styles/" . self::$user->theme['theme_path'] . '/theme/stylesheet.css' : append_sid("{$web_path}style." . PHP_EXT, 'id=' . self::$user->theme['style_id'] . '&amp;lang=' . self::$user->data['user_lang']),
 		));
-		
+
 		if (is_404() || is_category() || is_day() || is_month() || is_year() || is_search() || is_paged())
 		{
 			self::wp_notes();
@@ -651,7 +659,7 @@ class phpbb
 
 	/**
 	 * Enter description here...
-	 * See also WordPress root/wp-content/theme/prosilver/functions.php
+	 * See also WordPress root/wp-content/theme/phpBB/functions.php
 	 *
 	 * @return unknown
 	 */
@@ -729,13 +737,13 @@ class phpbb
 	/**
 	 * Page right collumn function handling the WP tasks
 	 */
-	public static function page_sidebar()
+	public static function page_sidebar($post_id = 0)
 	{
 		// Author information 
-		$post_ID = request_var('p', 0);
-		if (is_single() && $post_ID)
+		$post_id = request_var('p', $post_id);
+		if (is_single() && $post_id)
 		{
-			$post = get_post($post_ID);
+			$post = get_post($post_id);
 			self::phpbb_the_autor_full($post->post_author, true, false);
 		}
 
@@ -858,191 +866,210 @@ class phpbb
 	 */
 	public static function phpbb_the_autor_full($wp_poster_id = 0, $dump = false, $is_commen = false)
 	{
+		global $user_cache;
+		
+		if (empty($user_cache) || !is_array($user_cache))
+		{
+			$user_cache = array();
+		}
+
 		$wp_poster_id = (int) $wp_poster_id;
-		
-		$wp_poster_data = get_userdata($wp_poster_id);
 
-		// In WP the anonymous user is ID 0, we change that to the phpbb anonymous user ID
-		if ($wp_poster_id == 0)
+		/*
+		* Cache various user specific data ... so we don't have to recompute
+		* this each time the same user appears on this page
+		* unless we need to display the author data in the sidebar 
+		*/
+		if (!isset($user_cache[$wp_poster_id]) || !$is_commen)
 		{
-			$wp_poster_data->display_name = $wp_poster_data->user_nicename = get_comment_author($wp_poster_id);
-			$wp_poster_data->phpbb_userid = ANONYMOUS;
-		}
+			$wp_poster_data = get_userdata($wp_poster_id);
 
-		$poster_id = (int) $wp_poster_data->phpbb_userid;
-
-		$sql = 'SELECT *
-			FROM ' . USERS_TABLE . '
-			WHERE user_id = ' . $poster_id;
-		$result = self::$db->sql_query($sql);
-		$row = self::$db->sql_fetchrow($result);
-		self::$db->sql_freeresult($result);
-
-		if (!$row)
-		{
-			return array();
-		}
-
-		self::_include('functions_display', 'get_user_avatar');
-		self::_include('bbcode', false, 'bbcode');
-
-		$user_sig = '';
-		$bbcode_bitfield = '';
-
-		// We add the signature to every posters entry because enable_sig is post dependant
-		if ($row['user_sig'] && self::$config['allow_sig'] && self::$user->optionget('viewsigs'))
-		{
-			$bbcode_bitfield = $bbcode_bitfield | base64_decode($row['user_sig_bbcode_bitfield']);
-			// Instantiate BBCode if need be
-			if ($bbcode_bitfield !== '')
+			// In WP the anonymous user is ID 0, we change that to the phpbb anonymous user ID
+			if ($wp_poster_id == 0)
 			{
-				$bbcode = new bbcode(base64_encode($bbcode_bitfield));
-			}
-			$row['user_sig'] = censor_text($row['user_sig']);
-
-			if ($row['user_sig_bbcode_bitfield'])
-			{
-				$bbcode->bbcode_second_pass($row['user_sig'], $row['user_sig_bbcode_uid'], $row['user_sig_bbcode_bitfield']);
+				$wp_poster_data->display_name = $wp_poster_data->user_nicename = get_comment_author($wp_poster_id);
+				$wp_poster_data->phpbb_userid = ANONYMOUS;
 			}
 
-			$row['sig'] = bbcode_nl2br($row['user_sig']);
-			$row['sig'] = smiley_text($row['user_sig']);
+			$poster_id = (int) $wp_poster_data->phpbb_userid;
+
+			$sql = 'SELECT *
+				FROM ' . USERS_TABLE . '
+				WHERE user_id = ' . $poster_id;
+			$result = self::$db->sql_query($sql);
+			$row = self::$db->sql_fetchrow($result);
+			self::$db->sql_freeresult($result);
+
+			if (!$row)
+			{
+				return array();
+			}
+
+			self::_include('functions_display', 'get_user_avatar');
+			self::_include('bbcode', false, 'bbcode');
+
+			$user_sig = '';
+			$bbcode_bitfield = '';
+
+			// We add the signature to every posters entry because enable_sig is post dependant
+			if ($row['user_sig'] && self::$config['allow_sig'] && self::$user->optionget('viewsigs'))
+			{
+				$bbcode_bitfield = $bbcode_bitfield | base64_decode($row['user_sig_bbcode_bitfield']);
+				// Instantiate BBCode if need be
+				if ($bbcode_bitfield !== '')
+				{
+					$bbcode = new bbcode(base64_encode($bbcode_bitfield));
+				}
+				$row['user_sig'] = censor_text($row['user_sig']);
+
+				if ($row['user_sig_bbcode_bitfield'])
+				{
+					$bbcode->bbcode_second_pass($row['user_sig'], $row['user_sig_bbcode_uid'], $row['user_sig_bbcode_bitfield']);
+				}
+
+				$row['sig'] = bbcode_nl2br($row['user_sig']);
+				$row['sig'] = smiley_text($row['user_sig']);
 			
-			$user_sig = $row['sig'];
-		}
-		
-		if ($is_commen)
-		{
-			$row['user_avatar_width'] = $row['user_avatar_height'] = self::$config['wp_phpbb_bridge_comments_avatar_width'];
-		}
-
-		// IT'S A HACK! for images like avatar and rank
-		global $phpbb_root_path;
-		$phpbb_root_path = self::$absolute_phpbb_script_path;
-
-		$user_cache = array(
-			'author_full'		=> ($poster_id != ANONYMOUS) ? get_username_string('full', $poster_id, $row['username'], $row['user_colour']) : get_username_string('full', $poster_id, $wp_poster_data->user_nicename, $row['user_colour']),
-			'author_colour'		=> ($poster_id != ANONYMOUS) ? get_username_string('colour', $poster_id, $row['username'], $row['user_colour']) : get_username_string('colour', $poster_id, $wp_poster_data->user_nicename, $row['user_colour']),
-			'author_username'	=> ($poster_id != ANONYMOUS) ? get_username_string('username', $poster_id, $row['username'], $row['user_colour']) : get_username_string('username', $poster_id, $wp_poster_data->user_nicename, $row['user_colour']),
-			'author_profile'	=> ($poster_id != ANONYMOUS) ? get_username_string('profile', $poster_id, $row['username'], $row['user_colour']) : get_username_string('profile', $poster_id, $wp_poster_data->user_nicename, $row['user_colour']),
-		//	'author_full'		=> ($poster_id != ANONYMOUS) ? get_username_string('full', $poster_id, $row['username'], $row['user_colour']) : '',
-		//	'author_colour'		=> ($poster_id != ANONYMOUS) ? get_username_string('colour', $poster_id, $row['username'], $row['user_colour']) : '',
-		//	'author_username'	=> ($poster_id != ANONYMOUS) ? get_username_string('username', $poster_id, $row['username'], $row['user_colour']) : '',
-		//	'author_profile'	=> ($poster_id != ANONYMOUS) ? get_username_string('profile', $poster_id, $row['username'], $row['user_colour']) : '',
-			'username'			=> ($poster_id != ANONYMOUS) ? $row['username'] : $wp_poster_data->display_name ,
-			'user_colour'		=> ($poster_id != ANONYMOUS) ? $row['user_colour'] :'',
-
-		//	'online'			=> false,
-			'avatar'			=> (self::$user->optionget('viewavatars')) ? get_user_avatar($row['user_avatar'], $row['user_avatar_type'], $row['user_avatar_width'], $row['user_avatar_height']) : false,
-			'rank_title'		=> '',
-			'rank_image'		=> '',
-			'rank_image_src'	=> '',
-			'joined'			=> self::$user->format_date($row['user_regdate']),
-			'posts'				=> $row['user_posts'],
-			'from'				=> (!empty($row['user_from'])) ? $row['user_from'] : '',
-			'warnings'			=> (isset($row['user_warnings'])) ? $row['user_warnings'] : 0,
-			'age'				=> '',
-			'sig'				=> $user_sig,
-
-			'search'			=> (self::$auth->acl_get('u_search')) ? self::append_sid("search", "author_id=$poster_id&amp;sr=posts") : '',
-			'viewonline'		=> $row['user_allow_viewonline'],
-			'allow_pm'			=> $row['user_allow_pm'],
-
-			'profile'			=> self::append_sid("memberlist", "mode=viewprofile&amp;u=$poster_id"),
-			'email'				=> '',
-			'icq_status_img'	=> '',
-			'icq'				=> '',
-			'www'				=> $row['user_website'],
-			'aim'				=> ($row['user_aim'] && self::$auth->acl_get('u_sendim')) ? self::append_sid("memberlist", "mode=contact&amp;action=aim&amp;u=$poster_id") : '',
-			'msn'				=> ($row['user_msnm'] && self::$auth->acl_get('u_sendim')) ? self::append_sid("memberlist", "mode=contact&amp;action=msnm&amp;u=$poster_id") : '',
-			'yim'				=> ($row['user_yim']) ? 'http://edit.yahoo.com/config/send_webmesg?.target=' . urlencode($row['user_yim']) . '&amp;.src=pg' : '',
-			'jabber'			=> ($row['user_jabber'] && self::$auth->acl_get('u_sendim')) ? self::append_sid("memberlist", "mode=contact&amp;action=jabber&amp;u=$poster_id") : '',
-		);
-
-		get_user_rank($row['user_rank'], $row['user_posts'], $user_cache['rank_title'], $user_cache['rank_image'], $user_cache['rank_image_src']);
-
-		// Undo HACK! for images like avatar and rank
-		$phpbb_root_path = PHPBB_ROOT_PATH;
-
-		if ((!empty($row['user_allow_viewemail']) && self::$auth->acl_get('u_sendemail')) || self::$auth->acl_get('a_email'))
-		{
-			$user_cache['email'] = (self::$config['board_email_form'] && self::$config['email_enable']) ? self::append_sid("memberlist", "mode=email&amp;u=$poster_id") : ((self::$config['board_hide_emails'] && !self::$auth->acl_get('a_email')) ? '' : 'mailto:' . $row['user_email']);
-		}
-
-		if (!empty($row['user_icq']))
-		{
-			$user_cache['icq'] = 'http://www.icq.com/people/webmsg.php?to=' . $row['user_icq'];
-			$user_cache['icq_status_img'] = '<img src="http://web.icq.com/whitepages/online?icq=' . $row['user_icq'] . '&amp;img=5" width="18" height="18" alt="" />';
-		}
-
-		if (self::$config['allow_birthdays'] && !empty($row['user_birthday']))
-		{
-			list($bday_day, $bday_month, $bday_year) = array_map('intval', explode('-', $row['user_birthday']));
-
-			if ($bday_year)
-			{
-				$now = getdate(time() + self::$user->timezone + self::$user->dst - date('Z'));
-
-				$diff = $now['mon'] - $bday_month;
-				if ($diff == 0)
-				{
-					$diff = ($now['mday'] - $bday_day < 0) ? 1 : 0;
-				}
-				else
-				{
-					$diff = ($diff < 0) ? 1 : 0;
-				}
-
-				$user_cache['age'] = (int) ($now['year'] - $bday_year - $diff);
+				$user_sig = $row['sig'];
 			}
+		
+			if ($is_commen || !$row['user_avatar_width'])
+			{
+				$row['user_avatar_width'] = $row['user_avatar_height'] = self::$config['wp_phpbb_bridge_comments_avatar_width'];
+			}
+
+			// IT'S A HACK! for images like avatar and rank
+			global $phpbb_root_path;
+			$phpbb_root_path = self::$absolute_phpbb_script_path;
+
+			$user_cache[$wp_poster_id] = array(
+				'author_full'		=> ($poster_id != ANONYMOUS) ? get_username_string('full', $poster_id, $row['username'], $row['user_colour']) : get_username_string('full', $poster_id, $wp_poster_data->user_nicename, $row['user_colour']),
+				'author_colour'		=> ($poster_id != ANONYMOUS) ? get_username_string('colour', $poster_id, $row['username'], $row['user_colour']) : get_username_string('colour', $poster_id, $wp_poster_data->user_nicename, $row['user_colour']),
+				'author_username'	=> ($poster_id != ANONYMOUS) ? get_username_string('username', $poster_id, $row['username'], $row['user_colour']) : get_username_string('username', $poster_id, $wp_poster_data->user_nicename, $row['user_colour']),
+				'author_profile'	=> ($poster_id != ANONYMOUS) ? get_username_string('profile', $poster_id, $row['username'], $row['user_colour']) : get_username_string('profile', $poster_id, $wp_poster_data->user_nicename, $row['user_colour']),
+				'username'			=> ($poster_id != ANONYMOUS) ? $row['username'] : $wp_poster_data->display_name ,
+				'user_colour'		=> ($poster_id != ANONYMOUS) ? $row['user_colour'] :'',
+
+			//	'online'			=> false,
+				'avatar'			=> (self::$user->optionget('viewavatars')) ? get_user_avatar($row['user_avatar'], $row['user_avatar_type'], $row['user_avatar_width'], $row['user_avatar_height']) : false,
+				'avatar_width'		=> $row['user_avatar_width'],
+				'avatar_height'		=> $row['user_avatar_height'],
+				'rank_title'		=> '',
+				'rank_image'		=> '',
+				'rank_image_src'	=> '',
+				'joined'			=> self::$user->format_date($row['user_regdate']),
+				'posts'				=> $row['user_posts'],
+				'from'				=> (!empty($row['user_from'])) ? $row['user_from'] : '',
+				'warnings'			=> (isset($row['user_warnings'])) ? $row['user_warnings'] : 0,
+				'age'				=> '',
+				'sig'				=> $user_sig,
+
+				'search'			=> (self::$auth->acl_get('u_search')) ? self::append_sid("search", "author_id=$poster_id&amp;sr=posts") : '',
+				'viewonline'		=> $row['user_allow_viewonline'],
+				'allow_pm'			=> $row['user_allow_pm'],
+
+				'profile'			=> self::append_sid("memberlist", "mode=viewprofile&amp;u=$poster_id"),
+				'email'				=> '',
+				'icq_status_img'	=> '',
+				'icq'				=> '',
+				'www'				=> $row['user_website'],
+				'aim'				=> ($row['user_aim'] && self::$auth->acl_get('u_sendim')) ? self::append_sid("memberlist", "mode=contact&amp;action=aim&amp;u=$poster_id") : '',
+				'msn'				=> ($row['user_msnm'] && self::$auth->acl_get('u_sendim')) ? self::append_sid("memberlist", "mode=contact&amp;action=msnm&amp;u=$poster_id") : '',
+				'yim'				=> ($row['user_yim']) ? 'http://edit.yahoo.com/config/send_webmesg?.target=' . urlencode($row['user_yim']) . '&amp;.src=pg' : '',
+				'jabber'			=> ($row['user_jabber'] && self::$auth->acl_get('u_sendim')) ? self::append_sid("memberlist", "mode=contact&amp;action=jabber&amp;u=$poster_id") : '',
+			);
+
+			get_user_rank($row['user_rank'], $row['user_posts'], $user_cache[$wp_poster_id]['rank_title'], $user_cache[$wp_poster_id]['rank_image'], $user_cache[$wp_poster_id]['rank_image_src']);
+
+			// Undo HACK! for images like avatar and rank
+			$phpbb_root_path = PHPBB_ROOT_PATH;
+
+			if ((!empty($row['user_allow_viewemail']) && self::$auth->acl_get('u_sendemail')) || self::$auth->acl_get('a_email'))
+			{
+				$user_cache[$wp_poster_id]['email'] = (self::$config['board_email_form'] && self::$config['email_enable']) ? self::append_sid("memberlist", "mode=email&amp;u=$poster_id") : ((self::$config['board_hide_emails'] && !self::$auth->acl_get('a_email')) ? '' : 'mailto:' . $row['user_email']);
+			}
+
+			if (!empty($row['user_icq']))
+			{
+				$user_cache[$wp_poster_id]['icq'] = 'http://www.icq.com/people/webmsg.php?to=' . $row['user_icq'];
+				$user_cache[$wp_poster_id]['icq_status_img'] = '<img src="http://web.icq.com/whitepages/online?icq=' . $row['user_icq'] . '&amp;img=5" width="18" height="18" alt="" />';
+			}
+
+			if (self::$config['allow_birthdays'] && !empty($row['user_birthday']))
+			{
+				list($bday_day, $bday_month, $bday_year) = array_map('intval', explode('-', $row['user_birthday']));
+
+				if ($bday_year)
+				{
+					$now = getdate(time() + self::$user->timezone + self::$user->dst - date('Z'));
+
+					$diff = $now['mon'] - $bday_month;
+					if ($diff == 0)
+					{
+						$diff = ($now['mday'] - $bday_day < 0) ? 1 : 0;
+					}
+					else
+					{
+						$diff = ($diff < 0) ? 1 : 0;
+					}
+
+					$user_cache[$wp_poster_id]['age'] = (int) ($now['year'] - $bday_year - $diff);
+				}
+			}
+
+			if ($is_commen || $user_cache[$wp_poster_id]['avatar'] !== false)
+			{
+				// <img height="32" width="32" class="avatar avatar-32 photo avatar-default" src="http://0.gravatar.com/avatar/ad516503a11cd5ca435acc9bb6523536?s=32" alt="">
+				$user_cache[$wp_poster_id]['avatar'] = str_replace('<img', '<img class="avatar avatar-32 photo avatar-default"', $user_cache[$wp_poster_id]['avatar']);
+			}
+
+			$user_cache[$wp_poster_id]['avatar'] = ($user_cache[$wp_poster_id]['avatar'] !== false) ? (($user_cache[$wp_poster_id]['avatar']) ? $user_cache[$wp_poster_id]['avatar'] : get_avatar($wp_poster_id, $user_cache[$wp_poster_id]['avatar_width'])) : '';
 		}
 
-		if ($is_commen && $user_cache['avatar'] !== false)
-		{
-			// <img height="32" width="32" class="avatar avatar-32 photo avatar-default" src="http://0.gravatar.com/avatar/ad516503a11cd5ca435acc9bb6523536?s=32" alt="">
-			$user_cache['avatar'] = str_replace('<img', '<img class="avatar avatar-32 photo avatar-default"', $user_cache['avatar']);
-		}
-		
 		// Dump vars into template
 		$autor = array(
-			'POSTER_ID'				=> $poster_id,
-		//	'POST_AUTHOR_FULL'		=> ($poster_id != ANONYMOUS) ? $user_cache['author_full'] : get_username_string('full', $poster_id, $row['username'], $row['user_colour'], $row['post_username']),
-		//	'POST_AUTHOR_COLOUR'	=> ($poster_id != ANONYMOUS) ? $user_cache['author_colour'] : get_username_string('colour', $poster_id, $row['username'], $row['user_colour'], $row['post_username']),
-		//	'POST_AUTHOR'			=> ($poster_id != ANONYMOUS) ? $user_cache['author_username'] : get_username_string('username', $poster_id, $row['username'], $row['user_colour'], $row['post_username']),
-		//	'U_POST_AUTHOR'			=> ($poster_id != ANONYMOUS) ? $user_cache['author_profile'] : get_username_string('profile', $poster_id, $row['username'], $row['user_colour'], $row['post_username']),
-			'POST_AUTHOR_FULL'		=> $user_cache['author_full'],
-			'POST_AUTHOR_COLOUR'	=> $user_cache['author_colour'],
-			'POST_AUTHOR'			=> $user_cache['author_username'],
-			'U_POST_AUTHOR'			=> $user_cache['author_profile'],
+			'POSTER_ID'				=> $wp_poster_id,
+			'POST_AUTHOR_FULL'		=> $user_cache[$wp_poster_id]['author_full'],
+			'POST_AUTHOR_COLOUR'	=> $user_cache[$wp_poster_id]['author_colour'],
+			'POST_AUTHOR'			=> $user_cache[$wp_poster_id]['author_username'],
+			'U_POST_AUTHOR'			=> $user_cache[$wp_poster_id]['author_profile'],
 			'U_FORUM_POSTS_AUTHOR'	=> self::append_sid("search", array('author_id' => 2, 'sr' => 'posts')),
 			'U_BLOG_POSTS_AUTHOR'	=> get_author_posts_url($wp_poster_id),
 			'S_POSTS_AUTHOR'		=> get_the_author_posts(),
-		//	'L_POSTS_AUTHOR'		=> sprintf(self::$user->lang['WP_READ_TOPICS'], $user_cache['author_username']),
 
-		//	'ONLINE_IMG'			=> ($poster_id == ANONYMOUS || !self::$config['load_onlinetrack']) ? '' : (($user_cache['online']) ? self::$user->img('icon_user_online', 'ONLINE') : self::$user->img('icon_user_offline', 'OFFLINE')),
-		//	'S_ONLINE'				=> ($poster_id == ANONYMOUS || !self::$config['load_onlinetrack']) ? false : (($user_cache['online']) ? true : false),
-			'POSTER_AVATAR'			=> ($user_cache['avatar'] !== false) ? (($user_cache['avatar']) ? $user_cache['avatar'] : get_avatar($wp_poster_id, self::$config['wp_phpbb_bridge_comments_avatar_width'])) : '',
-			'RANK_TITLE'			=> $user_cache['rank_title'],
-			'RANK_IMG'				=> $user_cache['rank_image'],
-			'RANK_IMG_SRC'			=> $user_cache['rank_image_src'],
-			'POSTER_JOINED'			=> $user_cache['joined'],
-			'POSTER_POSTS'			=> $user_cache['posts'],
-			'POSTER_FROM'			=> $user_cache['from'],
-			'POSTER_WARNINGS'		=> $user_cache['warnings'],
-			'POSTER_AGE'			=> $user_cache['age'],
-			'SIGNATURE'				=> $user_cache['sig'],
+		//	'ONLINE_IMG'			=> ($poster_id == ANONYMOUS || !self::$config['load_onlinetrack']) ? '' : (($user_cache[$wp_poster_id]['online']) ? self::$user->img('icon_user_online', 'ONLINE') : self::$user->img('icon_user_offline', 'OFFLINE')),
+		//	'S_ONLINE'				=> ($poster_id == ANONYMOUS || !self::$config['load_onlinetrack']) ? false : (($user_cache[$wp_poster_id]['online']) ? true : false),
+			'POSTER_AVATAR'			=> $user_cache[$wp_poster_id]['avatar'],
+			'RANK_TITLE'			=> $user_cache[$wp_poster_id]['rank_title'],
+			'RANK_IMG'				=> $user_cache[$wp_poster_id]['rank_image'],
+			'RANK_IMG_SRC'			=> $user_cache[$wp_poster_id]['rank_image_src'],
+			'POSTER_JOINED'			=> $user_cache[$wp_poster_id]['joined'],
+			'POSTER_POSTS'			=> $user_cache[$wp_poster_id]['posts'],
+			'POSTER_FROM'			=> $user_cache[$wp_poster_id]['from'],
+			'POSTER_WARNINGS'		=> $user_cache[$wp_poster_id]['warnings'],
+			'POSTER_AGE'			=> $user_cache[$wp_poster_id]['age'],
+			'SIGNATURE'				=> $user_cache[$wp_poster_id]['sig'],
 
-		//	'ICQ_STATUS_IMG'		=> $user_cache['icq_status_img'],
-			'U_PROFILE'		=> $user_cache['profile'],
-		//	'U_SEARCH'		=> $user_cache['search'],
-		//	'U_PM'			=> ($poster_id != ANONYMOUS && self::$config['allow_privmsg'] && self::$auth->acl_get('u_sendpm') && ($user_cache['allow_pm'] || self::$auth->acl_gets('a_', 'm_') || self::$auth->acl_getf_global('m_'))) ? self::append_sid("ucp", 'i=pm&amp;mode=compose&amp;action=quotepost&amp;p=' . $row['post_id']) : '',
-			'U_EMAIL'		=> $user_cache['email'],
-			'U_WWW'			=> $user_cache['www'],
-			'U_ICQ'			=> $user_cache['icq'],
-			'U_AIM'			=> $user_cache['aim'],
-			'U_MSN'			=> $user_cache['msn'],
-			'U_YIM'			=> $user_cache['yim'],
-			'U_JABBER'		=> $user_cache['jabber'],
+			'PROFILE_IMG'		=> self::$user->img('icon_user_profile', 'READ_PROFILE'),
+			'PM_IMG' 			=> self::$user->img('icon_contact_pm', 'SEND_PRIVATE_MESSAGE'),
+			'EMAIL_IMG' 		=> self::$user->img('icon_contact_email', 'SEND_EMAIL'),
+			'WWW_IMG' 			=> self::$user->img('icon_contact_www', 'VISIT_WEBSITE'),
+			'ICQ_IMG' 			=> self::$user->img('icon_contact_icq', 'ICQ'),
+			'AIM_IMG' 			=> self::$user->img('icon_contact_aim', 'AIM'),
+			'MSN_IMG' 			=> self::$user->img('icon_contact_msnm', 'MSNM'),
+			'YIM_IMG' 			=> self::$user->img('icon_contact_yahoo', 'YIM'),
+			'JABBER_IMG'		=> self::$user->img('icon_contact_jabber', 'JABBER') ,
+
+			'U_PROFILE'		=> $user_cache[$wp_poster_id]['profile'],
+		//	'U_SEARCH'		=> $user_cache[$wp_poster_id]['search'],
+		//	'U_PM'			=> ($poster_id != ANONYMOUS && self::$config['allow_privmsg'] && self::$auth->acl_get('u_sendpm') && ($user_cache[$wp_poster_id]['allow_pm'] || self::$auth->acl_gets('a_', 'm_') || self::$auth->acl_getf_global('m_'))) ? self::append_sid("ucp", 'i=pm&amp;mode=compose&amp;action=quotepost&amp;p=' . $row['post_id']) : '',
+			'U_EMAIL'		=> $user_cache[$wp_poster_id]['email'],
+			'U_WWW'			=> $user_cache[$wp_poster_id]['www'],
+			'U_ICQ'			=> $user_cache[$wp_poster_id]['icq'],
+			'U_AIM'			=> $user_cache[$wp_poster_id]['aim'],
+			'U_MSN'			=> $user_cache[$wp_poster_id]['msn'],
+			'U_YIM'			=> $user_cache[$wp_poster_id]['yim'],
+			'U_JABBER'		=> $user_cache[$wp_poster_id]['jabber'],
 		);
 
 		// Dump vars into template ?
@@ -1050,10 +1077,8 @@ class phpbb
 		{
 			self::$template->assign_vars($autor);
 		}
-//		else
-//		{
-			return $autor;
-//		}
+
+		return $autor;
 	}
 
 	/**
@@ -1077,14 +1102,14 @@ class phpbb
 	{
 		$blog_footer  = '&nbsp;|&nbsp;Powered by <a href="http://wordpress.org/" title="Semantic Personal Publishing Platform" rel="generator" id="site-generator" onclick="window.open(this.href);return false;">WordPress</a>&nbsp;|&nbsp;Bridge by <a href="http://www.mssti.com/phpbb3" title="Micro Software &amp; Servicio Técnico Informático" onclick="window.open(this.href);return false;">.:: MSSTI ::.</a><br />';
 		$blog_footer .= '<!-- If you\'d like to support WordPress, having the "powered by" link somewhere on your blog is the best way; it\'s our only promotion or advertising. -->' . "\n";
-		$blog_footer .= sprintf(self::$user->lang['WP_RSS_NOTES'], '<a href="' . get_bloginfo('rss2_url') . '">' . self::$user->lang['WP_RSS_ENRIES_LINK'] . '</a>', '<a href="' . get_bloginfo('comments_rss2_url') . '">' . self::$user->lang['WP_RSS_COMMENTS_LINK'] . '</a><br />');
+		$blog_footer .= sprintf(self::$user->lang['WP_RSS_NOTES'], '<a href="' . get_bloginfo('rss2_url') . '">' . self::$user->lang['WP_RSS_ENRIES_LINK'] . '</a>', '<a href="' . get_bloginfo('comments_rss2_url') . '">' . self::$user->lang['WP_RSS_COMMENTS_LINK'] . '</a>');
 
 	//	$blog_footer .= wp_do_action('wp_footer');
 
 		// Output page creation time
 		if (defined('WP_DEBUG') and WP_DEBUG == true)
 		{
-			$blog_footer .= sprintf(self::$user->lang['WP_DEBUG_NOTE'], get_num_queries(), timer_stop(0, 3));
+			$blog_footer .=  '<br />' . sprintf(self::$user->lang['WP_DEBUG_NOTE'], get_num_queries(), timer_stop(0, 3));
 		}
 
 		return $blog_footer;
@@ -1293,6 +1318,58 @@ class phpbb
 		));
 
 		self::page_footer(true, 'login_body.html');
+	}
+
+	/**
+	* Some images to do not modify the imageset
+	*/
+	function wp_imageset()
+	{
+		global $phpbb_root_path;
+
+		// Use URL if told so
+		$root_path = (defined('PHPBB_USE_BOARD_URL_PATH') && PHPBB_USE_BOARD_URL_PATH) ? generate_board_url() . '/' : $phpbb_root_path;
+
+		$imgdata = array(
+			'icon_approve' => array(
+				'image_filename' 	=> 'icon_wp_approve.gif',
+				'image_name' 		=> 'icon_wp_approve',
+				'image_lang'		=> false,
+				'image_width' 		=> 20,
+				'image_height'		=> 20,
+			),
+			'icon_unapprove' => array(
+				'image_filename' 	=> 'icon_wp_unapprove.gif',
+				'image_name' 		=> 'icon_wp_unapprove',
+				'image_lang'		=> false,
+				'image_width' 		=> 20,
+				'image_height'		=> 20,
+			),
+			'icon_wp_spam' => array(
+				'image_filename' 	=> 'icon_wp_spam.gif',
+				'image_name' 		=> 'icon_wp_spam',
+				'image_lang'		=> false,
+				'image_width' 		=> 20,
+				'image_height'		=> 20,
+			),
+			'icon_wp_nospam' => array(
+				'image_filename' 	=> 'icon_wp_nospam.gif',
+				'image_name' 		=> 'icon_wp_nospam',
+				'image_lang'		=> false,
+				'image_width' 		=> 20,
+				'image_height'		=> 20,
+			),
+		);
+
+		foreach ($imgdata as $image => $img_data)
+		{
+			$path = 'styles/' . rawurlencode(self::$user->theme['imageset_path']) . '/imageset/' . ($img_data['image_lang'] ? $img_data['image_lang'] .'/' : '') . rawurlencode($img_data['image_filename']);
+			$img_data['src'] = $root_path . $path;
+			$img_data['image_id'] = sizeof(self::$user->img_array)+1;
+			$img_data['imageset_id'] = (int) self::$user->theme['imageset_id'];
+
+			self::$user->img_array[$img_data['image_name']] = $img_data;
+		}
 	}
 }
 
