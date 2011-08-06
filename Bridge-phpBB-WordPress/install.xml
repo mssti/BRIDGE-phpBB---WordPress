@@ -62,6 +62,7 @@
 					<change> [CAMBIO] Carpeta principal del tema en WP, cambio de nombre de "prosilver" a "phpBB" </change>
 					<change> [AGREGADO] : botón en idioma local, gracias a nextgen por los hermosos botones </change>
 				</changelog>
+			</entry>
 			<entry>
 				<date>2011-07-21</date>
 				<rev-version>0.0.6</rev-version>
