@@ -576,8 +576,8 @@ class phpbb
 			'L_LOGIN_LOGOUT'	=> (!is_user_logged_in()) ? self::$user->lang['LOGIN'] : sprintf(self::$user->lang['LOGOUT_USER'], self::$user->data['username']),
 			'U_WP_ACP'			=> (self::$user->data['user_type'] == USER_FOUNDER || current_user_can('level_8')) ? admin_url() : '',
 			'U_POST_NEW_TOPIC'	=> (self::$user->data['user_type'] == USER_FOUNDER || current_user_can('level_8')) ? admin_url('post-new.php') : '',
-
-			'BLOG_POST_IMG'		=> (self::$user->img('button_blogpost_new', 'REPLY_TO_TOPIC') != '') ? self::$user->img('button_blogpost_new', 'REPLY_TO_TOPIC') : '',
+			// Fall back to the phpbb "New topic" button
+			'BLOG_POST_IMG'		=> (self::$user->img('button_blogpost_new', 'POST_NEW_TOPIC') != '') ? self::$user->img('button_blogpost_new', 'POST_NEW_TOPIC') : '',
 			'POST_IMG'			=> self::$user->img('button_topic_new', 'POST_NEW_TOPIC'),
 			'DYNAMIC_SIDEBAR_W'	=> (int) self::$config['wp_phpbb_bridge_widgets_column_width'],
 
@@ -1358,6 +1358,13 @@ class phpbb
 				'image_lang'		=> false,
 				'image_width' 		=> 20,
 				'image_height'		=> 20,
+			),
+			'button_blogpost_new' => array(
+				'image_filename' 	=> 'button_blogpost_new.gif',
+				'image_name' 		=> 'button_blogpost_new',
+				'image_lang'		=> self::$user->img_lang,
+				'image_width' 		=> false,
+				'image_height'		=> false,
 			),
 		);
 
