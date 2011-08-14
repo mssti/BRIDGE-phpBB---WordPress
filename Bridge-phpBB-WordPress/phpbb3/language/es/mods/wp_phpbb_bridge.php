@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.8 :: BRIDGE phpBB & WordPress -> root/language/es/mods :: [es][Spanish]
- * @version: $Id: wp_phpbb_bridge.php, v0.0.6 2011/07/21 11:07:21 leviatan21 Exp $
+ * @version: $Id: wp_phpbb_bridge.php, v0.0.7.1 2011/08/13 11:08:13 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -126,7 +126,7 @@ $lang = array_merge($lang, array(
 	// Comment form
 	'WP_LOGIN_NEED'						=> 'Disculpa, debes <a href=\"%s\">iniciar sesión</a> para escribir un comentario.',
 	'WP_LOGGED_IN'						=> 'Identificado como ',
-	'WP_LOGGED_AS_OUT'					=> '<a href="%1$s">%2$s</a>. <a href="%3$s" title="Salir de esta cuenta">Desconectarme ?</a>',
+	'WP_LOGGED_AS_OUT'					=> '%1$s. <a href="%2$s" title="Salir de esta cuenta">Desconectarme ?</a>',
 	'WP_REQUIRED_FIELDS'				=> 'Los campos obligatorios están marcados como :',
 	'WP_USERNAME_REQUIRED_NOTE'			=> '* Por favor, complete el campo "Nombre de Usuario" con su nombre o apodo.',
 	'WP_EMAIL_REQUIRED_NOTE'			=> '* Por favor, complete el campo "Dirección de email" con una dirección de email válida.',

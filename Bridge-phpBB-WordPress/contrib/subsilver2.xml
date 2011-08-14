@@ -90,8 +90,9 @@
 			<edit>
 				<find><![CDATA[</head>]]></find>
 				<action type="before-add"><![CDATA[<!-- MOD : WordPress - phpBB Integration Mod - START //-->
-<!-- IF PHPBB_IN_BLOG -->{BLOG_HEADER}<!-- ENDIF -->
+<!-- IF PHPBB_IN_BLOG -->{BLOG_HEADER}
 <link rel="stylesheet" href="{T_THEME_PATH}/wp_phpbb_bridge.css" type="text/css" />
+<!-- ENDIF -->
 <!-- MOD : WordPress - phpBB Integration Mod - END //-->
 ]]></action>
 				<comment lang="en"><![CDATA[You must do this change to ALL styles you have installed, based off Prosilver. I use "Prosilver" as an example.]]></comment>

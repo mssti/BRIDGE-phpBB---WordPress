@@ -54,10 +54,11 @@
 			// ]]>
 			</script>
 
+			<form action="{U_ACTION}" method="post" id="commentform">
 		<!-- IF S_DISPLAY_NOTE -->
 			{S_DISPLAY_NOTE}
+			{S_LOG_REDIRECT}
 		<!-- ELSE -->
-			<form action="{U_ACTION}" method="post" id="commentform">
 				<div class="panel bg3">
 					<div class="inner"><span class="corners-top"><span></span></span>
 						<h3>{L_POST_REPLY}</h3>
@@ -70,6 +71,7 @@
 									<input id="author" name="author" type="hidden" value="{COMMENT_AUTHOR}" size="60" maxlength="255" class="text autowidth" />
 									<input id="email" name="email" type="hidden" value="{COMMENT_AUTHOR_EMAIL}" size="60" maxlength="255" class="text autowidth" />
 									<input id="url" name="url" type="hidden" value="{COMMENT_AUTHOR_ULR}" size="60" maxlength="255" class="text autowidth" />
+									{S_LOG_REDIRECT}
 								</dd>
 							</dl>
 							<!-- ELSE -->
@@ -113,6 +115,6 @@
 						</fieldset>
 					<span class="corners-bottom"><span></span></span></div>
 				</div>
-			</form>
 			<!-- ENDIF -->
+			</form>
 		</div><!-- #quickreply //-->

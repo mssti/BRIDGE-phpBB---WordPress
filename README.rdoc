@@ -1,6 +1,6 @@
 = BRIDGE phpBB & WordPress
 * Release Version none
-* Developer Version [DEV]0.0.7
+* Developer Version [DEV]0.0.7.1
 
 The source code, issue tracker and wiki can be found at:
 

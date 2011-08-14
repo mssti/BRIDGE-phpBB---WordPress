@@ -40,7 +40,7 @@
 
 		</author-group>
 
-		<mod-version>0.0.7</mod-version>
+		<mod-version>0.0.7.1</mod-version>
 
 		<installation>
 			<level>easy</level>
@@ -50,17 +50,27 @@
 
 		<history>
 			<entry>
+				<date>2011-08-13</date>
+				<rev-version>0.0.7.1</rev-version>
+				<changelog lang="en">
+					<change> [FIX] minor bugs </change>
+				</changelog>
+				<changelog lang="es">
+					<change> [CORRECCIÓN] Pequeños errores </change>
+				</changelog>
+			</entry>
+			<entry>
 				<date>2011-08-01</date>
 				<rev-version>0.0.7</rev-version>
 				<changelog lang="en">
 					<change> [FEATURE] Support for Subsilver2 style</change>
 					<change> [CHANGE] Main WP theme folder name change, from "prosilver" to "phpBB" </change>
-					<change> [ADD-ON] localise button image, thanks to nextgen for the beatiful images </change>
+					<change> [ADD-ON] localise button image, thanks to nextgen for the beautiful images </change>
 				</changelog>
 				<changelog lang="es">
 					<change> [CARACTERÍSTICA] Soporte para estilo Subsilver2</change>
 					<change> [CAMBIO] Carpeta principal del tema en WP, cambio de nombre de "prosilver" a "phpBB" </change>
-					<change> [AGREGADO] : botón en idioma local, gracias a nextgen por los hermosos botones </change>
+					<change> [AGREGADO] botón en idioma local, gracias a nextgen por los hermosos botones </change>
 				</changelog>
 			</entry>
 			<entry>
