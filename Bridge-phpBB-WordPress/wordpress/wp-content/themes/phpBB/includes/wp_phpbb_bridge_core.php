@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.9 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/themes/phpBB/includes
- * @version: $Id: wp_phpbb_bridge_core.php, v0.0.7 2011/08/04 11:08:04 leviatan21 Exp $
+ * @version: $Id: wp_phpbb_bridge_core.php, v0.0.7.1 2011/08/13 11:08:13 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -862,7 +862,7 @@ class phpbb
  	}
 
 	/**
-	 * Page footer function handling the phpBB tasks
+	 * function handling the users data
 	 */
 	public static function phpbb_the_autor_full($wp_poster_id = 0, $dump = false, $is_commen = false)
 	{
@@ -874,7 +874,6 @@ class phpbb
 		}
 
 		$wp_poster_id = (int) $wp_poster_id;
-
 		/*
 		* Cache various user specific data ... so we don't have to recompute
 		* this each time the same user appears on this page
@@ -885,9 +884,9 @@ class phpbb
 			$wp_poster_data = get_userdata($wp_poster_id);
 
 			// In WP the anonymous user is ID 0, we change that to the phpbb anonymous user ID
-			if ($wp_poster_id == 0)
+			if ($wp_poster_id == 0 || !$wp_poster_data)
 			{
-				$wp_poster_data->display_name = $wp_poster_data->user_nicename = get_comment_author($wp_poster_id);
+				$wp_poster_data->display_name = $wp_poster_data->user_nicename = (!$wp_poster_data) ? self::$user->lang['GUEST'] : get_comment_author($wp_poster_id);
 				$wp_poster_data->phpbb_userid = ANONYMOUS;
 			}
 
@@ -902,7 +901,8 @@ class phpbb
 
 			if (!$row)
 			{
-				return array();
+				return self::phpbb_the_autor_full(0, $dump, $is_commen);
+			//	return array();
 			}
 
 			self::_include('functions_display', 'get_user_avatar');

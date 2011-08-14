@@ -195,43 +195,23 @@ function wp_do_action($tag)
  */
 function wp_phpbb_widgets_init()
 {
-	$base_subsilver = array('subsilver2');
+	// Register Single Sidebar
+	register_sidebar(
+		array(
+			'id'			=> 'wp_phpbb-widget-area',
+			'name'			=> __('Primary Widget Area', 'wp_phpbb3_bridge'),
+			'description'	=> __('The primary widget area.', 'wp_phpbb3_bridge'),
+			'before_widget'	=> "\n" . '<div class="panel bg3">' . "\r\t" . '<div class="inner"><span class="corners-top"><span></span></span>' . "\n\t\t",
+			'after_widget'	=> "\n\t" . '<span class="corners-bottom"><span></span></span></div>' . "\r" . '</div>' . "\n",
+			'before_title'	=> '<h3>',
+			'after_title'	=> '</h3>' . "\n",
+		)
+	);
 
-	if (class_exists('phpbb') && in_array(strtolower(phpbb::$config['wp_phpbb_bridge_template']), $base_subsilver))
-	{
-		// subsilver2 Register Single Sidebar
-		register_sidebar(
-			array(
-				'id'			=> 'wp_phpbb-widget-area',
-				'name'			=> __('Primary Widget Area', 'wp_phpbb3_bridge'),
-				'description'	=> __('The primary widget area.', 'wp_phpbb3_bridge'),
-				'before_widget'	=> "\n" . '<table class="tablebg" cellspacing="1">' . "\r\t",
-				'after_widget'	=> "\n\t" . '</td>' . "\r" . '</tr>' . "\r" . '</table><br clear="all" />' . "\n",
-				'before_title'	=> '<tr>' . "\r" . '<th>',
-				'after_title'	=> '</th>' . "\r" . '</tr>' . "\r" . '<tr>' . "\r" . '<td nowrap="nowrap" class="row2">' . "\n",
-			)
-		);
-	}
-	else
-	{
-		// prosilver Register Single Sidebar
-		register_sidebar(
-			array(
-				'id'			=> 'wp_phpbb-widget-area',
-				'name'			=> __('Primary Widget Area', 'wp_phpbb3_bridge'),
-				'description'	=> __('The primary widget area.', 'wp_phpbb3_bridge'),
-				'before_widget'	=> "\n" . '<div class="panel bg3">' . "\r\t" . '<div class="inner"><span class="corners-top"><span></span></span>' . "\n\t\t",
-				'after_widget'	=> "\n\t" . '<span class="corners-bottom"><span></span></span></div>' . "\r" . '</div>' . "\n",
-				'before_title'	=> '<h3>',
-				'after_title'	=> '</h3>' . "\n",
-			)
-		);
-	}
+	unregister_widget('WP_Nav_Menu_Widget');
+
+	register_widget('WP_Widget_phpbb_recet_topics');
 }
-
-unregister_widget('WP_Nav_Menu_Widget');
-
-register_widget('WP_Widget_phpbb_recet_topics');
 
 // Register sidebars by running wp_phpbb_widgets_init() on the widgets_init hook.
 add_action('widgets_init', 'wp_phpbb_widgets_init');

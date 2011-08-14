@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.9 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/themes/phpBB
- * @version: $Id: single.php, v0.0.7 2011/08/04 11:08:04 leviatan21 Exp $
+ * @version: $Id: single.php, v0.0.7.1 2011/08/13 11:08:13 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -88,7 +88,7 @@ if (have_posts())
 
 		// Assign posting specific vars
 		phpbb::$template->assign_vars(array(
-			'S_LOGGED_AS'			=> sprintf(phpbb::$user->lang['WP_LOGGED_AS_OUT'], admin_url('profile.php'), $user_identity, wp_logout_url(apply_filters('the_permalink', get_permalink($post_id)))),
+			'S_LOGGED_AS'			=> sprintf(phpbb::$user->lang['WP_LOGGED_AS_OUT'], phpbb::$user->data['username'], get_option('siteurl') . '/?action=logout'),
 			'U_ACTION'				=> get_option('siteurl') . '/wp-comments-post.php',
 			'S_REPLYTO'				=> wp_nonce_field('replyto-comment', '_ajax_nonce-replyto-comment', false, false),
 			'S_UNFILTEREDHTML'		=> (current_user_can('unfiltered_html')) ? wp_nonce_field('unfiltered-html-comment_' . $post_id, '_wp_unfiltered_html_comment', false, false) : '',
@@ -158,6 +158,7 @@ if (have_posts())
 		'POST_REPLIES'			=> wp_do_action('comments_number' , phpbb::$user->lang['WP_NO_COMMENTS'], phpbb::$user->lang['WP_ONE_COMMENT'], phpbb::$user->lang['WP_COMMENTS']) . sprintf(phpbb::$user->lang['WP_COMMENTS_TO'], $topic_title),
 		'PREVIOUS_ENTRIE'		=> wp_do_action('adjacent_post_link', phpbb::$user->lang['PREVIOUS_ENTRIE'] . ' %link', '%title', false, '', true),
 		'NEXT_ENTRIE'			=> wp_do_action('adjacent_post_link', '%link ' . phpbb::$user->lang['NEXT_ENTRIE'], '%title', false, '', false),
+		'S_LOG_REDIRECT'		=> build_hidden_fields(array('redirect' => apply_filters('the_permalink', get_permalink($post_id)))),
 	));
 }
 
