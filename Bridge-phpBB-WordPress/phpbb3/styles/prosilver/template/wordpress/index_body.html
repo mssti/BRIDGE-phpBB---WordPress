@@ -1,5 +1,9 @@
 <!-- INCLUDE overall_header.html -->
 
+<!-- IF not DYNAMIC_SIDEBAR and IN_HOME and not S_USER_LOGGED_IN and not S_IS_BOT -->
+	<!-- INCLUDE wordpress/login_body.html -->
+<!-- ENDIF -->
+
 <div id="wp-phpbb-bridge-container">
 	<div id="content">
 	<!-- IF WP_NOTES_IS_404 or WP_NOTES_IS_CATEGORY or WP_NOTES_IS_MONTH or WP_NOTES_IS_YEAR or WP_NOTES_IS_SEARCH or WP_NOTES_IS_PAGED -->
@@ -39,7 +43,13 @@
 
 <!-- IF DYNAMIC_SIDEBAR or (IN_HOME and S_RECENT_TOPICS) -->
 <div id="wp-phpbb-bridge-primary" class="widget-area">
+
+<!-- IF IN_HOME and not S_USER_LOGGED_IN and not S_IS_BOT -->
+	<!-- INCLUDE wordpress/login_body.html -->
+<!-- ENDIF -->
+
 	<!-- INCLUDE wordpress/left_sidebar_body.html -->
+
 </div><!-- #primary .widget-area //-->
 <!-- ENDIF -->
 

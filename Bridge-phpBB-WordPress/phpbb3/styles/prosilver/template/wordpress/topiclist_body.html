@@ -1,19 +1,26 @@
+<!-- IF DYNAMIC_CONTENT_GALLERY -->{DYNAMIC_CONTENT_GALLERY}<!-- ENDIF -->
+
+<!-- DEFINE $BLOCK_COMPACT = 0 -->
+<!-- DEFINE $FIRST_FULL_WIDTH = 0 -->
 
 		<!-- BEGIN topicrow -->
+
+		<!-- IF $BLOCK_COMPACT --><!-- IF $FIRST_FULL_WIDTH and topicrow.S_FIRST_ROW --><!-- ELSE --><div class="<!-- IF $FIRST_FULL_WIDTH --><!-- IF topicrow.S_ROW_COUNT is odd -->column1<!-- ELSE -->column2<!-- ENDIF --><!-- ELSE --><!-- IF topicrow.S_ROW_COUNT is odd -->column2<!-- ELSE -->column1<!-- ENDIF --><!-- ENDIF -->"><!-- ENDIF --><!-- ENDIF -->
+		
 		<div class="row post <!-- IF topicrow.POST_ID is odd -->bg2<!-- ELSE -->bg2<!-- ENDIF -->" id="post-{topicrow.POST_ID}">
 			<div class="inner"><span class="corners-top"><span></span></span>
 			<div class="postbody postbodyfull">
-				<!-- IF not S_IS_BOT -->
-					<!-- IF topicrow.U_POST_EDIT or topicrow.U_POST_DELETE or topicrow.U_POST_TRASH or topicrow.U_POST_SPAM or topicrow.U_POST_APPROVE or topicrow.U_POST_UNAPPROVE -->
+				<!-- IF not S_IS_BOT and (topicrow.U_POST_EDIT or topicrow.U_POST_DELETE or topicrow.U_POST_TRASH or topicrow.U_POST_SPAM or topicrow.U_POST_APPROVE or topicrow.U_POST_UNAPPROVE) -->
 					<ul class="profile-icons">
+						<!-- IF topicrow.XU_POST_COMMENT --><li class="wp-comment-icon"><a href="{topicrow.U_POST_COMMENT}"><span></span></a></li><!-- ENDIF -->
+						<!-- IF topicrow.XU_FOLLOW_FEED --><li class="wp-feed-icon"><a href="{topicrow.U_POST_FEED}"><span></span></a></li><!-- ENDIF -->
 						<!-- IF topicrow.U_POST_EDIT --><li class="edit-icon"><a href="{topicrow.U_POST_EDIT}" title="{L_WP_COMMENT_EDIT_EXPLAIN}"><span>{L_WP_COMMENT_EDIT}</span></a></li><!-- ENDIF -->
 						<!-- IF topicrow.U_POST_DELETE --><li class="edit-icon"><a href="{topicrow.U_POST_DELETE}" title="{L_WP_COMMENT_DELETE_EXPLAIN}"><span>{L_WP_COMMENT_DELETE}</span></a></li><!-- ENDIF -->
 						<!-- IF topicrow.U_POST_TRASH --><li class="wp-trash-icon"><a href="{topicrow.U_POST_TRASH}" title="{L_WP_COMMENT_TRASH_EXPLAIN}"><span>{L_WP_COMMENT_TRASH}</span></a></li><!-- ENDIF -->
-						<!-- IF topicrow.U_POST_SPAM --><li class="spam-icon"><a href="{topicrow.U_POST_SPAM}" title="{L_WP_COMMENT_SPAM_EXPLAIN}"><span>{L_WP_COMMENT_SPAM}</span></a></li><!-- ENDIF -->
-						<!-- IF topicrow.U_POST_APPROVE --><li class="wp-approve-icon"><a href="{topicrow.U_POST_APPROVE}" title="{L_WP_COMMENT_APPROVE_EXPLAIN}"><span>{L_WP_COMMENT_APPROVE}</span></a></li><!-- ENDIF -->
-						<!-- IF topicrow.U_POST_UNAPPROVE --><li class="wp-unapprove-icon"><a href="{topicrow.U_POST_UNAPPROVE}" title="{L_WP_COMMENT_APPROVE_EXPLAIN}"><span>{L_WP_COMMENT_APPROVE}</span></a></li><!-- ENDIF -->
+						<!-- IF topicrow.XU_POST_SPAM --><li class="spam-icon"><a href="{topicrow.U_POST_SPAM}" title="{L_WP_COMMENT_SPAM_EXPLAIN}"><span>{L_WP_COMMENT_SPAM}</span></a></li><!-- ENDIF -->
+						<!-- IF topicrow.XU_POST_APPROVE --><li class="wp-approve-icon"><a href="{topicrow.U_POST_APPROVE}" title="{L_WP_COMMENT_APPROVE_EXPLAIN}"><span>{L_WP_COMMENT_APPROVE}</span></a></li><!-- ENDIF -->
+						<!-- IF topicrow.XU_POST_UNAPPROVE --><li class="wp-unapprove-icon"><a href="{topicrow.U_POST_UNAPPROVE}" title="{L_WP_COMMENT_APPROVE_EXPLAIN}"><span>{L_WP_COMMENT_APPROVE}</span></a></li><!-- ENDIF -->
 					</ul>
-					<!-- ENDIF -->
 				<!-- ENDIF -->
 
 				<h3><a href="{topicrow.U_MINI_POST}" rel="bookmark">{topicrow.POST_SUBJECT}</a></h3>
@@ -23,27 +30,30 @@
 					{L_POST_BY_AUTHOR} <strong>{topicrow.POST_AUTHOR_FULL}</strong> &raquo; {topicrow.POST_DATE}
 				</p>
 
-				<div class="entry content">{topicrow.MESSAGE}<!-- IF topicrow.XPAGINATION --><strong class="pagination"><span>{topicrow.PAGINATION}</span></strong><!-- ENDIF --></div>
-
+				<div class="entry content">{topicrow.MESSAGE}</div>
 
 				<!-- IF topicrow.POST_TAGS or topicrow.POST_CATS or topicrow.POST_EDIT or topicrow.POST_COMENT -->
 				<div class="postmetadata alt notice">
-					<!-- IF topicrow.POST_TAGS -->{topicrow.POST_TAGS}<!-- ENDIF -->
-					<!-- IF topicrow.POST_CATS -->{topicrow.POST_CATS}<!-- ENDIF -->
-					<!-- IF topicrow.POST_COMENT --><!-- IF topicrow.POST_CATS --> | <!-- ENDIF -->{topicrow.POST_COMENT}<!-- IF topicrow.PAGINATION --><strong class="pagination"><span>{topicrow.PAGINATION}</span></strong><!-- ENDIF --><!-- ENDIF -->
-					<!-- IF topicrow.U_FOLLOW_FEED --><br />{topicrow.U_FOLLOW_FEED}<!-- ENDIF -->
-					<!-- IF topicrow.U_YES_COMMENT_YES_PING --><br />{topicrow.U_YES_COMMENT_YES_PING}<!-- ENDIF -->
-					<!-- IF topicrow.U_NO_COMMENT_YES_PING --><br />{topicrow.U_NO_COMMENT_YES_PING}<!-- ENDIF -->
-					<!-- IF topicrow.U_YES_COMMENT_NO_PING --><br />{topicrow.U_YES_COMMENT_NO_PING}<!-- ENDIF -->
-					<!-- IF topicrow.U_NO_COMMENT_NO_PING --><br />{topicrow.U_NO_COMMENT_NO_PING}<!-- ENDIF -->
+					<ul class="postmetadata-icons">
+					<!-- IF topicrow.POST_TAGS --><li>{topicrow.POST_TAGS}</li><!-- ENDIF -->
+					<!-- IF topicrow.POST_CATS --><li>{topicrow.POST_CATS}<!-- ENDIF -->
+					<!-- IF topicrow.POST_COMENT --><!-- IF topicrow.POST_CATS --> | <!-- ENDIF -->{topicrow.POST_COMENT}</li><!-- IF topicrow.PAGINATION --><strong class="pagination"><span>{topicrow.PAGINATION}</span></strong><!-- ENDIF --><!-- ENDIF -->
+					<!-- IF topicrow.U_FOLLOW_FEED --><li>{topicrow.U_FOLLOW_FEED}</li><!-- ENDIF -->
+					<!-- IF topicrow.U_YES_COMMENT_YES_PING --><li>{topicrow.U_YES_COMMENT_YES_PING}</li><!-- ENDIF -->
+					<!-- IF topicrow.U_NO_COMMENT_YES_PING --><li>{topicrow.U_NO_COMMENT_YES_PING}</li><!-- ENDIF -->
+					<!-- IF topicrow.U_YES_COMMENT_NO_PING --><li>{topicrow.U_YES_COMMENT_NO_PING}</li><!-- ENDIF -->
+					<!-- IF topicrow.U_NO_COMMENT_NO_PING --><li>{topicrow.U_NO_COMMENT_NO_PING}</li><!-- ENDIF -->
+					</ul>
 				</div>
 				<!-- ENDIF -->
 			</div>
 
 			<span class="corners-bottom"><span></span></span></div>
 		</div>
-		<hr class="divider" />
 
+		<!-- IF $BLOCK_COMPACT --><!-- IF $FIRST_FULL_WIDTH and topicrow.S_FIRST_ROW --><!-- ELSE --></div><!-- ENDIF --><!-- ENDIF -->
+
+		<hr class="divider" /><!-- IF $BLOCK_COMPACT and topicrow.S_LAST_ROW --><br style="clear: both;" /><!-- ENDIF -->
 		<!-- BEGINELSE -->
 
 		<!-- IF IN_SEARCH -->
@@ -64,10 +74,12 @@
 
 		<!-- END topicrow -->
 
-		<!-- IF PREVIOUS_ENTRIE or NEXT_ENTRIE -->
+		<!-- IF PREVIOUS_ENTRIE -->
 		<ul class="linklist leftside">
 			<li>{PREVIOUS_ENTRIE}</li>
 		</ul>
+		<!-- ENDIF -->
+		<!-- IF NEXT_ENTRIE -->
 		<ul class="linklist rightside">
 			<li>{NEXT_ENTRIE}</li>
 		</ul>

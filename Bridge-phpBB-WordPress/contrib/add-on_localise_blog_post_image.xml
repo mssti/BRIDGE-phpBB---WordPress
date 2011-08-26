@@ -51,7 +51,7 @@
 		<history>
 			<entry>
 				<date>2011-08-01</date>
-				<rev-version>0.0.7</rev-version>
+				<rev-version>0.0.8</rev-version>
 				<changelog lang="en">
 					<change> For a changelog, read the main install file</change>
 				</changelog>
@@ -76,9 +76,10 @@
 			<edit>
 				<find><![CDATA[		// Execute overall actions]]></find>
 				<action type="before-add"><![CDATA[// MOD : WordPress - phpBB Integration Mod - START
-		$this->imageset_keys['buttons'][] = 'button_blogpost_new';
+		$this->imageset_keys['buttons'] = array_merge($this->imageset_keys['buttons'], array(
+			'button_blogpost_new', 'icon_wp_approve', 'icon_wp_unapprove', 'icon_wp_spam', 'icon_wp_nospam', 'icon_wp_trash', 'icon_wp_untrash',
+		));
 // MOD : WordPress - phpBB Integration Mod - END
-
 ]]></action>
 			</edit>
 		</open>
@@ -87,9 +88,10 @@
 			<edit>
 				<find><![CDATA[				$sql_ary = array();]]></find>
 				<action type="before-add"><![CDATA[// MOD : WordPress - phpBB Integration Mod - START
-				$valid_localized[] = 'button_blogpost_new';
+				$valid_localized = array_merge($valid_localized, array(
+					'button_blogpost_new', 'icon_wp_approve', 'icon_wp_unapprove', 'icon_wp_spam', 'icon_wp_nospam', 'icon_wp_trash', 'icon_wp_untrash',
+				));
 // MOD : WordPress - phpBB Integration Mod - END
-
 ]]></action>
 			</edit>
 		</open>
@@ -98,7 +100,13 @@
 			<edit>
 				<find><![CDATA[	'IMG_USER_ICON1'	=> 'Definida por usuario 1',]]></find>
 				<action type="after-add"><![CDATA[// MOD : WordPress - phpBB Integration Mod - START
-	'IMG_BUTTON_BLOGPOST_NEW'	=> 'New Blog Post',
+	'IMG_BUTTON_BLOGPOST_NEW'	=> 'Blog : New Post',
+	'IMG_ICON_WP_APPROVE'		=> 'Blog : Approve a Post',
+	'IMG_ICON_WP_UNAPPROVE'		=> 'Blog : Unapprove a Post',
+	'IMG_ICON_WP_SPAM'			=> 'Blog : Mark a Post as Spam',
+	'IMG_ICON_WP_NOSPAM'		=> 'Blog : Mark a Post as No Spam',
+	'IMG_ICON_WP_TRASH'			=> 'Blog : Move a Post to Trash',
+	'IMG_ICON_WP_UNTRASH'		=> 'Blog : Recover a Post from Trash',
 // MOD : WordPress - phpBB Integration Mod - END
 ]]></action>
 				<comment lang="en"><![CDATA[You will have to make this change to ALL languages you have installed, I use "en" as an example.
@@ -108,12 +116,69 @@
 			</edit>
 		</open>
 
+		<open src="styles/prosilver/imageset/imageset.cfg">
+			<edit>
+				<find><![CDATA[# Images]]></find>
+				<action type="after-add"><![CDATA[
+# MOD : WordPress - phpBB Integration Mod - START
+img_icon_wp_approve = icon_wp_approve.gif*20*20
+img_icon_wp_unapprove = icon_wp_unapprove.gif*20*20
+img_icon_wp_spam = icon_wp_spam.gif*20*20
+img_icon_wp_nospam = icon_wp_spam.gif*20*20
+img_icon_wp_trash = icon_wp_trash.gif*20*20
+img_icon_wp_untrash = icon_wp_trash.gif*20*20
+# MOD : WordPress - phpBB Integration Mod - END
+]]></action>
+				<comment lang="en"><![CDATA[You will have to make this change to ALL themes you have installed, based off Prosilver. I use "Prosilver" as an example.
+				You can add it at the bottom of the imageset.cfg file]]></comment>
+				<comment lang="es"><![CDATA[Usted debe hacer este cambio en TODOS los temas que tiene instalado, basados de Prosilver. Yo uso "Prosilver" como ejemplo.
+				Puede hacer el agregado al final del archivo imageset.cfg]]></comment>
+			</edit>
+		</open>
+
 		<open src="styles/prosilver/imageset/en/imageset.cfg">
 			<edit>
 				<find><![CDATA[# Images]]></find>
 				<action type="after-add"><![CDATA[
 # MOD : WordPress - phpBB Integration Mod - START
 img_button_blogpost_new = button_blogpost_new.gif*25*96
+# MOD : WordPress - phpBB Integration Mod - END
+]]></action>
+				<comment lang="en"><![CDATA[You will have to make this change to ALL themes you have installed, based off Prosilver. I use "Prosilver" as an example.
+				You will have to make this change to ALL languages you have installed. I use "en" as an example.
+				You can add it at the bottom of the imageset.cfg file]]></comment>
+				<comment lang="es"><![CDATA[Usted debe hacer este cambio en TODOS los temas que tiene instalado, basados de Prosilver. Yo uso "Prosilver" como ejemplo.
+				Usted debe realizar este cambio en TODOS los idiomas que tenga instalados, yo uso "en" como un ejemplo.
+				Puede hacer el agregado al final del archivo imageset.cfg]]></comment>
+			</edit>
+		</open>
+
+		<open src="styles/subsilver2/imageset/imageset.cfg">
+			<edit>
+				<find><![CDATA[# Images]]></find>
+				<action type="after-add"><![CDATA[
+# MOD : WordPress - phpBB Integration Mod - START
+img_icon_wp_approve = icon_wp_approve.gif*20*20
+img_icon_wp_unapprove = icon_wp_unapprove.gif*20*20
+img_icon_wp_spam = icon_wp_spam.gif*20*20
+img_icon_wp_nospam = icon_wp_nospam.gif*20*20
+img_icon_wp_trash = icon_wp_trash.gif*20*20
+img_icon_wp_untrash = icon_wp_untrash.gif*20*20
+# MOD : WordPress - phpBB Integration Mod - END
+]]></action>
+				<comment lang="en"><![CDATA[You will have to make this change to ALL themes you have installed, based off Prosilver. I use "Prosilver" as an example.
+				You can add it at the bottom of the imageset.cfg file]]></comment>
+				<comment lang="es"><![CDATA[Usted debe hacer este cambio en TODOS los temas que tiene instalado, basados de Prosilver. Yo uso "Prosilver" como ejemplo.
+				Puede hacer el agregado al final del archivo imageset.cfg]]></comment>
+			</edit>
+		</open>
+
+		<open src="styles/subsilver2/imageset/en/imageset.cfg">
+			<edit>
+				<find><![CDATA[# Images]]></find>
+				<action type="after-add"><![CDATA[
+# MOD : WordPress - phpBB Integration Mod - START
+img_button_blogpost_new = button_blogpost_new.gif
 # MOD : WordPress - phpBB Integration Mod - END
 ]]></action>
 				<comment lang="en"><![CDATA[You will have to make this change to ALL themes you have installed, based off Prosilver. I use "Prosilver" as an example.
@@ -136,6 +201,9 @@ A) Refresh the theme :
 	A.2) Under "Style components " click on "Theme".
 	A.3) Under "Actions" click on "Refresh".
 	A.4) in the next screen, click on "Yes" ( Repeat last 2 steps to each instaled style ).
+	A.5) Under "Style components " click on "Imageset".
+	A.6) Under "Actions" click on "Refresh".
+	A.7) in the next screen, click on "Yes" ( Repeat last 2 steps to each instaled style ).
 
 #####################################################################
 B) Enjoy it !.]]>
@@ -152,6 +220,9 @@ A) Actualizar el Tema :
 	A.2) Debajo de "COMPONENTES DE ESTILO" hacer click en "Tema".
 	A.3) En "Acciones" hacer click en "Actualizar".
 	A.4) En la siguente pantalla, haga click en "SI" ( Repita los 2 últimos pasos para cada estilo Instalado ).
+	A.5) Debajo de "COMPONENTES DE ESTILO" hacer click en "Galerías de imagenes
+	A.6) En "Acciones" hacer click en "Actualizar".
+	A.7) En la siguente pantalla, haga click en "SI" ( Repita los 2 últimos pasos para cada estilo Instalado ).
 
 #####################################################################
 B) Disfruten !.]]></diy-instructions>

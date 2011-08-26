@@ -40,7 +40,7 @@
 
 		</author-group>
 
-		<mod-version>0.0.7.1</mod-version>
+		<mod-version>0.0.8</mod-version>
 
 		<installation>
 			<level>easy</level>
@@ -49,6 +49,24 @@
 		</installation>
 
 		<history>
+			<entry>
+				<date>2011-08-25</date>
+				<rev-version>0.0.8</rev-version>
+				<changelog lang="en">
+					<change> [FIX] login/logout </change>
+					<change> [FIX] minor html bugs </change>
+					<change> [FIX] Pagination with rewrite </change>
+					<change> [FIX] Comments filters </change>
+					<change> [FIX] Widget style for subsilver2 </change>
+				</changelog>
+				<changelog lang="es">
+					<change> [CORRECCIÓN] Identificarse/Desconectarse </change>
+					<change> [CORRECCIÓN] Pequeños errores html </change>
+					<change> [CORRECCIÓN] Paginacion con rewrite </change>
+					<change> [CORRECCIÓN] Filtros en comentarios </change>
+					<change> [CORRECCIÓN] Estilo de Widget para subsilver2 </change>
+				</changelog>
+			</entry>
 			<entry>
 				<date>2011-08-13</date>
 				<rev-version>0.0.7.1</rev-version>

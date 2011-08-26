@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.9 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/themes/phpBB/includes
- * @version: $Id: wp_phpbb_bridge_core.php, v0.0.7.1 2011/08/13 11:08:13 leviatan21 Exp $
+ * @version: $Id: wp_phpbb_bridge_core.php, v0.0.8 2011/08/25 11:08:25 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -216,7 +216,13 @@ class phpbb
 		self::$absolute_phpbb_script_path = generate_board_url(true) . '/' . get_option('phpbb_script_path', bridge::$config['phpbb_script_path']);
 		self::$absolute_wordpress_script_path = generate_board_url(true) . '/' . get_option('wordpress_script_path', bridge::$config['wordpress_script_path']);
 
-		// Start session management
+		/**
+		* Start session management
+		* 	Disable to call the function leave_newly_registered() 
+		* 	and avoid to include the phpbb/includes/functions_user.php because the duplicated function validate_username()
+		**/
+		self::$config['new_member_post_limit'] = null;
+
 		if (!defined('PHPBB_INCLUDED'))
 		{
 			self::$user->session_begin();
@@ -227,9 +233,6 @@ class phpbb
 
 		// enhance phpbb $config data with WP $config data
 		self::wp_get_config();
-
-		// enhance imageset
-		self::wp_imageset();
 	}
 
 	/**
@@ -258,7 +261,7 @@ class phpbb
 
 		$wpdb = new wpdb(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST);
 
-		$wpdb ->set_prefix(WP_TABLE_PREFIX);
+		$wpdb->set_prefix(WP_TABLE_PREFIX);
 
 		return $wpdb;
 	}
@@ -289,8 +292,6 @@ class phpbb
 
 		// enhance phpbb user data with WP user data
 		self::$user->data['wp_user'] = self::wp_get_userdata($userid);
-
-	//	return self::$user->session_id;
 	}
 
 	public static function wp_get_userid()
@@ -317,7 +318,7 @@ class phpbb
 				}
 				else
 				{
-					$userid = wp_create_user(self::phpbb_get_username(), wp_generate_password(), self::$user->data['user_email']);
+					$userid = wp_create_user(self::$user->data['username'], wp_generate_password(), self::$user->data['user_email']);
 				}
 
 				update_user_meta($userid, 'phpbb_userid', self::$user->data['user_id']);
@@ -385,25 +386,6 @@ class phpbb
 		}
 
 		return $wpuser;
-	}
-
-	public static function phpbb_get_username($count = 0)
-	{
-		$new_username = ereg_replace("[^A-Za-z0-9]", "", self::$user->data['username']);
-		$new_username = strtolower($new_username);
-
-		if ($count > 0)
-		{
-			$new_username .= (string) $count;
-		}
-
-		if (username_exists($new_username))
-		{
-			$count++;
-			$new_username = self::phpbb_get_username($count);
-		}
-
-		return $new_username;
 	}
 
 	/**
@@ -552,6 +534,8 @@ class phpbb
 		// Do the phpBB page header stuff first
 		page_header($wp_title);
 
+		$redirect = request_var('redirect', get_option('siteurl'));
+
 		self::$template->assign_vars(array(
 			'PHPBB_IN_FORUM'	=> false,
 			'PHPBB_IN_WEB'		=> false,
@@ -573,14 +557,18 @@ class phpbb
 
 			'S_REGISTER_ENABLED'=> (self::$config['require_activation'] != USER_ACTIVATION_DISABLE && get_option('users_can_register')) ? true : false,
 			'U_LOGIN_LOGOUT'	=> (!is_user_logged_in()) ? get_option('siteurl') . '/?action=login' : get_option('siteurl') . '/?action=logout',
-			'L_LOGIN_LOGOUT'	=> (!is_user_logged_in()) ? self::$user->lang['LOGIN'] : sprintf(self::$user->lang['LOGOUT_USER'], self::$user->data['username']),
+			'U_LOGIN_LOGOUT'	=> (!is_user_logged_in()) ? append_sid(get_option('siteurl') . '/', array('action' => 'login', 'redirect' => $redirect)) : append_sid(get_option('siteurl') . '/', array('action' => 'logout', 'redirect' => $redirect), true, self::$user->session_id),
+			'S_LOGIN_REDIRECT'	=> build_hidden_fields(array('redirect' => $redirect)),
+
 			'U_WP_ACP'			=> (self::$user->data['user_type'] == USER_FOUNDER || current_user_can('level_8')) ? admin_url() : '',
 			'U_POST_NEW_TOPIC'	=> (self::$user->data['user_type'] == USER_FOUNDER || current_user_can('level_8')) ? admin_url('post-new.php') : '',
-			// Fall back to the phpbb "New topic" button
-			'BLOG_POST_IMG'		=> (self::$user->img('button_blogpost_new', 'POST_NEW_TOPIC') != '') ? self::$user->img('button_blogpost_new', 'POST_NEW_TOPIC') : '',
+
+			'BLOG_POST_IMG'		=> self::wp_imageset('button_blogpost_new', 'WP_POST_TOPIC', 'BLOG_POST_IMG_CLASS'),
 			'POST_IMG'			=> self::$user->img('button_topic_new', 'POST_NEW_TOPIC'),
 			'DYNAMIC_SIDEBAR_W'	=> (int) self::$config['wp_phpbb_bridge_widgets_column_width'],
 
+			'WPT_TEMPLATE_PATH'	=> get_template_directory_uri(),
+			'WPT_STYLESHEETPATH'=> get_stylesheet_directory(),
 			'T_THEME_PATH'		=> "{$web_path}styles/" . self::$user->theme['theme_path'] . '/theme',
 			'T_STYLESHEET_LINK'	=> (!self::$user->theme['theme_storedb']) ? "{$web_path}styles/" . self::$user->theme['theme_path'] . '/theme/stylesheet.css' : append_sid("{$web_path}style." . PHP_EXT, 'id=' . self::$user->theme['style_id'] . '&amp;lang=' . self::$user->data['user_lang']),
 		));
@@ -669,7 +657,7 @@ class phpbb
 		$blog_header .= '<link rel="pingback" href="' . get_bloginfo('pingback_url') . '" />' . "\n";
 
 		// Main layout 1 column
-		$blog_header .= '<link rel="stylesheet" type="text/css" media="all" href="' . get_bloginfo('stylesheet_url') . '" />' . "\n";
+		$blog_header .= '<link rel="stylesheet" type="text/css" media="all" href="' . get_bloginfo('stylesheet_url') . '?ver=' . WP_PHPBB_BRIDGE_VERSION . '" />' . "\n";
 
 		// Some js files
 		add_action('wp_head', 'wp_phpbb_javascript');
@@ -1322,60 +1310,97 @@ class phpbb
 
 	/**
 	* Some images to do not modify the imageset
+	* with Fall back to a default the phpbb image
 	*/
-	function wp_imageset()
+	function wp_imageset($img = 'all', $lang_var = '', $tpl_name = '')
 	{
-		global $phpbb_root_path;
+		static $imageset = array();
 
-		// Use URL if told so
-		$root_path = (defined('PHPBB_USE_BOARD_URL_PATH') && PHPBB_USE_BOARD_URL_PATH) ? generate_board_url() . '/' : $phpbb_root_path;
-
-		$imgdata = array(
-			'icon_approve' => array(
-				'image_filename' 	=> 'icon_wp_approve.gif',
-				'image_name' 		=> 'icon_wp_approve',
-				'image_lang'		=> false,
-				'image_width' 		=> 20,
-				'image_height'		=> 20,
-			),
-			'icon_unapprove' => array(
-				'image_filename' 	=> 'icon_wp_unapprove.gif',
-				'image_name' 		=> 'icon_wp_unapprove',
-				'image_lang'		=> false,
-				'image_width' 		=> 20,
-				'image_height'		=> 20,
-			),
-			'icon_wp_spam' => array(
-				'image_filename' 	=> 'icon_wp_spam.gif',
-				'image_name' 		=> 'icon_wp_spam',
-				'image_lang'		=> false,
-				'image_width' 		=> 20,
-				'image_height'		=> 20,
-			),
-			'icon_wp_nospam' => array(
-				'image_filename' 	=> 'icon_wp_nospam.gif',
-				'image_name' 		=> 'icon_wp_nospam',
-				'image_lang'		=> false,
-				'image_width' 		=> 20,
-				'image_height'		=> 20,
-			),
-			'button_blogpost_new' => array(
-				'image_filename' 	=> 'button_blogpost_new.gif',
-				'image_name' 		=> 'button_blogpost_new',
-				'image_lang'		=> self::$user->img_lang,
-				'image_width' 		=> false,
-				'image_height'		=> false,
-			),
-		);
-
-		foreach ($imgdata as $image => $img_data)
+		if (empty($imageset))
 		{
-			$path = 'styles/' . rawurlencode(self::$user->theme['imageset_path']) . '/imageset/' . ($img_data['image_lang'] ? $img_data['image_lang'] .'/' : '') . rawurlencode($img_data['image_filename']);
-			$img_data['src'] = $root_path . $path;
-			$img_data['image_id'] = sizeof(self::$user->img_array)+1;
-			$img_data['imageset_id'] = (int) self::$user->theme['imageset_id'];
+			$imageset = array(
+				'icon_wp_trash' => array(
+					'image_filename_fall_back' 	=> 'icon_post_delete.gif',
+					'image_name_fall_back' 		=> 'icon_post_delete',
+					'image_class_fall_back'		=> 'wp-delete-icon',
 
-			self::$user->img_array[$img_data['image_name']] = $img_data;
+					'image_filename' 			=> 'icon_wp_trash.gif',
+					'image_name' 				=> 'icon_wp_trash',
+					'image_class'				=> 'wp-trash-icon',
+				),
+				'icon_wp_untrash' => array(
+					'image_filename_fall_back' 	=> 'icon_post_delete.gif',
+					'image_name_fall_back' 		=> 'icon_post_delete',
+					'image_class_fall_back'		=> 'wp-undelete-icon',
+
+					'image_filename' 			=> 'icon_wp_trash.gif',
+					'image_name' 				=> 'icon_wp_untrash',
+					'image_class'				=> 'wp-untrash-icon',
+				),
+				'icon_wp_approve' => array(
+					'image_filename_fall_back' 	=> 'icon_post_report.gif',
+					'image_name_fall_back' 		=> 'icon_post_report',
+					'image_class_fall_back'		=> 'wp-report-icon',
+
+					'image_filename' 			=> 'icon_wp_approve.gif',
+					'image_name' 				=> 'icon_wp_approve',
+					'image_class'				=> 'wp-approve-icon',
+				),
+				'icon_wp_unapprove' => array(
+					'image_filename_fall_back' 	=> 'icon_topic_unapproved.gif',
+					'image_name_fall_back' 		=> 'icon_topic_unapproved',
+					'image_class_fall_back'		=> 'wp-noreport-icon',
+
+					'image_filename' 			=> 'icon_wp_unapprove.gif',
+					'image_name' 				=> 'icon_wp_unapprove',
+					'image_class'				=> 'wp-unapprove-icon',
+				),
+				'icon_wp_spam' => array(
+					'image_filename_fall_back' 	=> 'icon_post_report.gif',
+					'image_name_fall_back' 		=> 'icon_post_report',
+					'image_class_fall_back'		=> 'wp-info-icon',
+
+					'image_filename' 			=> 'icon_wp_spam.gif',
+					'image_name' 				=> 'icon_wp_spam',
+					'image_class'				=> 'wp-spam-icon',
+				),
+				'icon_wp_nospam' => array(
+					'image_filename_fall_back' 	=> 'icon_user_warn.gif',
+					'image_name_fall_back' 		=> 'icon_user_warn',
+					'image_class_fall_back'		=> 'wp-noinfo-icon',
+
+					'image_filename' 			=> 'icon_wp_nospam.gif',
+					'image_name' 				=> 'icon_wp_nospam',
+					'image_class'				=> 'wp-nospam-icon',
+				),
+				'button_blogpost_new' => array(
+					'image_filename_fall_back' 	=> 'button_topic_new.gif',
+					'image_name_fall_back'		=> 'button_topic_new',
+					'image_class_fall_back'		=> 'wp-post-icon',
+
+					'image_filename' 			=> 'button_blogpost_new.gif',
+					'image_name' 				=> 'button_blogpost_new',
+					'image_class'				=> 'blogpostnew-icon',
+				),
+			);
+		}
+
+		foreach ($imageset as $image => $img_data)
+		{
+			if ($img == $image)
+			{
+				$imagedata = self::$user->img($img_data['image_name'], $lang_var);
+				if ($imagedata != '')
+				{
+					self::$template->assign_var($tpl_name, $img_data['image_class']);
+					return $imagedata;
+				}
+				else
+				{
+					self::$template->assign_var($tpl_name, $img_data['image_class_fall_back']);
+					return self::$user->img($img_data['image_name_fall_back'], $lang_var);
+				}
+			}
 		}
 	}
 }

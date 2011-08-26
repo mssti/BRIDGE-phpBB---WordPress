@@ -11,7 +11,7 @@
 		<!-- ENDIF -->
 
 		<!-- BEGIN postrow -->
-		<div class="post<!-- IF postrow.S_FIRST_ROW --> bg3<!-- ELSE --><!-- IF postrow.S_ROW_COUNT is odd --> bg2<!-- ELSE --> bg1<!-- ENDIF --><!-- ENDIF --><!-- IF (postrow.S_POST_UNAPPROVED or postrow.S_POST_REPORTED) --> reported<!-- ENDIF -->" id="<!-- IF postrow.S_COMMENT -->comment-{postrow.POST_ID}<!-- ELSE -->post-{postrow.POST_ID}<!-- ENDIF -->">
+		<div class="post<!-- IF postrow.S_FIRST_ROW --> bg3<!-- ELSE --><!-- IF postrow.S_ROW_COUNT is odd --> bg2<!-- ELSE --> bg1<!-- ENDIF --><!-- ENDIF --><!-- IF (postrow.S_POST_UNAPPROVED or postrow.S_POST_REPORTED or postrow.S_POST_TRASHED) --> reported<!-- ENDIF -->" id="<!-- IF postrow.S_COMMENT -->comment-{postrow.POST_ID}<!-- ELSE -->post-{postrow.POST_ID}<!-- ENDIF -->">
 			<div class="inner"><span class="corners-top"><span></span></span>
 				<div class="postbody<!-- IF DYNAMIC_SIDEBAR and postrow.S_FIRST_ROW--> postbodyfull<!-- ELSEIF not postrow.S_FIRST_ROW --> postbodyfull<!-- ENDIF -->">
 				<!-- IF not S_IS_BOT -->
@@ -19,11 +19,12 @@
 					<ul class="profile-icons">
 						<!-- IF postrow.U_POST_EDIT --><li class="edit-icon"><a href="{postrow.U_POST_EDIT}" title="{L_WP_COMMENT_EDIT_EXPLAIN}"><span>{L_WP_COMMENT_EDIT}</span></a></li><!-- ENDIF -->
 						<!-- IF postrow.U_POST_DELETE --><li class="delete-icon"><a href="{postrow.U_POST_DELETE}" title="{L_WP_COMMENT_DELETE_EXPLAIN}"><span>{L_WP_COMMENT_DELETE}</span></a></li><!-- ENDIF -->
-						<!-- IF postrow.U_POST_TRASH --><li class="wp-trash-icon"><a href="{postrow.U_POST_TRASH}" title="{L_WP_COMMENT_TRASH_EXPLAIN}"><span>{L_WP_COMMENT_TRASH}</span></a></li><!-- ENDIF -->
-						<!-- IF postrow.U_POST_SPAM --><li class="wp-spam-icon"><a href="{postrow.U_POST_SPAM}" title="{L_WP_COMMENT_SPAM_EXPLAIN}"><span>{L_WP_COMMENT_SPAM}</span></a></li><!-- ENDIF -->
-						<!-- IF postrow.U_POST_UNSPAM --><li class="info-icon"><a href="{postrow.U_POST_UNSPAM}" title="{L_WP_COMMENT_UNSPAM_EXPLAIN}"><span>{L_WP_COMMENT_UNSPAM}</span></a></li><!-- ENDIF -->
-						<!-- IF postrow.U_POST_APPROVE --><li class="wp-approve-icon"><a href="{postrow.U_POST_APPROVE}" title="{L_WP_COMMENT_APPROVE_EXPLAIN}"><span>{L_WP_COMMENT_APPROVE}</span></a></li><!-- ENDIF -->
-						<!-- IF postrow.U_POST_UNAPPROVE --><li class="wp-unapprove-icon"><a href="{postrow.U_POST_UNAPPROVE}" title="{L_WP_COMMENT_UNAPPROVE_EXPLAIN}"><span>{L_WP_COMMENT_UNAPPROVE}</span></a></li><!-- ENDIF -->
+						<!-- IF postrow.U_POST_TRASH --><li class="{TRASH_IMG_CLASS}"><a href="{postrow.U_POST_TRASH}" title="{L_WP_COMMENT_TRASH_EXPLAIN}"><span>{L_WP_COMMENT_TRASH}</span></a></li><!-- ENDIF -->
+						<!-- IF postrow.U_POST_UNTRASH --><li class="{UNTRASH_IMG_CLASS}"><a href="{postrow.U_POST_UNTRASH}" title="{L_WP_COMMENT_UNTRASH_EXPLAIN}"><span>{L_WP_COMMENT_UNTRASH}</span></a></li><!-- ENDIF -->
+						<!-- IF postrow.U_POST_SPAM --><li class="{SPAM_IMG_CLASS}"><a href="{postrow.U_POST_SPAM}" title="{L_WP_COMMENT_SPAM_EXPLAIN}"><span>{L_WP_COMMENT_SPAM}</span></a></li><!-- ENDIF -->
+						<!-- IF postrow.U_POST_UNSPAM --><li class="{UNSPAM_IMG_CLASS}"><a href="{postrow.U_POST_UNSPAM}" title="{L_WP_COMMENT_UNSPAM_EXPLAIN}"><span>{L_WP_COMMENT_UNSPAM}</span></a></li><!-- ENDIF -->
+						<!-- IF postrow.U_POST_APPROVE --><li class="{APPROVE_IMG_CLASS}"><a href="{postrow.U_POST_APPROVE}" title="{L_WP_COMMENT_APPROVE_EXPLAIN}"><span>{L_WP_COMMENT_APPROVE}</span></a></li><!-- ENDIF -->
+						<!-- IF postrow.U_POST_UNAPPROVE --><li class="{UNAPPROVE_IMG_CLASS}"><a href="{postrow.U_POST_UNAPPROVE}" title="{L_WP_COMMENT_UNAPPROVE_EXPLAIN}"><span>{L_WP_COMMENT_UNAPPROVE}</span></a></li><!-- ENDIF -->
 					</ul>
 					<!-- ENDIF -->
 				<!-- ENDIF -->
@@ -38,10 +39,11 @@
 						<h3 class="first"><a href="{postrow.U_MINI_POST}">{postrow.MINI_POST_IMG}</a>{postrow.POST_SUBJECT}</h3>
 					<!-- ENDIF -->
 
-					<!-- IF postrow.S_POST_UNAPPROVED or postrow.S_POST_REPORTED -->
+					<!-- IF postrow.S_POST_UNAPPROVED or postrow.S_POST_REPORTED or postrow.S_POST_TRASHED -->
 						<p class="rules">
-							<!-- IF postrow.S_POST_UNAPPROVED -->{UNAPPROVED_IMG} <strong>{L_WP_COMMENT_UNAPPROVED}</strong><br /><!-- ENDIF -->
+							<!-- IF postrow.S_POST_UNAPPROVED -->{REPORTED_IMG} <strong>{L_WP_COMMENT_UNAPPROVED}</strong><br /><!-- ENDIF -->
 							<!-- IF postrow.S_POST_REPORTED -->{REPORTED_IMG} <strong>{L_WP_COMMENT_REPORTED_NOTE}</strong><!-- ENDIF -->
+							<!-- IF postrow.S_POST_TRASHED -->{REPORTED_IMG} <strong>{L_WP_COMMENT_UNTRASHED_NOTE}</strong><!-- ENDIF -->
 						</p>
 					<!-- ENDIF -->
 

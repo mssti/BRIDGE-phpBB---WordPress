@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.9 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/themes/phpBB
- * @version: $Id: single.php, v0.0.7.1 2011/08/13 11:08:13 leviatan21 Exp $
+ * @version: $Id: single.php, v0.0.8 2011/08/25 11:08:25 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -118,8 +118,14 @@ if (have_posts())
 
 	if ($total_comments > 1 && $comments_per_page)
 	{
-		$on_page = request_var('cpage', 1);
 		$base_url = apply_filters('the_permalink', get_permalink());
+
+		$on_page = request_var('cpage', 1);
+		// if $wp_rewrite->using_permalinks() - Start
+		$location = redirect_canonical('', false);
+		preg_match('#comment-page-([0-9]{1,})/?$#', $location, $temp_page);
+		$on_page = (isset($temp_page) && !empty($temp_page[1])) ? $temp_page[1] : $on_page;
+		// if $wp_rewrite->using_permalinks() - End
 
 		phpbb::$template->assign_vars(array(
 			'PAGINATION' 	=> wp_generate_pagination($base_url, $total_comments, $comments_per_page, $on_page),
@@ -147,10 +153,13 @@ if (have_posts())
 
 		'EDIT_IMG' 				=> phpbb::$user->img('icon_post_edit', 'EDIT_POST'),
 		'DELETE_IMG' 			=> phpbb::$user->img('icon_post_delete', 'DELETE_POST'),
-		'SPAM_IMG' 				=> phpbb::$user->img('icon_wp_spam', 'WP_COMMENT_SPAM_EXPLAIN'),
-		'UNSPAM_IMG'			=> phpbb::$user->img('icon_wp_nospam', 'WP_COMMENT_UNSPAM_EXPLAIN'),
-		'APPROVE_IMG'			=> phpbb::$user->img('icon_wp_approve', 'WP_COMMENT_APPROVE_EXPLAIN'),
-		'UNAPPROVE_IMG'			=> phpbb::$user->img('icon_wp_unapprove', 'POST_UNAPPROVED'),
+		'TRASH_IMG' 			=> phpbb::wp_imageset('icon_wp_trash', 'WP_COMMENT_TRASH_EXPLAIN', 'TRASH_IMG_CLASS'),
+		'UNTRASH_IMG' 			=> phpbb::wp_imageset('icon_wp_untrash', 'WP_COMMENT_UNTRASH_EXPLAIN', 'UNTRASH_IMG_CLASS'),
+		'SPAM_IMG' 				=> phpbb::wp_imageset('icon_wp_spam', 'WP_COMMENT_SPAM_EXPLAIN', 'SPAM_IMG_CLASS'),
+		'UNSPAM_IMG'			=> phpbb::wp_imageset('icon_wp_nospam', 'WP_COMMENT_UNSPAM_EXPLAIN', 'UNSPAM_IMG_CLASS'),
+		'APPROVE_IMG'			=> phpbb::wp_imageset('icon_wp_approve', 'WP_COMMENT_APPROVE_EXPLAIN', 'APPROVE_IMG_CLASS'),
+		'UNAPPROVE_IMG'			=> phpbb::wp_imageset('icon_wp_unapprove', 'POST_UNAPPROVED', 'UNAPPROVE_IMG_CLASS'),
+
 		'REPORTED_IMG'			=> phpbb::$user->img('icon_topic_reported', 'POST_REPORTED'),
 		'UNAPPROVED_IMG'		=> phpbb::$user->img('icon_topic_unapproved', 'POST_UNAPPROVED'),
 

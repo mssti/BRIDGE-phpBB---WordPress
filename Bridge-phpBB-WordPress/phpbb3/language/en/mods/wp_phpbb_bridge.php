@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.8 :: BRIDGE phpBB & WordPress -> root/language/en/mods :: [en][English]
- * @version: $Id: wp_phpbb_bridge.php, v0.0.7.1 2011/08/13 11:08:13 leviatan21 Exp $
+ * @version: $Id: wp_phpbb_bridge.php, v0.0.8 2011/08/25 11:08:25 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -82,12 +82,13 @@ $lang = array_merge($lang, array(
 	'WP_POST_NOT_FOUND_EXPLAIN'	=> 'Apologies, but no results were found for the requested archive. Perhaps searching will help find a related post.',
 	'WP_READ_MORE'				=> 'Read full entry »',
 	'WP_POSTED_IN'				=> 'Posted in: %s',
-	'WP_FOLLOW_FEED'			=> 'You can follow any responses to this entry through the <a href="%s">RSS 2.0</a> feed.',
+	'WP_FOLLOW_FEED'			=> 'You can follow any responses to this entry through the <a href="%s" class="wp_icon-feed">feed</a>.',
 	'WP_YES_COMMENT_YES_PING'	=> 'You can <a href="%1$s#respond">leave a response</a>, or <a href="%2$s" rel="trackback">trackback</a> from your own site.',
 	'WP_NO_COMMENT_YES_PING'	=> 'Responses are currently closed, but you can <a href="%s" rel="trackback">trackback</a> from your own site.',
 	'WP_YES_COMMENT_NO_PING'	=> 'You can skip to the end and leave a response. Pinging is currently not allowed.',
 	'WP_NO_COMMENT_NO_PING'		=> 'Both comments and pings are currently closed.',
 
+	'WP_POST_TOPIC'				=> 'Create a new entry',
 	'WP_NO_COMMENTS'			=> 'No Comments',
 	'WP_ONE_COMMENT'			=> '1 Comment',
 	'WP_COMMENTS'				=> '% Comments',
@@ -120,6 +121,9 @@ $lang = array_merge($lang, array(
 	'WP_COMMENT_UNSPAM_EXPLAIN'			=> 'Mark this comment as not Spam',
 	'WP_COMMENT_TRASH'					=> 'Trash',
 	'WP_COMMENT_TRASH_EXPLAIN'			=> 'Move this comment to the trash',
+	'WP_COMMENT_UNTRASH'				=> 'Not Trash',
+	'WP_COMMENT_UNTRASH_EXPLAIN'		=> 'Restore this comment from the trash',
+	'WP_COMMENT_UNTRASHED_NOTE'			=> 'This comment is in the Trash',
 	'WP_COMMENT_DELETE'					=> 'Delete',
 	'WP_COMMENT_DELETE_EXPLAIN'			=> 'Delete Permanently',
 

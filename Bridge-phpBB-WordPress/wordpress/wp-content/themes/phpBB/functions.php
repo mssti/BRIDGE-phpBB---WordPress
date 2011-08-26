@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.9 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/themes/phpBB
- * @version: $Id: functions.php, v0.0.7 2011/08/04 11:08:04 leviatan21 Exp $
+ * @version: $Id: functions.php, v0.0.8 2011/08/25 11:08:25 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -17,6 +17,9 @@
 add_filter('show_admin_bar', '__return_false');
 
 load_theme_textdomain('wp_phpbb3_bridge', TEMPLATEPATH . '/languages' );
+
+// http://wordpress.org/extend/plugins/dynamic-content-gallery-plugin/
+// add_theme_support('post-thumbnails');
 
 /**
  * Extra layout 2 columns
@@ -45,7 +48,7 @@ function wp_phpbb_stylesheet()
 function wp_phpbb_javascript()
 {
 	// javascript for general proposes
-	wp_register_script('javascript', get_bloginfo('stylesheet_directory') . '/js/javascript.js', false, '0.0.6');
+	wp_register_script('javascript', get_bloginfo('stylesheet_directory') . '/js/javascript.js', false, WP_PHPBB_BRIDGE_VERSION);
 	wp_enqueue_script('javascript');
 	wp_print_scripts('javascript');
 
@@ -67,7 +70,6 @@ function wp_phpbb_javascript()
  */
 function wp_generate_pagination($base_url, $num_items, $per_page, $on_page)
 {
-
 	$seperator = '<span class="page-sep">' . phpbb::$user->lang['COMMA_SEPARATOR'] . '</span>';
 	$total_pages = ceil($num_items / $per_page);
 
@@ -76,13 +78,24 @@ function wp_generate_pagination($base_url, $num_items, $per_page, $on_page)
 		return false;
 	}
 
+	global $wp_rewrite;
 	global $paged;
-	$paged = $on_page;
 
+	$paged = $on_page;
+	$page_delim = 'cpage=';
 	$url_delim = (strpos($base_url, '?') === false) ? '?' : ((strpos($base_url, '?') === strlen($base_url) - 1) ? '' : '&amp;');
+	$url_delim2 = '';
+
+	if ($wp_rewrite->using_permalinks())
+	{
+		$page_delim = 'comment-page-';
+		$url_delim = '';
+		$url_delim2 = '/#comments';
+	}
 
 	$page_string = ($on_page == 1) ? '<strong>1</strong>' : '<a href="' . $base_url . '">1</a>';
 	$max_pages = min(ceil($num_items / $total_pages), 4);
+
 	if ($total_pages > 5)
 	{
 		$start_cnt = min(max(1, $on_page - $max_pages), $total_pages - 5);
@@ -92,7 +105,7 @@ function wp_generate_pagination($base_url, $num_items, $per_page, $on_page)
 
 		for ($i = $start_cnt + 1; $i < $end_cnt; $i++)
 		{
-			$page_string .= ($i == $on_page) ? '<strong>' . $i . '</strong>' : '<a href="' . $base_url . "{$url_delim}cpage=" . $i . '">' . $i . '</a>';
+			$page_string .= ($i == $on_page) ? '<strong>' . $i . '</strong>' : '<a href="' . $base_url . "{$url_delim}{$page_delim}" . $i . $url_delim2 . '">' . $i . '</a>';
 			if ($i < $end_cnt - 1)
 			{
 				$page_string .= $seperator;
@@ -107,7 +120,7 @@ function wp_generate_pagination($base_url, $num_items, $per_page, $on_page)
 
 		for ($i = 2; $i < $total_pages; $i++)
 		{
-			$page_string .= ($i == $on_page) ? '<strong>' . $i . '</strong>' : '<a href="' . $base_url . "{$url_delim}cpage=" . $i . '">' . $i . '</a>';
+			$page_string .= ($i == $on_page) ? '<strong>' . $i . '</strong>' : '<a href="' . $base_url . "{$url_delim}{$page_delim}" . $i . $url_delim2 . '">' . $i . '</a>';
 			if ($i < $total_pages)
 			{
 				$page_string .= $seperator;
@@ -115,7 +128,7 @@ function wp_generate_pagination($base_url, $num_items, $per_page, $on_page)
 		}
 	}
 
-	$page_string .= ($on_page == $total_pages) ? '<strong>' . $total_pages . '</strong>' : '<a href="' . $base_url . "{$url_delim}cpage=" . $total_pages . '">' . $total_pages . '</a>';
+	$page_string .= ($on_page == $total_pages) ? '<strong>' . $total_pages . '</strong>' : '<a href="' . $base_url . "{$url_delim}{$page_delim}" . $total_pages . '">' . $total_pages . '</a>';
 
 	return $page_string;
 }
@@ -190,6 +203,8 @@ function wp_do_action($tag)
 	return $echo;
 }
 
+// Register sidebars by running wp_phpbb_widgets_init() on the widgets_init hook.
+add_action('widgets_init', 'wp_phpbb_widgets_init');
 /**
  * Register widgetized area, and available widdgets for the bridge.
  */
@@ -213,8 +228,19 @@ function wp_phpbb_widgets_init()
 	register_widget('WP_Widget_phpbb_recet_topics');
 }
 
-// Register sidebars by running wp_phpbb_widgets_init() on the widgets_init hook.
-add_action('widgets_init', 'wp_phpbb_widgets_init');
+// Add a filter for the widget title by running wp_phpbb_widget_title() on the widget_title hook
+add_filter('widget_title', 'wp_phpbb_widget_title');
+/**
+ * If the widget have no title, just add a "nonbreacking space" instead
+ *
+ * @param (string) $title
+ * @return (string) $title or space
+ */
+function wp_phpbb_widget_title($title)
+{
+	$title = (!empty($title)) ? $title : '&nbsp;';
+	return $title;
+}
 
 /**
  * Enter description here...

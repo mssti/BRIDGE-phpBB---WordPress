@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.9 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/themes/phpBB
- * @version: $Id: comments.php, v0.0.7 2011/08/04 11:08:04 leviatan21 Exp $
+ * @version: $Id: comments.php, v0.0.8 2011/08/25 11:08:25 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -62,14 +62,29 @@ function wp_phpbb_comment_loop($comment, $args)
 	// Retrieve the ID of the current item in the WordPress Loop
 	$comment_id = $comment->comment_ID;
 
+	// The status of a comment by ID.
+	$status = wp_get_comment_status($comment_id);
+
+	// Only admin and/or poster can see approved comments
+	if ($status != 'approved')
+	{
+		// The user who is viewing is an administrator
+		if (!current_user_can('level_8'))
+		{
+			return;
+		}
+		// The user who is viewing is the comment author
+		if (phpbb::$user->data['wp_user']['ID'] != $comment->user_id)
+		{
+			return;
+		}
+	}
+
 	// Retrieve the ID of the current post in the WordPress Loop
 	$post_id = $comment->comment_post_ID;
 
 	// Retrieve the time at which the post was written. returns timestamp
 	$post_date_time = get_comment_time('U', false, false);
-
-	// The status of a comment by ID.
-	$status = wp_get_comment_status($comment_id);
 
 	// Creates a random, one time use token.
 	$del_nonce = esc_html('_wpnonce=' . wp_create_nonce("delete-comment_$comment_id"));
@@ -86,7 +101,8 @@ function wp_phpbb_comment_loop($comment, $args)
 		'S_POST_ACTIONS'	=> (current_user_can('edit_comment', $comment_id) || current_user_can('moderate_comments')),
 		'U_POST_EDIT'		=> admin_url("comment.php?action=editcomment&amp;c=$comment_id&amp;noredir=1"),
 		'U_POST_DELETE'		=> (!EMPTY_TRASH_DAYS) ? admin_url("comment.php?action=deletecomment&amp;p=$post_id&amp;c=$comment_id&amp;noredir=1&amp;$del_nonce") : '',
-		'U_POST_TRASH'		=> (EMPTY_TRASH_DAYS) ? admin_url("comment.php?action=trashcomment&amp;p=$post_id&amp;c=$comment_id&amp;noredir=1&amp;$del_nonce") : '',
+		'U_POST_TRASH'		=> ($status != 'trash' && EMPTY_TRASH_DAYS) ? admin_url("comment.php?action=trashcomment&amp;p=$post_id&amp;c=$comment_id&amp;noredir=1&amp;$del_nonce") : '',
+		'U_POST_UNTRASH'	=> ($status == 'trash' && EMPTY_TRASH_DAYS) ? admin_url("comment.php?action=untrashcomment&amp;p=$post_id&amp;c=$comment_id&amp;noredir=1&amp;$del_nonce") : '',
 		'U_POST_SPAM'		=> ($status != 'spam') ? admin_url("comment.php?action=spamcomment&amp;p=$post_id&amp;c=$comment_id&amp;noredir=1&amp;$del_nonce") : '',
 		'U_POST_UNSPAM'		=> ($status =='spam') ? admin_url("comment.php?action=unspamcomment&amp;p=$post_id&amp;c=$comment_id&amp;noredir=1&amp;$del_nonce") : '',
 		'U_POST_APPROVE'	=> ($status == 'unapproved') ? admin_url("comment.php?action=approvecomment&amp;p=$post_id&amp;c=$comment_id&amp;noredir=1&amp;$approve_nonce") : '',
@@ -96,7 +112,9 @@ function wp_phpbb_comment_loop($comment, $args)
 		'U_MINI_POST'		=> apply_filters('the_permalink', get_permalink()) . "#comment-$comment_id",
 		'S_POST_UNAPPROVED'	=> ($status == 'unapproved') ? true : false,
 		'S_POST_REPORTED'	=> ($status == 'spam') ? true : false,
-		'MESSAGE'			=> wp_phpbb_comment_text_filter(wp_do_action('comment_text', $comment_id), $comment->user_id, $status),
+		'S_POST_TRASHED'	=> ($status == 'trash') ? true : false,
+		'MESSAGE'			=> wp_do_action('comment_text', $comment_id),
+	//	'MESSAGE'			=> wp_phpbb_comment_text_filter(wp_do_action('comment_text', $comment_id), $comment->user_id, $status),
 	);
 
 	$autor = phpbb::phpbb_the_autor_full($comment->user_id, false, true);

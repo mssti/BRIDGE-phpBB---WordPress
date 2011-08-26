@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.8 :: BRIDGE phpBB & WordPress -> root/language/es/mods :: [es][Spanish]
- * @version: $Id: wp_phpbb_bridge.php, v0.0.7.1 2011/08/13 11:08:13 leviatan21 Exp $
+ * @version: $Id: wp_phpbb_bridge.php, v0.0.8 2011/08/25 11:08:25 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -82,12 +82,13 @@ $lang = array_merge($lang, array(
 	'WP_POST_NOT_FOUND_EXPLAIN'	=> 'Disculpe, pero ningún resultado fue encontrado para el archivo solicitado. Tal vez la búsqueda le ayudará a encontrar un mensaje relacionado.',
 	'WP_READ_MORE'				=> 'Lea el artículo completo »',
 	'WP_POSTED_IN'				=> 'Publicado en: %s',
-	'WP_FOLLOW_FEED'			=> 'Puede seguir cualquier respuesta a esta entrada a través del <a href="%s">RSS 2.0</a> feed.',
+	'WP_FOLLOW_FEED'			=> 'Puede seguir cualquier respuesta a esta entrada a través del <a href="%s" class="wp_icon-feed">feed</a>.',
 	'WP_YES_COMMENT_YES_PING'	=> 'Puede <a href="%1$s#respond">dejar una respuesta</a>, o <a href="%2$s" rel="trackback">hacer un seguimiento</a> desde tu propio sitio.',
 	'WP_NO_COMMENT_YES_PING'	=> 'Las respuestas están actualmente cerradas, pero puedes <a href="%s" rel="trackback">hacer un seguimiento</a>desde tu propio sitio.',
 	'WP_YES_COMMENT_NO_PING'	=> 'Puede saltar hasta el final y dejar una respuesta. Hacer Pings no está permitido.',
 	'WP_NO_COMMENT_NO_PING'		=> 'Comentarios y pings están actualmente cerrados.',
 
+	'WP_POST_TOPIC'				=> 'Crear un nuevo artículo',
 	'WP_NO_COMMENTS'			=> 'Sin Comentarioss',
 	'WP_ONE_COMMENT'			=> '1 Comentario',
 	'WP_COMMENTS'				=> '% Comentarios',
@@ -115,11 +116,14 @@ $lang = array_merge($lang, array(
 	'WP_COMMENT_REPLY_EXPLAIN'			=> 'Responder a este comentario',
 	'WP_COMMENT_SPAM'					=> 'Spam',
 	'WP_COMMENT_SPAM_EXPLAIN'			=> 'Marcar este comentario como spam',
-	'WP_COMMENT_REPORTED_NOTE'			=> 'This comment is maked as Spam',
+	'WP_COMMENT_REPORTED_NOTE'			=> 'Este comentario estámarcado como spam',
 	'WP_COMMENT_UNSPAM'					=> 'No es Spam',
 	'WP_COMMENT_UNSPAM_EXPLAIN'			=> 'Marcar este comentario como no Spam',
 	'WP_COMMENT_TRASH'					=> 'Papelera',
-	'WP_COMMENT_TRASH_EXPLAIN'			=> 'Movee este comentario a la papelera',
+	'WP_COMMENT_TRASH_EXPLAIN'			=> 'Mover este comentario a la papelera',
+	'WP_COMMENT_UNTRASH'				=> 'Recuperar papelera',
+	'WP_COMMENT_UNTRASH_EXPLAIN'		=> 'Recuperar este comentario desde la papelera',
+	'WP_COMMENT_UNTRASHED_NOTE'			=> 'Este comentario está en la papelera',
 	'WP_COMMENT_DELETE'					=> 'Eliminar',
 	'WP_COMMENT_DELETE_EXPLAIN'			=> 'Borrar permanentemente',
 

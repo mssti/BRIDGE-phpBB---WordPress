@@ -4,7 +4,7 @@
  * Plugin Name: BRIDGE phpBB & WordPress
  * Plugin URI: http://www.mssti.com/
  * Description: Synchronize users from phpBB 3.0.x in WordPress.
- * Version: 0.0.6
+ * Version: 0.0.8
  * Author: leviatan21
  * Author URI: http://www.mssti.com/
  * License: GNU
@@ -13,7 +13,7 @@
 /** phpbb Header
  * 
  * @package: phpBB 3.0.8 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/plugins
- * @version: $Id: wp_phpbb3_bridge_options.php, v0.0.6 2011/07/21 11:07:21 leviatan21 Exp $
+ * @version: $Id: wp_phpbb3_bridge_options.php, v0.0.8 2011/08/25 11:08:25 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763

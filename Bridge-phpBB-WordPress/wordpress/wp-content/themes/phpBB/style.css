@@ -2,7 +2,7 @@
 Theme Name: phpbb (ProSilver or Subsilver2)
 Theme URI: http://www.mssti.com/
 Description: Style based off ProSilver and Subsilver2 <a href="http://www.mssti.com/">leviatan21</a>.
-Version: v0.0.7 2011/08/04 11:08:04
+Version: v0.0.8 2011/08/25 11:08:25
 Author: leviatan21
 Author URI: http://www.mssti.com/
 Tags: phpbb, ProSilver, Subsilver2, full width, two columns
@@ -160,3 +160,30 @@ a#site-generator {
 	line-height: 16px;
 	padding-left: 20px;
 }
+
+.postmetadata-icons {
+	list-style: none outside none;
+}
+/*
+.postmetadata-icons li a.wp-comments-icon {
+    background-image: url("images/comments.png");
+    background-repeat: no-repeat;
+    background-position: 0;
+    height: 14px;
+    padding: 5px 0 0 17px;
+}
+.postmetadata-icons li a.wp_icon-feed {
+    background-image: url("images/rss.png");
+    background-repeat: no-repeat;
+    background-position: 0;
+    height: 14px;
+    padding: 5px 0 0 17px;
+}
+*/
+/*
+ul.profile-icons li.wp-feed-icon		{ width: 20px; height: 20px; margin: 0 0px; }
+.wp-feed-icon, .wp-feed-icon a			{ background: url("images/icon_post_feed.gif") top left no-repeat; }
+
+ul.profile-icons li.wp-comment-icon		{ width: 20px; height: 20px;; margin: 0 0px; }
+.wp-comment-icon, .wp-comment-icon a	{ background: url("images/icon_post_respond.png") top left no-repeat; }
+*/

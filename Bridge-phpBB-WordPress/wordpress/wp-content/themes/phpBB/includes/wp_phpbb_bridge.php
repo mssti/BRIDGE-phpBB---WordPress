@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.9 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/themes/phpBB/includes
- * @version: $Id: wp_phpbb_bridge.php, v0.0.7 2011/08/04 11:08:04 leviatan21 Exp $
+ * @version: $Id: wp_phpbb_bridge.php, v0.0.8 2011/08/25 11:08:25 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -32,7 +32,7 @@ define('WP_TABLE_PREFIX', $table_prefix);
 $wp_user = wp_get_current_user();
 
 // Version number (only used for the installer)
-@define('WP_PHPBB_BRIDGE_VERSION', '0.0.7');
+@define('WP_PHPBB_BRIDGE_VERSION', '0.0.8');
 
 // Without this we cannot include phpBB 3.0.x scripts.
 if (!defined('IN_PHPBB'))
@@ -72,7 +72,7 @@ if (!defined('PHPBB_USE_BOARD_URL_PATH'))
 // Initialise phpbb
 phpbb::initialise();
 
-phpbb::$user->add_lang(array('viewtopic', 'posting', 'mods/wp_phpbb_bridge'));
+phpbb::$user->add_lang(array('viewtopic', 'posting', 'ucp', 'mods/wp_phpbb_bridge'));
 
 @define('PHPBB_INCLUDED', true);
 
@@ -109,20 +109,23 @@ function wp_phpbb_dynamic_sidebar_params($params)
 	}
 
 	// Interpolate the phpbb style theme based off SubSilver2
-	$params[0] = array(
-		'before_widget'	=> "\n\t\t" . '<table class="tablebg" cellspacing="1">',
-		'after_widget'	=> "\n\t\t\t\t" . '</td>' . "\n\t\t\t" . '</tr>' . "\n\t\t" . '</table>' . "\n\t\t" . '<br clear="all" />' . "\n",
-		'before_title'	=> "\n\t\t\t" . '<tr>' . "\n\t\t\t\t" . '<th>',
-		'after_title'	=> '</th>' . "\n\t\t\t" . '</tr>' . "\n\t\t\t" . '<tr>' . "\n\t\t\t\t" . '<td nowrap="nowrap" class="row2">' . "\n",
-	);
+	$params[0]['before_widget'] = "\n\t\t" . '<table class="tablebg" cellspacing="1">';
+	$params[0]['after_widget'] = "\n\t\t\t\t" . '</td>' . "\n\t\t\t" . '</tr>' . "\n\t\t" . '</table>' . "\n\t\t" . '<br clear="all" />' . "\n";
+	$params[0]['before_title'] = "\n\t\t\t" . '<tr>' . "\n\t\t\t\t" . '<th>';
+	$params[0]['after_title'] = '</th>' . "\n\t\t\t" . '</tr>' . "\n\t\t\t" . '<tr>' . "\n\t\t\t\t" . '<td nowrap="nowrap" class="row2">' . "\n";
 
 	return $params;
 }
 
+/**
+* Always try to redirect to Wordpress index
+**/
 $action = request_var('action', '');
 if ($action != '')
 {
+	// phpBB redirection
 	$redirect = request_var('redirect', get_option('home'));
+	// WP redirection
 	$redirect_to = request_var('redirect_to', $redirect);
 
 	switch ($action)
@@ -131,14 +134,23 @@ if ($action != '')
 			phpbb::login_box($redirect_to);
 		break;
 
+		// Same as phpbb/ucp.php
 		case 'logout':
-			if (phpbb::$user->data['user_id'] != ANONYMOUS)
+			if (phpbb::$user->data['user_id'] != ANONYMOUS && isset($_GET['sid']) && !is_array($_GET['sid']) && $_GET['sid'] === phpbb::$user->session_id)
 			{
 				phpbb::$user->session_kill();
 				phpbb::$user->session_begin();
+				$message = phpbb::$user->lang['LOGOUT_REDIRECT'];
 			}
+			else
+			{
+				$message = (phpbb::$user->data['user_id'] == ANONYMOUS) ? phpbb::$user->lang['LOGOUT_REDIRECT'] : phpbb::$user->lang['LOGOUT_FAILED'];
+			}
+			meta_refresh(3, $redirect_to);
 
-			redirect($redirect_to);
+			$message = $message . '<br /><br />' . sprintf(phpbb::$user->lang['RETURN_INDEX'], '<a href="' . $redirect_to . '">', '</a> ');
+			trigger_error($message);
+
 		break;
 	}
 }

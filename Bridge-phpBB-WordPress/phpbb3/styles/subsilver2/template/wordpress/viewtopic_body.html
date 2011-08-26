@@ -39,10 +39,10 @@
 					<table width="100%" cellspacing="5">
 						<tr>
 							<td>
-							<!-- IF postrow.S_POST_UNAPPROVED or postrow.S_POST_REPORTED -->
+							<!-- IF postrow.S_POST_UNAPPROVED or postrow.S_POST_REPORTED or postrow.S_POST_TRASHED -->
 								<table width="100%" cellspacing="0">
 								<tr>
-									<td class="gensmall error <!-- IF (postrow.S_POST_UNAPPROVED or postrow.S_POST_REPORTED) --> forumrules<!-- ENDIF -->"><!-- IF postrow.S_POST_UNAPPROVED -->{UNAPPROVED_IMG} <b>{L_WP_COMMENT_UNAPPROVED}</b><br /><!-- ENDIF --><!-- IF postrow.S_POST_REPORTED -->{REPORTED_IMG} <b>{L_WP_COMMENT_REPORTED_NOTE}</b><!-- ENDIF --></td>
+									<td class="gensmall error forumrules"><!-- IF postrow.S_POST_UNAPPROVED -->{UNAPPROVED_IMG} <b>{L_WP_COMMENT_UNAPPROVED}</b><br /><!-- ENDIF --><!-- IF postrow.S_POST_REPORTED -->{REPORTED_IMG} <b>{L_WP_COMMENT_REPORTED_NOTE}</b><!-- ENDIF --><!-- IF postrow.S_POST_TRASHED -->{REPORTED_IMG} <b>{L_WP_COMMENT_UNTRASHED_NOTE}</b><!-- ENDIF --></td>
 								</tr>
 								</table>
 								<br clear="all" />
@@ -55,7 +55,8 @@
 										<td class="gensmall" align="right">
 										<!-- IF postrow.U_POST_EDIT --><a href="{postrow.U_POST_EDIT}" title="{L_WP_COMMENT_EDIT_EXPLAIN}">{EDIT_IMG}</a><!-- ENDIF -->
 										<!-- IF postrow.U_POST_DELETE --><a href="{postrow.U_POST_DELETE}" title="{L_WP_COMMENT_DELETE_EXPLAIN}">{DELETE_IMG}</a><!-- ENDIF -->
-										<!-- IF postrow.U_POST_TRASH --><a href="{postrow.U_POST_TRASH}" title="{L_WP_COMMENT_TRASH_EXPLAIN}">{DELETE_IMG}</a><!-- ENDIF -->
+										<!-- IF postrow.U_POST_TRASH --><a href="{postrow.U_POST_TRASH}" title="{L_WP_COMMENT_TRASH_EXPLAIN}">{TRASH_IMG}</a><!-- ENDIF -->
+										<!-- IF postrow.U_POST_UNTRASH --><a href="{postrow.U_POST_UNTRASH}" title="{L_WP_COMMENT_UNTRASH_EXPLAIN}">{UNTRASH_IMG}</a><!-- ENDIF -->
 										<!-- IF postrow.U_POST_SPAM --><a href="{postrow.U_POST_SPAM}" title="{L_WP_COMMENT_SPAM_EXPLAIN}">{SPAM_IMG}</a><!-- ENDIF -->
 										<!-- IF postrow.U_POST_UNSPAM --><a href="{postrow.U_POST_UNSPAM}" title="{L_WP_COMMENT_UNSPAM_EXPLAIN}">{UNSPAM_IMG}</a><!-- ENDIF -->
 										<!-- IF postrow.U_POST_APPROVE --><a href="{postrow.U_POST_APPROVE}" title="{L_WP_COMMENT_APPROVE_EXPLAIN}">{APPROVE_IMG}</a><!-- ENDIF -->
