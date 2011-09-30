@@ -1,0 +1,54 @@
+/*
+Theme Name: phpbb (ProSilver or Subsilver2)
+Theme URI: http://www.mssti.com/
+Description: Style based off ProSilver and Subsilver2 <a href="http://www.mssti.com/">leviatan21</a>.
+Version: v0.0.8 2011/08/25 11:08:25
+Author: leviatan21
+Author URI: http://www.mssti.com/
+Tags: phpbb, ProSilver, Subsilver2, full width, two columns
+
+    --------------------------------------------------------------
+	Style name:		 proSilver
+	Based on style:	 proSilver (this is the default phpBB 3 style)
+	Original author: subBlue ( http://www.subBlue.com/ )
+	Modified by:	 leviatan21		
+    --------------------------------------------------------------
+	Style name:		 subsilver2
+	Based on style:	 subSilver (the default phpBB 2 style)
+	Original author: subBlue ( http://www.subBlue.com/ )
+	Modified by:	 leviatan21	
+	
+	Copyright 2011 leviatan21 ( http://www.mssti.com/ )
+    --------------------------------------------------------------
+
+	The CSS, XHTML and design is released under GPL:
+	http://www.opensource.org/licenses/gpl-license.php
+
+*/
+* {
+	/* Reset browsers default margin, padding and font sizes */
+	margin: 0;
+	padding: 0;
+}
+body, label {
+	padding-top: 0px !important;
+	font-size: 12px !important;
+}
+html 		{
+	background-color: #cccccc !important;
+	height: 100%;
+}
+
+body.login {
+	background-color: #fff;
+	height: 100%;
+}
+
+body#error-page {
+	width: 80% !important;
+}
+
+.input-error {
+	border: 1px solid #ff0000 !important;
+	background-color : #ff0000 !important;
+}

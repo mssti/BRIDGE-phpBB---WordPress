@@ -187,3 +187,71 @@ ul.profile-icons li.wp-feed-icon		{ width: 20px; height: 20px; margin: 0 0px; }
 ul.profile-icons li.wp-comment-icon		{ width: 20px; height: 20px;; margin: 0 0px; }
 .wp-comment-icon, .wp-comment-icon a	{ background: url("images/icon_post_respond.png") top left no-repeat; }
 */
+
+.modal-overlay {
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	background: #000;
+	z-index: 101;
+}
+.modal-window {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	margin: 0;
+	padding: 0px;
+	z-index: 102;
+	background: #fff;
+	overflow: auto;
+}
+* html .modal-window {
+	position: absolute;
+}
+.modal-window .close-window {
+	position: absolute;
+	font-size: 1.5em;
+	font-weight: bold;
+	right: 5px;
+	top: 1px;
+	cursor: pointer;
+}
+.modal-window .copyright {
+	position: absolute;
+	bottom: 5px;
+	right: 5px;
+}
+.modal-window img.modal-loading {
+	position: absolute;
+	margin: 49.5%;
+}
+#ajax-loading {
+	padding: 0px 50px;
+}
+
+body#error-page {
+	width: 80% !important;
+}
+
+.modal-iframe body.login, label	{
+	padding-top: 0px;
+	font-size: 12px !important;
+}
+.modal-iframe html 				{
+	background-color: #cccccc !important;
+	height: 100%;
+}
+.modal-iframe body.login		{
+	background-color: #fff; height: 100%;
+}
+
+.input-error {
+	border: 1px solid #ff0000 !important;
+	background-color : #ff0000 !important;
+}

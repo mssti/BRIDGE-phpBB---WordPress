@@ -6,19 +6,18 @@
 	Copyright 2011 leviatan21 ( http://www.mssti.com/ )
    --------------------------------------------------------------
 */
+.widget-area table {
+	width: 100%;
+}
 
 /* Moderator icons
  ------------ */
-
-/* Delete/Trash icon */
-ul.profile-icons li.wp-trash-icon												{ width: {IMG_ICON_POST_DELETE_WIDTH}px; height: {IMG_ICON_POST_DELETE_HEIGHT}px; }
-.wp-trash-icon, .wp-trash-icon a												{ background: url("{IMG_ICON_POST_DELETE_SRC}") top left no-repeat; }
 
 /* Spam icon */
 ul.profile-icons li.wp-spam-icon												{ width: {IMG_ICON_WP_SPAM_WIDTH}px; height: {IMG_ICON_WP_SPAM_HEIGHT}px; }
 ul.profile-icons li.wp-spam-icon, ul.profile-icons li.wp-spam-icon a			{ background-image: url("{IMG_ICON_WP_SPAM_SRC}"); background-position: 0 0; }
 ul.profile-icons li.wp-spam-icon a:hover										{ background-position: 50% 100%; }
-/* Spam icon fall back */
+/* Spam icon fallback */
 ul.profile-icons li.wp-info-icon												{ width: {IMG_ICON_POST_INFO_WIDTH}px; height: {IMG_ICON_POST_INFO_HEIGHT}px; }
 ul.profile-icons li.wp-info-icon, ul.profile-icons li.wp-info-icon a			{ background-image: url("{IMG_ICON_POST_INFO_SRC}"); background-position: 0 0; }
 ul.profile-icons li.wp-info-icon a:hover										{ background-position: 50% 100%; }
@@ -27,7 +26,7 @@ ul.profile-icons li.wp-info-icon a:hover										{ background-position: 50% 100
 ul.profile-icons li.wp-nospam-icon												{ width: {IMG_ICON_WP_SPAM_WIDTH}px; height: {IMG_ICON_WP_SPAM_HEIGHT}px; }
 ul.profile-icons li.wp-nospam-icon, ul.profile-icons li.wp-nospam-icon a		{ background-image: url("{IMG_ICON_WP_SPAM_SRC}"); background-position: 50% 100%; }
 ul.profile-icons li.wp-nospam-icon a:hover										{ background-position: 0 0; }
-/* No Spam icon fall back */
+/* No Spam icon fallback */
 ul.profile-icons li.wp-noinfo-icon												{ width: {IMG_ICON_POST_REPORT_WIDTH}px; height: {IMG_ICON_POST_REPORT_HEIGHT}px; }
 ul.profile-icons li.wp-noinfo-icon, ul.profile-icons li.wp-noinfo-icon a		{ background-image: url("{IMG_ICON_POST_INFO_SRC}"); background-position: 50% 100%; }
 ul.profile-icons li.wp-noinfo-icon a:hover										{ background-position: 0 0; }
@@ -36,7 +35,7 @@ ul.profile-icons li.wp-noinfo-icon a:hover										{ background-position: 0 0; 
 ul.profile-icons li.wp-approve-icon												{ width: {IMG_ICON_WP_APPROVE_WIDTH}px; height: {IMG_ICON_WP_APPROVE_HEIGHT}px; }
 ul.profile-icons li.wp-approve-icon, ul.profile-icons li.wp-approve-icon a		{ background-image: url("{IMG_ICON_WP_APPROVE_SRC}"); background-position: 50% 100%; }
 ul.profile-icons li.wp-approve-icon a:hover										{ background-position: 0 0; }
-/* Approve icon fall back */
+/* Approve icon fallback */
 ul.profile-icons li.wp-report-icon												{ width: {IMG_ICON_POST_REPORT_WIDTH}px; height: {IMG_ICON_POST_REPORT_HEIGHT}px; }
 ul.profile-icons li.wp-report-icon, ul.profile-icons li.wp-report-icon a		{ background-image: url("{IMG_ICON_POST_REPORT_SRC}"); background-position: 50% 100%; }
 ul.profile-icons li.wp-report-icon a:hover										{ background-position: 0 0; }
@@ -45,61 +44,34 @@ ul.profile-icons li.wp-report-icon a:hover										{ background-position: 0 0; 
 ul.profile-icons li.wp-unapprove-icon											{ width: {IMG_ICON_WP_UNAPPROVE_WIDTH}px; height: {IMG_ICON_WP_UNAPPROVE_HEIGHT}px; }
 ul.profile-icons li.wp-unapprove-icon, ul.profile-icons li.wp-unapprove-icon a	{ background-image: url("{IMG_ICON_WP_UNAPPROVE_SRC}"); background-position: 0 0; }
 ul.profile-icons li.wp-unapprove-icon a:hover									{ background-position: 50% 100%; }
-/* Unapprove icon fall back */
+/* Unapprove icon fallback */
 ul.profile-icons li.wp-noreport-icon											{ width: {IMG_ICON_POST_REPORT_WIDTH}px; height: {IMG_ICON_POST_REPORT_HEIGHT}px; }
 ul.profile-icons li.wp-noreport-icon, ul.profile-icons li.wp-noreport-icon a	{ background-image: url("{IMG_ICON_POST_REPORT_SRC}"); background-position: 0 0; }
 ul.profile-icons li.wp-noreport-icon a:hover									{ background-position: 50% 100%; }
 
 /* Trash icon */
-ul.profile-icons li.wp-trash-icon												{ width: 20px; height: 20px; }
-ul.profile-icons li.wp-trash-icon, ul.profile-icons li.wp-trash-icon a			{ background-image: url("{T_IMAGESET_PATH}/icon_wp_trash.gif"); background-position: 0 0; }
+ul.profile-icons li.wp-trash-icon												{ width: {IMG_ICON_WP_TRASH_WIDTH}px; height: {IMG_ICON_WP_TRASH_WIDTH}px; }
+ul.profile-icons li.wp-trash-icon, ul.profile-icons li.wp-trash-icon a			{ background-image: url("{IMG_ICON_WP_TRASH_SRC}"); background-position: 0 0; }
 ul.profile-icons li.wp-trash-icon a:hover										{ background-position: 50% 100%; }
-/* Trash icon fall back */
+/* Trash icon fallback */
 ul.profile-icons li.wp-delete-icon												{ width: {IMG_ICON_POST_DELETE_WIDTH}px; height: {IMG_ICON_POST_DELETE_HEIGHT}px; }
 ul.profile-icons li.wp-delete-icon, ul.profile-icons li.wp-delete-icon a		{ background-image: url("{IMG_ICON_POST_DELETE_SRC}"); background-position: 0 0; }
 ul.profile-icons li.wp-delete-icon a:hover										{ background-position: 50% 100%; }
 
 /* Untrash icon */
-ul.profile-icons li.wp-untrash-icon												{ width: 20px; height: 20px; }
-ul.profile-icons li.wp-untrash-icon, ul.profile-icons li.wp-untrash-icon a		{ background-image: url("{T_IMAGESET_PATH}/icon_wp_trash.gif"); background-position: 50% 100%; }
+ul.profile-icons li.wp-untrash-icon												{ width: {IMG_ICON_WP_TRASH_WIDTH}px; height: {IMG_ICON_WP_TRASH_WIDTH}px; }
+ul.profile-icons li.wp-untrash-icon, ul.profile-icons li.wp-untrash-icon a		{ background-image: url("{IMG_ICON_WP_TRASH_SRC}"); background-position: 50% 100%; }
 ul.profile-icons li.wp-untrash-icon a:hover										{ background-position: 0 0; }
-/* Untrash icon fall back */
+/* Untrash icon fallback */
 ul.profile-icons li.wp-undelete-icon											{ width: {IMG_ICON_POST_DELETE_WIDTH}px; height: {IMG_ICON_POST_DELETE_HEIGHT}px; }
 ul.profile-icons li.wp-undelete-icon, ul.profile-icons li.wp-undelete-icon a	{ background-image: url("{IMG_ICON_POST_DELETE_SRC}"); background-position: 50% 100%; }
 ul.profile-icons li.wp-undelete-icon a:hover									{ background-position: 0 0; }
-
 
 .postbody ul.profile-icons li {
 	margin: 0 1px;
 }
 
-
-
-/*
-ul.profile-icons li.wp-trash-icon			{ width: {IMG_ICON_POST_DELETE_WIDTH}px; height: {IMG_ICON_POST_DELETE_HEIGHT}px; }
-.wp-trash-icon, .wp-trash-icon a			{ background: url("{IMG_ICON_POST_DELETE_SRC}") top left no-repeat; }
-
-ul.profile-icons li.wp-spam-icon			{ width: {IMG_ICON_POST_REPORT_WIDTH}px; height: {IMG_ICON_POST_REPORT_HEIGHT}px; }
-.wp-spam-icon, .wp-spam-icon a				{ background: url("{IMG_ICON_POST_REPORT_SRC}") top left no-repeat; }
-
-ul.profile-icons li.wp-approve-icon			{ width: {IMG_ICON_USER_WARN_WIDTH}px; height: {IMG_ICON_USER_WARN_HEIGHT}px; }
-.wp-approve-icon, .wp-approve-icon a		{ background: url("{T_IMAGESET_PATH}/icon_wp_approve.gif") top left no-repeat; }
-
-ul.profile-icons li.wp-approve-icon			{ width: {IMG_ICON_USER_WARN_WIDTH}px; height: {IMG_ICON_USER_WARN_HEIGHT}px; }
-.wp-approve-icon, .wp-approve-icon a		{ background: url("{IMG_ICON_WP_APPROVE_SRC}") top left no-repeat; }
-
-ul.profile-icons li.wp-unapprove-icon		{ width: {IMG_ICON_POST_INFO_WIDTH}px; height: {IMG_ICON_POST_INFO_HEIGHT}px; }
-.wp-unapprove-icon, .wp-unapprove-icon a	{ background: url("{T_IMAGESET_PATH}/icon_wp_unapprove.gif") top left no-repeat; }
-
-ul.profile-icons li.wp-unapprove-icon		{ width: {IMG_ICON_POST_INFO_WIDTH}px; height: {IMG_ICON_POST_INFO_HEIGHT}px; }
-.wp-unapprove-icon, .wp-unapprove-icon a	{ background: url("{IMG_ICON_WP_UNAPPROVE_SRC}") top left no-repeat; }
-*/
-ul.profile-icons li.wp-approve-icon, ul.profile-icons li.wp-unapprove-icon {
-	margin: 0;
-}
-
-/* New Post button
- ------------ */
+/* New Post button at the navbar */
 .section-blog .navbar .topic-actions {
 	margin: 5px 0 0 0;
 	float: right;
@@ -113,10 +85,8 @@ ul.profile-icons li.wp-approve-icon, ul.profile-icons li.wp-unapprove-icon {
   	text-align: left;
 	font-weight: normal;
 }
+
+/* New Post button ( fallback to post-icon ) */
 .blogpostnew-icon span						{ background: transparent none 0 0 no-repeat; }
 .buttons div.blogpostnew-icon				{ width: {IMG_BUTTON_BLOGPOST_NEW_WIDTH}px; height: {IMG_BUTTON_BLOGPOST_NEW_HEIGHT}px; }
 .blogpostnew-icon span						{ background-image: url("{IMG_BUTTON_BLOGPOST_NEW_SRC}"); }
-
-.wp-post-icon span							{ background: transparent none 0 0 no-repeat; }
-.buttons div.wp-post-icon					{ width: {IMG_BUTTON_TOPIC_NEW_WIDTH}px; height: {IMG_BUTTON_TOPIC_NEW_HEIGHT}px; }
-.wp-post-icon span							{ background-image: url("{IMG_BUTTON_TOPIC_NEW_SRC}"); }

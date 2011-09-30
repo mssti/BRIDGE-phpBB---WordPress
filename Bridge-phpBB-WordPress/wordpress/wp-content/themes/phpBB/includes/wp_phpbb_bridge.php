@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.9 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/themes/phpBB/includes
- * @version: $Id: wp_phpbb_bridge.php, v0.0.8 2011/08/25 11:08:25 leviatan21 Exp $
+ * @version: $Id: wp_phpbb_bridge.php, v0.0.8 2011/10/01 11:10:01 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -29,7 +29,11 @@ define('PHP_EXT', substr(strrchr(__FILE__, '.'), 1));
 define('WP_TABLE_PREFIX', $table_prefix);
 
 // Make this variable global before initialize phpbb
-$wp_user = wp_get_current_user();
+if (function_exists('wp_get_current_user'))
+{
+	wp_set_current_user(0);
+	$wp_user = wp_get_current_user();
+}
 
 // Version number (only used for the installer)
 @define('WP_PHPBB_BRIDGE_VERSION', '0.0.8');
@@ -77,6 +81,18 @@ phpbb::$user->add_lang(array('viewtopic', 'posting', 'ucp', 'mods/wp_phpbb_bridg
 @define('PHPBB_INCLUDED', true);
 
 /**
+ * a hook function to fix the ACP url
+ * 
+ * The hook is called in the WordPress root/wp-content/themes/phpBB/includes/wp_phpbb_bridge_core.php file at the page_footer() function
+ */
+function wp_phpbb_u_acp()
+{
+	phpbb::$template->assign_vars(array(
+		'U_ACP'	=> phpbb::append_sid("adm/index", false, true, phpbb::$user->session_id),
+	));
+}
+
+/**
 * Register sidebars style by running wp_phpbb_dynamic_sidebar_params() on the dynamic_sidebar_params hook.
 * We do it here because in functions.php we do not have the class phpbb initialized
 * 	and we need the template name/type to set the widget style
@@ -118,41 +134,70 @@ function wp_phpbb_dynamic_sidebar_params($params)
 }
 
 /**
-* Always try to redirect to Wordpress index
-**/
-$action = request_var('action', '');
-if ($action != '')
+ * A function with a very simple but powerful method to encrypt a string with a given key.
+ * 
+ * 	Usage : $sring_encrypted = encrypt("String to Encrypt", "Secret Key");
+ * 	Based off : http://www.emm-gfx.net/2008/11/encriptar-y-desencriptar-cadena-php/
+ * 	Updated to work in WP by leviatan21
+ *
+ * @param (string)	$string		String to Encrypt
+ * @param (string)	$key		Secret Key			( Options : AUTH_KEY, SECURE_AUTH_KEY, LOGGED_IN_KEY, NONCE_KEY, AUTH_SALT, SECURE_AUTH_SALT, LOGGED_IN_SALT, NONCE_SALT )
+ * @return (string)	encrypted string
+ */
+function wp_phpbb_encrypt($string = '', $key = SECURE_AUTH_SALT)
 {
-	// phpBB redirection
-	$redirect = request_var('redirect', get_option('home'));
-	// WP redirection
-	$redirect_to = request_var('redirect_to', $redirect);
-
-	switch ($action)
+	// Load pluggable functions.
+	if (!function_exists('wp_salt'))
 	{
-		case 'login':
-			phpbb::login_box($redirect_to);
-		break;
-
-		// Same as phpbb/ucp.php
-		case 'logout':
-			if (phpbb::$user->data['user_id'] != ANONYMOUS && isset($_GET['sid']) && !is_array($_GET['sid']) && $_GET['sid'] === phpbb::$user->session_id)
-			{
-				phpbb::$user->session_kill();
-				phpbb::$user->session_begin();
-				$message = phpbb::$user->lang['LOGOUT_REDIRECT'];
-			}
-			else
-			{
-				$message = (phpbb::$user->data['user_id'] == ANONYMOUS) ? phpbb::$user->lang['LOGOUT_REDIRECT'] : phpbb::$user->lang['LOGOUT_FAILED'];
-			}
-			meta_refresh(3, $redirect_to);
-
-			$message = $message . '<br /><br />' . sprintf(phpbb::$user->lang['RETURN_INDEX'], '<a href="' . $redirect_to . '">', '</a> ');
-			trigger_error($message);
-
-		break;
+		require(ABSPATH . WPINC . '/pluggable.php');
 	}
+
+	$result = '';
+	$key = wp_salt($key);
+	$key = utf8_normalize_nfc(request_var('key', $key, true));
+
+	for ($i = 0; $i < strlen($string); $i++)
+	{
+		$char	 = substr($string, $i, 1);
+		$keychar = substr($key, ($i % strlen($key)) -1, 1);
+		$char	 = chr(ord($char) + ord($keychar));
+		$result .= $char;
+	}
+	return base64_encode($result);
+}
+
+/**
+ * A function with a very simple but powerful method to decrypt a string with a given key.
+ * 
+ * 	Usage : $sring_decrypt = decrypt("String to decrypt", "Secret Key");
+ * 	Based off : http://www.emm-gfx.net/2008/11/encriptar-y-desencriptar-cadena-php/
+ * 	Updated to work in WP by leviatan21
+ *
+ * @param (string)	$string		String to decrypt
+ * @param (string)	$key		Secret Key			( Options : AUTH_KEY, SECURE_AUTH_KEY, LOGGED_IN_KEY, NONCE_KEY, AUTH_SALT, SECURE_AUTH_SALT, LOGGED_IN_SALT, NONCE_SALT )
+ * @return (string)	decrypted string
+*/
+function wp_phpbb_decrypt($string = '', $key = SECURE_AUTH_SALT)
+{
+	// Load pluggable functions.
+	if (!function_exists('wp_salt'))
+	{
+		require(ABSPATH . WPINC . '/pluggable.php');
+	}
+
+	$result = '';
+	$key = wp_salt($key);
+	$key = utf8_normalize_nfc(request_var('key', $key, true));
+	$string = base64_decode($string);
+
+	for ($i = 0; $i < strlen($string); $i++)
+	{
+		$char	 = substr($string, $i, 1);
+		$keychar = substr($key, ($i % strlen($key)) -1, 1);
+		$char	 = chr(ord($char) - ord($keychar));
+		$result .= $char;
+	}
+	return $result;
 }
 
 ?>

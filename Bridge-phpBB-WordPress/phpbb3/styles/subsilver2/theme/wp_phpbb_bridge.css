@@ -22,3 +22,6 @@ p.author .avatar {
 .tablebg {
 	width :100%;
 }
+.widget-area table {
+	width: 100%;
+}

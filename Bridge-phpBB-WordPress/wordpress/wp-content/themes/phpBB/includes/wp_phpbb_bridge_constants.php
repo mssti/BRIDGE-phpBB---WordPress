@@ -66,6 +66,20 @@ $wp_phpbb_bridge_config = array(
 //	'wordpress_script_path' => 'phpbb/quickinstall/boards/wp_phpbb_bridge/wordpress/',
 
 	/**
+	 * The ID of user forum founder
+	 *
+	 * @param integer $wp_phpbb_bridge_permissions_forum_id
+	 */
+	'wp_phpbb_bridge_forum_founder_user_id'		=> 2,
+
+	/**
+	 * The ID of user blog founder
+	 *
+	 * @param integer $wp_phpbb_bridge_permissions_forum_id
+	 */
+	'wp_phpbb_bridge_blog_founder_user_id'		=> 1,
+
+	/**
 	 * The ID of you forum where to use permissions ( like $auth->acl_get('f_reply') )
 	 *
 	 * @param integer $wp_phpbb_bridge_permissions_forum_id

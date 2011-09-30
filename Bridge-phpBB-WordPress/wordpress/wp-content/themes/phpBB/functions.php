@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.9 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/themes/phpBB
- * @version: $Id: functions.php, v0.0.8 2011/08/25 11:08:25 leviatan21 Exp $
+ * @version: $Id: functions.php, v0.0.8 2011/10/01 11:10:01 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -16,6 +16,308 @@
 // Hide WordPress Admin Bar
 add_filter('show_admin_bar', '__return_false');
 
+add_filter('logout_url', 'wp_phpbb_loginout', 1, 2);
+add_filter('login_url', 'wp_phpbb_loginout', 1, 2);
+add_filter('wp_redirect', 'wp_phpbb_loginout', 1, 2);
+function wp_phpbb_loginout($url = '', $redirect)
+{
+	$sid = (isset($_GET['sid']) && !is_array($_GET['sid'])) ? $_GET['sid'] : '';
+	if ($url === 'wp-login.php?loggedout=true')
+	{
+		$message = wp_phpbb_logout($sid);
+		wp_die($message);
+	}
+
+	if ($sid)
+	{	$args = array('sid' => $sid);
+
+		$url = add_query_arg($args, $url);
+		$url = str_replace('&amp;', '&', $url);
+		$url = str_replace('&', '&amp;', $url);
+	}
+	return $url;
+}
+
+function wp_phpbb_logout($sid)
+{
+	if (!defined('IN_WP_PHPBB_BRIDGE'))
+	{
+		global $wp_phpbb_bridge_config, $phpbb_root_path, $phpEx, $phpbb_session_id;
+		global $auth, $config, $db, $template, $user, $cache;
+		global $table_prefix, $wp_user;
+		include(TEMPLATEPATH . '/includes/wp_phpbb_bridge.php');
+	}
+
+	// phpBB redirection
+	$redirect = request_var('redirect', get_option('home'));
+	// WP redirection
+	$redirect_to = request_var('redirect_to', $redirect);
+
+	if (phpbb::$user->data['user_id'] != ANONYMOUS && $sid === phpbb::$user->session_id)
+	{
+		phpbb::$user->session_kill();
+		phpbb::$user->session_begin();
+
+		wp_clear_auth_cookie();
+
+		$message = phpbb::$user->lang['LOGOUT_REDIRECT'];
+	}
+	else
+	{
+		$message = (phpbb::$user->data['user_id'] == ANONYMOUS) ? phpbb::$user->lang['LOGOUT_REDIRECT'] : phpbb::$user->lang['LOGOUT_FAILED'];
+	}
+
+	$message = $message . '<br /><br />' . sprintf(phpbb::$user->lang['RETURN_INDEX'], '<a class="close-window" href="' . $redirect_to . '" onclick="parent.modalWindow.close();">', '</a> ');
+
+	return $message;
+}
+
+/**
+ * Add a form field with the phpbb user session ID
+ *
+ */
+function phpbb_login_form()
+{
+	global $phpbb_session_id;
+	echo '<input type="hidden" name="sid" value="' . $phpbb_session_id . '" />';
+}
+
+add_action('login_head', 'phpbb_loginbox_head', 1);
+function phpbb_loginbox_head()
+{
+	if (!defined('IN_WP_PHPBB_BRIDGE'))
+	{
+		global $wp_phpbb_bridge_config, $phpbb_root_path, $phpEx, $phpbb_session_id;
+		global $auth, $config, $db, $template, $user, $cache;
+		global $table_prefix, $wp_user;
+		include(TEMPLATEPATH . '/includes/wp_phpbb_bridge.php');
+	}
+	$action = request_var('action', '');
+	$home_url = get_option('siteurl');
+	$ajax_url = get_bloginfo('stylesheet_directory') . '/wp_phpbb_bridge_login_box.php';
+
+	$secure_cookie = '';
+	$reauth = empty($_REQUEST['reauth']) ? false : true;
+
+	// We pass the user session ID to ensure some minimun security, similar to phpbb/ucp.php
+	$sid = request_var('sid', '');
+	$phpbb_session_id = (phpbb::$user->data['user_id'] == ANONYMOUS && $sid && !is_array($sid) && $sid === phpbb::$user->session_id) ? $sid : '';
+//	$phpbb_session_id = ($sid && !is_array($sid) && $sid === phpbb::$user->session_id) ? $sid : '';
+
+/* Main HTML code - Start */
+	add_action('login_form', 'phpbb_login_form', 10);
+	?>
+	<script type="text/javascript">
+		var base_url = '<?php echo esc_url(get_home_url(null, '/wp-content/themes/phpBB')); ?>';
+		var home_url = '<?php echo addslashes($home_url) ?>';
+	</script>
+	<?php
+	wp_phpbb_javascript(true);
+	wp_register_style('wp_phpbb_bridge', get_bloginfo('stylesheet_directory') . '/css/login.css', false, WP_PHPBB_BRIDGE_VERSION);
+	wp_print_styles('wp_phpbb_bridge');
+	
+	$errors = new WP_Error();
+	$errors->add('expired', __('Please log-in.'), 'message');
+// Main HTML code - End
+
+	// If there are no user session ID, display an error
+	if ($phpbb_session_id == '')
+	{
+		?>
+		<script type="text/javascript">
+		$jQ_WPphpBB(document).ready(function(){
+			WPphpBBlogin.error('<?php echo addslashes(phpbb::$user->lang['WP_LOGIN_FAILED']); ?>');
+			$jQ_WPphpBB("#loginform").remove();
+		});
+		</script>
+		<?php
+	}
+	// Start with the tricky part
+	else
+	{
+		?>
+		<script type="text/javascript">
+		$jQ_WPphpBB(document).ready(function(){
+	 		$jQ_WPphpBB(".message").html('<?php echo addslashes($message = phpbb::$user->lang['LOGIN']) ?>');
+			$jQ_WPphpBB(".message").prepend( $jQ_WPphpBB('<span id=\"ajax-loading\"><img class=\"modal-loading\" style=\"float: left; padding-right:5px;\" src=\"' + base_url + '/images/loading.gif\" alt=\"\" /></span>').hide());
+		});
+		</script>
+		<?php
+
+		// If the user was redirected to a secure login form from a non-secure admin page, and secure login is required but secure admin is not, then don't use a secure
+		// cookie and redirect back to the referring non-secure admin page.  This allows logins to always be POSTed over SSL while allowing the user to choose visiting
+		// the admin via http or https.
+		if (!$secure_cookie && is_ssl() && force_ssl_login() && !force_ssl_admin() && (0 !== strpos($redirect_to, 'https')) && (0 === strpos($redirect_to, 'http')))
+		{
+			$secure_cookie = false;
+		}
+
+		if (isset($_REQUEST['redirect_to']))
+		{
+			$redirect_to = $_REQUEST['redirect_to'];
+			// Redirect to https if user wants ssl
+			if ($secure_cookie && false !== strpos($redirect_to, 'wp-admin'))
+			{
+				$redirect_to = preg_replace('|^http://|', 'https://', $redirect_to);
+			}
+		}
+		else
+		{
+			$redirect_to = $home_url;
+		}
+
+		$pwd = (!empty($_POST['pwd'])) ? $_POST['pwd'] : '';
+		$username = (!empty($_POST['log'])) ? $_POST['log'] : '';
+		$rememberme = (!empty($_POST['rememberme']) && $_POST['rememberme']) ? 1 : 0;
+
+		$is_wp_user = false;
+		$is_wp_user_logged_in = false;
+		$is_phpbb_user = false;
+		$is_phpbb_user_logged_in = false;
+
+		if ( empty($wp_error) )
+		{
+			$wp_error = new WP_Error();
+		}
+		// Shake it!
+		$shake_error_codes = array( 'empty_password', 'empty_email', 'invalid_email', 'invalidcombo', 'empty_username', 'invalid_username', 'incorrect_password' );
+		$shake_error_codes = apply_filters( 'shake_error_codes', $shake_error_codes );
+
+		if ( $shake_error_codes && $wp_error->get_error_code() && in_array( $wp_error->get_error_code(), $shake_error_codes ) )
+		{
+			add_action( 'login_head', 'wp_shake_js', 12 );
+		}
+
+		// Take me out of here if the user did not fill the form yet
+		if (!$username && !$pwd)
+		{
+			return;
+		}
+
+// Check the user against WP - Start
+		$wp_user = wp_signon('', $secure_cookie);
+
+		// IF WP tells that the user is OK, we can continue with other checks
+		if (!is_wp_error($wp_user) && !$reauth)
+		{
+			$is_wp_user = true;
+			$is_wp_user_logged_in = true;
+
+			// if the WP user do not have a phpbb user ID, means the user is not a phpbb user, so we try to add it trough ajax
+			if (!isset($wp_user->phpbb_userid) || !$wp_user->phpbb_userid)
+			{
+				$WPphpBBlogin = array(
+					'mode'			=> 'loginajax',
+					'autologin'		=> $rememberme, 
+					'sid'			=> $sid,
+					'WPuser_id'		=> $wp_user->ID,
+					'WPuser_pass'	=> $pwd,
+					'WPuser_login'	=> $wp_user->user_login,
+					'WPuser_email'	=> $wp_user->user_email,
+				);
+				$WPphpBBlogin = wp_phpbb_encrypt(serialize($WPphpBBlogin));	
+				/**
+				* Sent to phpbb "user_name" + "user_pass" + "user_email" + "sid" values trough ajax
+				**/
+				?>
+				<script type="text/javascript">
+					$jQ_WPphpBB(document).ready(function(){
+						WPphpBBlogin.add( {data:'<?php echo $WPphpBBlogin ?>'}, '<?php echo addslashes($ajax_url) ?>', '<?php echo addslashes($home_url) ?>');
+					});
+				</script>
+				<?php
+				$is_phpbb_user = true;
+			}
+			else if ($wp_user->phpbb_userid > ANONYMOUS)
+			{
+				$is_phpbb_user = true;
+			}
+		}
+		/**
+		* Debugging
+		else
+		{
+			echo $wp_user->get_error_message();
+		}
+		**/
+// Check the user against WP - End
+
+// Check the user against phpbb - Start
+		// So the WP user is also an user in the forum, try to login at the phpbb
+		if (!$is_wp_user || (!$is_phpbb_user_logged_in && $is_phpbb_user))
+		{
+			// If authentication is successful we redirect user to previous page
+			$result = phpbb::$auth->login($username, $pwd, $rememberme, true, false);
+
+			// The result parameter is always an array, holding the relevant information...
+			if ($result['status'] == LOGIN_SUCCESS)
+			{
+				$is_phpbb_user = true;
+				$is_phpbb_user_logged_in = true;
+// Add the user at WP ? - Start
+
+				/**
+				 * Now chech again if the user exist in WP
+				 *  Probably the WP password is different from the phpBB password
+				 **/
+				$sanitized_user_login = sanitize_user($username);
+				if (username_exists($sanitized_user_login))
+				{
+					$is_wp_user = true;
+				}
+
+				/**
+				 * At this point we know that the user is a phpbb user but is NOT a WP user yet
+				 *	So if is NOT a WP user, but it IS a phpbb user, create the account at WP
+				 */
+				if (!$is_wp_user)
+				{
+					/**
+					 * Avoid the error for duplicated email
+					 * 	See 3.2.1 wordpress/wp-includes/user.php => function wp_insert_user() line 1423
+					 */
+					@define('WP_IMPORTING', true);
+
+					$userid = wp_create_user(phpbb::$user->data['username'], $pwd, phpbb::$user->data['user_email']);
+					/**
+					* Debugging
+					**/
+					if (is_wp_error($userid))
+					{
+						$message = $userid->get_error_message();
+					}
+					else
+					{
+						update_user_meta($userid, 'phpbb_userid', phpbb::$user->data['user_id']);
+						$message = phpbb::$user->lang['LOGIN_REDIRECT'];
+						$is_wp_user = true;
+					}
+				}
+				else
+				{
+					$message = phpbb::$user->lang['LOGIN_REDIRECT'];
+				}
+// Add the user at WP ? - End
+			}
+			// Something failed, determine what...
+			else
+			{
+				$message = phpbb::$user->lang[$result['error_msg']];
+			}
+
+			?>
+			<script type="text/javascript">
+			$jQ_WPphpBB(document).ready(function(){
+				$jQ_WPphpBB("#login_error").remove();
+				$jQ_WPphpBB("#loginform").remove();
+				$jQ_WPphpBB(".message").html('<?php echo addslashes($message) ?>');
+			});
+			</script>
+			<?php
+		}
+// Check the user against phpbb - End
+	}
+}
 load_theme_textdomain('wp_phpbb3_bridge', TEMPLATEPATH . '/languages' );
 
 // http://wordpress.org/extend/plugins/dynamic-content-gallery-plugin/
@@ -45,20 +347,29 @@ function wp_phpbb_stylesheet()
 /**
  * Insert some js files
  */
-function wp_phpbb_javascript()
+function wp_phpbb_javascript($login = true)
 {
-	// javascript for general proposes
-	wp_register_script('javascript', get_bloginfo('stylesheet_directory') . '/js/javascript.js', false, WP_PHPBB_BRIDGE_VERSION);
-	wp_enqueue_script('javascript');
-	wp_print_scripts('javascript');
+	wp_deregister_script('jquery');
 
-	// jQuery for resply to comments
+	// jQuery for login and reply to comments
+	wp_register_script('jquery', get_bloginfo('stylesheet_directory') . '/js/jquery-1.5.0.min.js', false, '1.5.0');
+	wp_print_scripts('jquery');
+
+	// javascript for general proposes
+	wp_register_script('wp_phpbb_bridge', get_bloginfo('stylesheet_directory') . '/js/wp_phpbb_bridge_js.js', false, WP_PHPBB_BRIDGE_VERSION);
+	wp_print_scripts('wp_phpbb_bridge');
+
+	// jQuery for reply to comments
 	if (is_single())
 	{
-		wp_register_script('jquery', get_bloginfo('stylesheet_directory') . '/js/jquery-1.5.0.min.js', false, '1.5.0');
-		wp_register_script('jquery-validate', get_bloginfo('stylesheet_directory') . '/js/jquery.validate.js', array('jquery'), '1.5.2', true);
-		wp_enqueue_script('jquery-validate');
+		wp_register_script('jquery-validate', get_bloginfo('stylesheet_directory') . '/js/jquery.validate.js', array('jquery'), '1.5.2');
 		wp_print_scripts('jquery-validate');
+	}
+
+	if ($login)
+	{
+		wp_register_script('jquery-login-box', get_bloginfo('stylesheet_directory') . '/js/wp_phpbb_bridge_login_box.js', array('jquery'), WP_PHPBB_BRIDGE_VERSION);
+		wp_print_scripts('jquery-login-box');
 	}
 }
 

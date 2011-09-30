@@ -73,7 +73,11 @@ if (have_posts())
 	}
 
 	// Let us decide which comments text display and for who can see it
-	add_filter('query', 'wp_phpbb_query_filter');
+	// The user who is viewing is an administrator
+	if ($is_admin = current_user_can('level_8'))
+	{
+		add_filter('query', 'wp_phpbb_query_filter');
+	}
 
 	// Loads the comment template
 	comments_template('/comments.php', true);
@@ -113,6 +117,7 @@ if (have_posts())
 	}
 
 	// Pagination : Are there comments to navigate through?
+	add_filter('get_comments_number', 'wp_phpbb_update_comment_count');
 	$total_comments = (int) get_comments_number($post_id);
 	$comments_per_page = (int) get_option('comments_per_page');
 
@@ -188,38 +193,48 @@ phpbb::page_footer();
 function wp_phpbb_query_filter($query)
 {
 	$query_comment = array(
-		'from' 	=> array(
-			// Do not delete extra spaces after "(" amd before ")"
-			'is_registered' => "AND (comment_approved = '1' OR ( user_id = " . trim(phpbb::$user->data['wp_user']['ID']) . " AND comment_approved = '0' ) )",
-			'is_anonymous' => "WHERE comment_approved = '1' AND"
-		),
-		'to'	=> array(
-			'is_registered' => "",
-			'is_anonymous' => "WHERE"
-		),
+		// Do not delete extra spaces after "(" amd before ")"
+		'from' 	=> "AND (comment_approved = '1' OR ( user_id = " . trim(phpbb::$user->data['wp_user']['ID']) . " AND comment_approved = '0' ) )",
+		'to'	=> "",
 	);
-
 	/**
-	From : query=(SELECT * FROM wp_comments WHERE comment_post_ID = 1 AND (comment_approved = '1' OR ( user_id = 1 AND comment_approved = '0' ) ) ORDER BY comment_date_gmt)
+	From : query=(SELECT * FROM wp_comments WHERE comment_post_ID = 1 AND (comment_approved = '1' OR ( user_id = 1 AND comment_approved = '0' ) ) ORDER BY comment_date_gmt )
 	To :   query=(SELECT * FROM wp_comments WHERE comment_post_ID = 1 ORDER BY comment_date_gmt)
 	**/
-	if (strpos($query, $query_comment['from']['is_registered']) !== false)
+	if (strpos($query, $query_comment['from']) !== false)
 	{
-		$query = str_replace($query_comment['from']['is_registered'], $query_comment['to']['is_registered'], $query);
+		$query = str_replace($query_comment['from'], $query_comment['to'], $query);
 		remove_filter('query', 'query_filter');
 	}
-
-	/**
-	From : query=(SELECT * FROM wp_comments WHERE comment_approved = '1' AND comment_post_ID = 1 ORDER BY comment_date_gmt ASC )
-	To :   query=(SELECT * FROM wp_comments WHERE comment_post_ID = 1 ORDER BY comment_date_gmt ASC )
-	**/
-	if (strpos($query, $query_comment['from']['is_anonymous']) !== false)
-	{
-		$query = str_replace($query_comment['from']['is_anonymous'], $query_comment['to']['is_anonymous'], $query);
-		remove_filter('query', 'query_filter');
-	}
-
 	return $query;
 }
 
+/**
+ * Adjust the comment count, according the users capabilities
+ * 
+ * @uses apply_filters() Calls 'wp_update_comment_count_now' hook in the WordPress root/wp-includes/comments.php
+ * @param (int) $comment_count	The actual number of comments
+ * @return (int)
+ */
+function wp_phpbb_update_comment_count($comment_count)
+{
+	global $wpdb;
+
+	// Retrieve the ID of the current item in the WordPress Loop
+	$post_id = get_the_ID();
+
+	// The user who is viewing is an administrator
+	if ($is_admin = current_user_can('level_8'))
+	{
+		$comment_count = (int) $wpdb->get_var( $wpdb->prepare("SELECT COUNT(*) FROM $wpdb->comments WHERE comment_post_ID = %d ", $post_id) );
+	}
+	else
+	{
+		global $wpdb;
+	//	$new = (int) $wpdb->get_var( $wpdb->prepare("SELECT COUNT(*) FROM $wpdb->comments WHERE comment_post_ID = %d AND comment_approved = '1'", $post_id) );
+		$comment_count = (int) $wpdb->get_var( $wpdb->prepare("SELECT COUNT(*) FROM $wpdb->comments WHERE comment_post_ID = %d AND ( comment_approved = '1' OR user_id = " . trim(phpbb::$user->data['wp_user']['ID']) . ") ", $post_id) );
+	}
+
+	return $comment_count;
+}
 ?>

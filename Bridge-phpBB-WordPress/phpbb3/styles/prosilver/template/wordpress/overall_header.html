@@ -4,11 +4,11 @@
 				<!-- IF U_BLOG --><li class="icon-home"><a href="{U_BLOG}" title="{L_WP_TITLE_BLOG_EXPLAIN}" >{L_WP_TITLE_BLOG}</a></li><!-- ENDIF -->
 				<!-- IF not S_IS_BOT -->
 					<!-- IF U_WP_ACP --><li class="icon-register rightside"><a href="{U_WP_ACP}">{L_WP_ADMIN_PANEL}</a></li><!-- ENDIF -->
-					<li class="icon-logout rightside"><a href="{U_LOGIN_LOGOUT}" title="{L_LOGIN_LOGOUT}" accesskey="x">{L_LOGIN_LOGOUT}</a></li>
+					<li class="icon-logout rightside"><a href="{U_LOGIN_LOGOUT_POPUP}" onclick="openMyModal('<!-- IF S_USER_LOGGED_IN -->logout<!-- ELSE -->login<!-- ENDIF -->', '{U_LOGIN_LOGOUT_POPUP}'); return false;">{L_LOGIN_LOGOUT}</a></li>
 					<!-- IF not S_USER_LOGGED_IN and S_REGISTER_ENABLED and not (S_SHOW_COPPA or S_REGISTRATION) --><li class="icon-register rightside"><a href="{U_REGISTER}">{L_REGISTER}</a></li><!-- ENDIF -->
 				<!-- ENDIF -->
 			</ul>
-		<!-- IF S_CLOCK or  U_WP_ACP -->
+		<!-- IF S_CLOCK or U_WP_ACP -->
 			<ul class="linklist">
 				<!-- IF S_CLOCK -->
 				<li class="clock leftside">{CURRENT_DATE} <span id="the_clock">{CURRENT_TIME}<script type='text/javascript'> get_the_clock(); </script></span></li>

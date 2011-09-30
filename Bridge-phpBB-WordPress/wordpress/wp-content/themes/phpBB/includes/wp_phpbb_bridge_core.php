@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.9 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/themes/phpBB/includes
- * @version: $Id: wp_phpbb_bridge_core.php, v0.0.8 2011/08/25 11:08:25 leviatan21 Exp $
+ * @version: $Id: wp_phpbb_bridge_core.php, v0.0.8 2011/10/01 11:10:01 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -44,6 +44,10 @@ class bridge
 		$active	 = get_option('wp_phpbb_bridge', $wp_phpbb_bridge_config['phpbb_bridge']);
 		// bypass our own settings
 		$path	 = get_option('phpbb_root_path', $wp_phpbb_bridge_config['phpbb_root_path']);
+		if (defined('PHPBB_INAJAX') && PHPBB_INAJAX == true)
+		{
+			$path = '../../../' . $path;
+		}
 
 		// Measn the plugin is not enabbled yet!
 		// or the plugin is not set yet!
@@ -90,7 +94,7 @@ class bridge
 	}
 
 	/**
-	 * Enter description here...
+	 * Check the Bridge settings...
 	 *
 	 * @param (bolean) $active
 	 * @param (string) $path
@@ -216,23 +220,23 @@ class phpbb
 		self::$absolute_phpbb_script_path = generate_board_url(true) . '/' . get_option('phpbb_script_path', bridge::$config['phpbb_script_path']);
 		self::$absolute_wordpress_script_path = generate_board_url(true) . '/' . get_option('wordpress_script_path', bridge::$config['wordpress_script_path']);
 
-		/**
-		* Start session management
-		* 	Disable to call the function leave_newly_registered() 
-		* 	and avoid to include the phpbb/includes/functions_user.php because the duplicated function validate_username()
-		**/
-		self::$config['new_member_post_limit'] = null;
+		// enhance phpbb $config data with WP $config data
+		self::wp_get_config();
 
+		// Start session management
 		if (!defined('PHPBB_INCLUDED'))
 		{
 			self::$user->session_begin();
 			self::$auth->acl(self::$user->data);
 			self::$user->setup();
 		}
-		self::wp_phpbb_sanitize_userid();
 
-		// enhance phpbb $config data with WP $config data
-		self::wp_get_config();
+		$action = request_var('action', '');
+		if ($action != 'logout' || $action != 'log-out')
+		{
+			self::wp_phpbb_sanitize_user();
+		}
+
 	}
 
 	/**
@@ -268,37 +272,65 @@ class phpbb
 
 	/**
 	 * Update phpbb user data with wp user data
-	 * 	Andupdate wp user data with phpbb user data
+	 * 	And update wp user data with phpbb user data
 	 *
 	 * based off the WP add-on by Jason Sanborn <jsanborn@simplicitypoint.com> http://www.e-xtnd.it/wp-phpbb-bridge/
 	 */
-	public static function wp_phpbb_sanitize_userid()
+	public static function wp_phpbb_sanitize_user()
 	{
 		global $wp_user;
 
-		$userid = self::wp_get_userid();
+		$wp_user_id = self::wp_phpbb_get_userid();
 
-		if ($userid <= 0 && is_user_logged_in())
+		if($wp_user_id <= 0 && is_user_logged_in())
 		{
 			wp_logout();
 			wp_redirect('http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
 		}
-		else if ($userid > 0 && $userid != $wp_user->ID)
+		else if($wp_user_id > 0 && $wp_user_id != $wp_user->ID)
 		{
-			wp_set_current_user($userid);
-			wp_set_auth_cookie($userid, true, false);
-			self::wp_update_user($userid);
+			wp_set_current_user($wp_user_id);
+			wp_set_auth_cookie($wp_user_id, true, false);
 		}
 
-		// enhance phpbb user data with WP user data
-		self::$user->data['wp_user'] = self::wp_get_userdata($userid);
+		// Get the WP user data
+		$wp_user_data = get_userdata($wp_user->ID);
+
+		if (!isset($wp_user_data->phpbb_userid) || $wp_user_data->phpbb_userid == 0 || $wp_user_data->phpbb_userid != self::$user->data['user_id'])
+		{
+			$wp_user_data->phpbb_userid = self::$user->data['user_id'];
+			update_metadata('user', $wp_user_id, 'phpbb_userid', $wp_user_data->phpbb_userid);
+		}
+
+		$default_userdata = array(
+			'ID'			=> $wp_user_id,
+			'phpbb_userid'	=> self::$user->data['user_id'],
+			'user_url'		=> self::$user->data['user_website'],
+			'user_email'	=> self::$user->data['user_email'],
+			'nickname'		=> self::$user->data['username'],
+			'jabber'		=> self::$user->data['user_jabber'],
+			'aim'			=> self::$user->data['user_aim'],
+			'yim'			=> self::$user->data['user_yim'],
+		);
+
+		self::$user->data['wp_user'] = array_merge($default_userdata, (array) $wp_user_data);
+	//	print_r(self::$user->data);
 	}
 
-	public static function wp_get_userid()
+	/**
+	 * Get the WP user ID, based off the phpBB user ID
+	 *
+	 * @param (integer)	 	$wp_user_id	a default value, in WP the anonymous user is ID 0
+	 * @return (integer)	$wp_user_id
+	 */
+	public static function wp_phpbb_get_userid($wp_user_id = 0)
 	{
 		global $wpdb;
 
-		$userid = 0;
+		if (self::$user->data['user_type'] == USER_FOUNDER && self::$user->data['user_id'] == self::$config['wp_phpbb_bridge_forum_founder_user_id'])
+		{
+			return (int) self::$config['wp_phpbb_bridge_blog_founder_user_id'];
+		}
 
 		if (self::$user->data['user_type'] == USER_NORMAL || self::$user->data['user_type'] == USER_FOUNDER)
 		{
@@ -306,59 +338,32 @@ class phpbb
 
 			if (empty($id_list))
 			{
-				$check_email = email_exists(self::$user->data['user_email']);
-
-				if (self::$user->data['user_id'] == 2)
-				{
-					$userid = 1;
-				}
-				else if ($check_email)
-				{
-					$userid = $check_email;
-				}
-				else
-				{
-					$userid = wp_create_user(self::$user->data['username'], wp_generate_password(), self::$user->data['user_email']);
-				}
-
-				update_user_meta($userid, 'phpbb_userid', self::$user->data['user_id']);
+				return (int) $wp_user_id;
 			}
 			else
 			{
-				$userid = $id_list[0];
+				return (int) $id_list[0];
 			}
 		}
 
-		return $userid;
-	}
-
-	public static function wp_update_user($userid)
-	{
-		$userdata['ID'] = $userid;
-		$userdata['user_url'] = self::$user->data['user_website'];
-		$userdata['user_email'] = self::$user->data['user_email'];
-		$userdata['nickname'] = self::$user->data['username'];
-		$userdata['jabber'] = self::$user->data['user_jabber'];
-		$userdata['aim'] = self::$user->data['user_aim'];
-		$userdata['yim'] = self::$user->data['user_yim'];
-
-		wp_update_user($userdata);
+		return $wp_user_id;
 	}
 
 	/**
 	 * Get all available usuer data from wordpress tables
+	 * 	An alternative alternative to the WP get_userdata(), because we will have a name function conflict
 	 *
-	 * @param integer $user_id
-	 * @return array
+	 * @param (integer)		$wp_user_id
+	 * @return (array)	
 	 */
-	public static function wp_get_userdata($user_id)
+	public static function wp_phpbb_get_userdata($wp_user_id)
 	{
 		global $wpdb;
 		
-		$user_id = (int) $user_id;
+		$wp_user_id = (int) $wp_user_id;
 		$wpuser = array();
 
-		$users = $wpdb->get_row($wpdb->prepare("SELECT * FROM $wpdb->users WHERE ID = %d LIMIT 1", $user_id));
+		$users = $wpdb->get_row($wpdb->prepare("SELECT * FROM $wpdb->users WHERE ID = %d LIMIT 1", $wp_user_id));
 
 		if (!empty($users))
 		{
@@ -375,7 +380,7 @@ class phpbb
 			);
 		}
 
-		$usermeta = $wpdb->get_results($wpdb->prepare("SELECT meta_key, meta_value FROM $wpdb->usermeta WHERE user_id = %d ", $user_id));
+		$usermeta = $wpdb->get_results($wpdb->prepare("SELECT meta_key, meta_value FROM $wpdb->usermeta WHERE user_id = %d ", $wp_user_id));
 
 		if (!empty($usermeta))
 		{
@@ -389,17 +394,25 @@ class phpbb
 	}
 
 	/**
-	* Force some variables
+	* Set and Force some variables
 	* We do this instead made an ACP module for phpBB to manage this bridge configurations
 	*/
 	public static function wp_get_config()
 	{
-		$wp_phpbb_bridge_permissions_forum_id	= (isset(bridge::$config['wp_phpbb_bridge_permissions_forum_id'])	&& bridge::$config['wp_phpbb_bridge_permissions_forum_id']	!= 0) ? bridge::$config['wp_phpbb_bridge_permissions_forum_id']		: 0;
-		$wp_phpbb_bridge_post_forum_id			= (isset(bridge::$config['wp_phpbb_bridge_post_forum_id'])			&& bridge::$config['wp_phpbb_bridge_post_forum_id']			!= 0) ? bridge::$config['wp_phpbb_bridge_post_forum_id']			: 0;
-		$wp_phpbb_bridge_widgets_column_width	= (isset(bridge::$config['wp_phpbb_bridge_widgets_column_width'])	&& bridge::$config['wp_phpbb_bridge_widgets_column_width']	!= 0) ? bridge::$config['wp_phpbb_bridge_widgets_column_width']		: 300;
-		$wp_phpbb_bridge_comments_avatar_width	= (isset(bridge::$config['wp_phpbb_bridge_comments_avatar_width'])	&& bridge::$config['wp_phpbb_bridge_comments_avatar_width']	!= 0) ? bridge::$config['wp_phpbb_bridge_comments_avatar_width']	: 32;
+		$wp_phpbb_bridge_forum_founder_user_id	= (isset(bridge::$config['wp_phpbb_bridge_forum_founder_user_id'])	&& (int) bridge::$config['wp_phpbb_bridge_forum_founder_user_id']	!= 0) ? (int) bridge::$config['wp_phpbb_bridge_forum_founder_user_id']	: 2;
+		$wp_phpbb_bridge_blog_founder_user_id	= (isset(bridge::$config['wp_phpbb_bridge_blog_founder_user_id'])	&& (int) bridge::$config['wp_phpbb_bridge_blog_founder_user_id']	!= 0) ? (int) bridge::$config['wp_phpbb_bridge_blog_founder_user_id']	: 2;
+		$wp_phpbb_bridge_permissions_forum_id	= (isset(bridge::$config['wp_phpbb_bridge_permissions_forum_id'])	&& (int) bridge::$config['wp_phpbb_bridge_permissions_forum_id']	!= 0) ? (int) bridge::$config['wp_phpbb_bridge_permissions_forum_id']	: 0;
+		$wp_phpbb_bridge_post_forum_id			= (isset(bridge::$config['wp_phpbb_bridge_post_forum_id'])			&& (int) bridge::$config['wp_phpbb_bridge_post_forum_id']			!= 0) ? (int) bridge::$config['wp_phpbb_bridge_post_forum_id']			: 0;
+		$wp_phpbb_bridge_widgets_column_width	= (isset(bridge::$config['wp_phpbb_bridge_widgets_column_width'])	&& (int) bridge::$config['wp_phpbb_bridge_widgets_column_width']	!= 0) ? (int) bridge::$config['wp_phpbb_bridge_widgets_column_width']	: 300;
+		$wp_phpbb_bridge_comments_avatar_width	= (isset(bridge::$config['wp_phpbb_bridge_comments_avatar_width'])	&& (int) bridge::$config['wp_phpbb_bridge_comments_avatar_width']	!= 0) ? (int) bridge::$config['wp_phpbb_bridge_comments_avatar_width']	: 32;
 
 		self::$config = array_merge(self::$config, array(
+			// Disable to call the function leave_newly_registered()
+			'new_member_post_limit'					=> null,
+			// The ID of user forum founder
+			'wp_phpbb_bridge_forum_founder_user_id'	=> (int) $wp_phpbb_bridge_forum_founder_user_id,
+			// The ID of user blog founder
+			'wp_phpbb_bridge_blog_founder_user_id'	=> (int) $wp_phpbb_bridge_blog_founder_user_id,
 			// For the moment the ID of you forum where to use permissions ( like $auth->acl_get('f_reply') )
 			'wp_phpbb_bridge_permissions_forum_id'	=> (int) get_option('wp_phpbb_bridge_permissions_forum_id', $wp_phpbb_bridge_permissions_forum_id),
 			// For the moment the ID of you forum where to post a new entry whenever is published in the Wordpress
@@ -408,12 +421,6 @@ class phpbb
 			'wp_phpbb_bridge_widgets_column_width'	=> (int) get_option('wp_phpbb_bridge_widgets_column_width', $wp_phpbb_bridge_widgets_column_width),
 			// The width size of avatars in comments, in pixels
 			'wp_phpbb_bridge_comments_avatar_width'	=> (int) get_option('wp_phpbb_bridge_comments_avatar_width', $wp_phpbb_bridge_comments_avatar_width),
-			// Display a block with latest topics, it's a WP widget
-			// Display a block with a list of pages, it's a WP widget
-			// Display a block with a list of archives, it's a WP widget
-			// Display a block with a list of categories, it's a WP widget
-			// Display a block with tag clouds, it's a WP widget
-			// Display the search block, it's a WP widget
 		));
 	}
 
@@ -468,7 +475,6 @@ class phpbb
 	public static function append_sid($script, $params = false, $is_amp = true, $session_id = false)
 	{
 		return append_sid(self::$absolute_phpbb_script_path . $script . '.' . PHP_EXT, $params, $is_amp, $session_id);
-	//	return append_sid(PHPBB_ROOT_PATH . $script . '.' . PHP_EXT, $params, $is_amp, $session_id);
 	}
 
 	/**
@@ -532,9 +538,12 @@ class phpbb
 		}
 
 		// Do the phpBB page header stuff first
-		page_header($wp_title);
+		page_header($wp_title, false);
 
 		$redirect = request_var('redirect', get_option('siteurl'));
+		
+		$u_login_logout = site_url('wp-login.php', 'login');
+		$u_login_popup = get_option('siteurl') . '/?action=popup';
 
 		self::$template->assign_vars(array(
 			'PHPBB_IN_FORUM'	=> false,
@@ -556,9 +565,9 @@ class phpbb
 			'S_CLOCK'			=> self::clock(),
 
 			'S_REGISTER_ENABLED'=> (self::$config['require_activation'] != USER_ACTIVATION_DISABLE && get_option('users_can_register')) ? true : false,
-			'U_LOGIN_LOGOUT'	=> (!is_user_logged_in()) ? get_option('siteurl') . '/?action=login' : get_option('siteurl') . '/?action=logout',
 			'U_LOGIN_LOGOUT'	=> (!is_user_logged_in()) ? append_sid(get_option('siteurl') . '/', array('action' => 'login', 'redirect' => $redirect)) : append_sid(get_option('siteurl') . '/', array('action' => 'logout', 'redirect' => $redirect), true, self::$user->session_id),
 			'S_LOGIN_REDIRECT'	=> build_hidden_fields(array('redirect' => $redirect)),
+			'U_LOGIN_LOGOUT_POPUP'	=> (!is_user_logged_in()) ? site_url("wp-login.php?action=login&amp;interim-login=1&amp;sid=" . phpbb::$user->session_id . "&amp;redirect_to=" . $redirect, 'login') : site_url("wp-login.php?action=logout&amp;sid=" . phpbb::$user->session_id . "&amp;redirect_to=" . $redirect, 'login'),
 
 			'U_WP_ACP'			=> (self::$user->data['user_type'] == USER_FOUNDER || current_user_can('level_8')) ? admin_url() : '',
 			'U_POST_NEW_TOPIC'	=> (self::$user->data['user_type'] == USER_FOUNDER || current_user_can('level_8')) ? admin_url('post-new.php') : '',
@@ -568,7 +577,10 @@ class phpbb
 			'DYNAMIC_SIDEBAR_W'	=> (int) self::$config['wp_phpbb_bridge_widgets_column_width'],
 
 			'WPT_TEMPLATE_PATH'	=> get_template_directory_uri(),
+
 			'WPT_STYLESHEETPATH'=> get_stylesheet_directory(),
+			'A_BASE_URL'		=> esc_url( get_home_url( null, '/wp-content/themes/phpBB')),
+
 			'T_THEME_PATH'		=> "{$web_path}styles/" . self::$user->theme['theme_path'] . '/theme',
 			'T_STYLESHEET_LINK'	=> (!self::$user->theme['theme_storedb']) ? "{$web_path}styles/" . self::$user->theme['theme_path'] . '/theme/stylesheet.css' : append_sid("{$web_path}style." . PHP_EXT, 'id=' . self::$user->theme['style_id'] . '&amp;lang=' . self::$user->data['user_lang']),
 		));
@@ -579,14 +591,13 @@ class phpbb
 		}
 	}
 
-	public static function wp_location()
+	public static function wp_location($location = 'index')
 	{
 		$m = get_query_var('m');
 		$year = get_query_var('year');
 		$monthnum = get_query_var('monthnum');
 		$day = get_query_var('day');
 		$search = get_query_var('s');
-		$location = 'index';
 
 		// If there is a post
 		if (is_single() || (is_home() && !is_front_page()) || (is_page() && !is_front_page()))
@@ -754,9 +765,16 @@ class phpbb
 
 		$instance['forums'] = explode(',', $instance['forums']);
 
+		// We need to find at least one postable forum where the user can read
 		if ($instance['forums'][0] == 0)
 		{
+		//	$forum_ids = array_keys(self::$auth->acl_getf('f_read', true));
 			$instance['forums'] = array_keys(self::$auth->acl_getf('f_read', true));
+		}
+		// User cannot read any forums
+		if (empty($instance['forums']))
+		{
+			return false;
 		}
 
 		$sql_array = array(
@@ -874,7 +892,9 @@ class phpbb
 			// In WP the anonymous user is ID 0, we change that to the phpbb anonymous user ID
 			if ($wp_poster_id == 0 || !$wp_poster_data)
 			{
-				$wp_poster_data->display_name = $wp_poster_data->user_nicename = (!$wp_poster_data) ? self::$user->lang['GUEST'] : get_comment_author($wp_poster_id);
+		//		$wp_poster_data->display_name = $wp_poster_data->user_nicename = (!$wp_poster_data) ? self::$user->lang['GUEST'] : get_comment_author($wp_poster_id);
+				$wp_poster_data->display_name = get_comment_author();
+				$wp_poster_data->user_nicename = get_comment_author_link();
 				$wp_poster_data->phpbb_userid = ANONYMOUS;
 			}
 
@@ -1082,6 +1102,16 @@ class phpbb
 			'body' => ($template_body !== false) ? $template_body : 'wordpress/index_body.html',
 		));
 
+		/**
+		 * If the user is admin, we add a hook to fix the ACP url
+		 * To works property the function wp_phpbb_u_acp() is located in the WordPress root/wp-content/themes/phpBB/includes/wp_phpbb_bridge.php file
+		 */
+		if (self::$auth->acl_get('a_') && !empty(self::$user->data['is_registered']))
+		{
+			global $phpbb_hook;
+			$phpbb_hook->register(array('template', 'display'), 'wp_phpbb_u_acp');
+		}
+
 		// Do the phpBB page footer at least but do not run cron jobs
 		page_footer(false);
 	}
@@ -1104,213 +1134,8 @@ class phpbb
 	}
 
 	/**
-	* Generate login box or verify password
-	* 
-	* Based off : Titania 0.3.11
-	* File : titania/includes/core/phpbb.php
-	*/
-	function login_box($redirect = '', $l_explain = '', $l_success = '', $admin = false, $s_display = true)
-	{
-		global $phpbb_root_path, $phpEx;
-
-		self::_include('captcha/captcha_factory', 'phpbb_captcha_factory');
-		self::$user->add_lang('ucp');
-
-		$err = '';
-
-		// Make sure user->setup() has been called
-		if (empty(self::$user->lang))
-		{
-			self::$user->setup();
-		}
-
-		// Print out error if user tries to authenticate as an administrator without having the privileges...
-		if ($admin && !self::$auth->acl_get('a_'))
-		{
-			// Not authd
-			// anonymous/inactive users are never able to go to the ACP even if they have the relevant permissions
-			if (self::$user->data['is_registered'])
-			{
-				add_log('admin', 'LOG_ADMIN_AUTH_FAIL');
-			}
-			trigger_error('NO_AUTH_ADMIN');
-		}
-
-		if (isset($_POST['login']))
-		{
-			// Get credential
-			if ($admin)
-			{
-				$credential = request_var('credential', '');
-
-				if (strspn($credential, 'abcdef0123456789') !== strlen($credential) || strlen($credential) != 32)
-				{
-					if (self::$user->data['is_registered'])
-					{
-						add_log('admin', 'LOG_ADMIN_AUTH_FAIL');
-					}
-					trigger_error('NO_AUTH_ADMIN');
-				}
-
-				$password	= request_var('password_' . $credential, '', true);
-			}
-			else
-			{
-				$password	= request_var('password', '', true);
-			}
-
-			$username	= request_var('username', '', true);
-			$autologin	= (!empty($_POST['autologin'])) ? true : false;
-			$viewonline = (!empty($_POST['viewonline'])) ? 0 : 1;
-			$admin 		= ($admin) ? 1 : 0;
-			$viewonline = ($admin) ? self::$user->data['session_viewonline'] : $viewonline;
-
-			// Check if the supplied username is equal to the one stored within the database if re-authenticating
-			if ($admin && utf8_clean_string(self::$username) != utf8_clean_string(self::$user->data['username']))
-			{
-				// We log the attempt to use a different username...
-				add_log('admin', 'LOG_ADMIN_AUTH_FAIL');
-				trigger_error('NO_AUTH_ADMIN_USER_DIFFER');
-			}
-
-			// If authentication is successful we redirect user to previous page
-			$result = self::$auth->login($username, $password, $autologin, $viewonline, $admin);
-
-			// If admin authentication and login, we will log if it was a success or not...
-			// We also break the operation on the first non-success login - it could be argued that the user already knows
-			if ($admin)
-			{
-				if ($result['status'] == LOGIN_SUCCESS)
-				{
-					add_log('admin', 'LOG_ADMIN_AUTH_SUCCESS');
-				}
-				else
-				{
-					// Only log the failed attempt if a real user tried to.
-					// anonymous/inactive users are never able to go to the ACP even if they have the relevant permissions
-					if (self::$user->data['is_registered'])
-					{
-						add_log('admin', 'LOG_ADMIN_AUTH_FAIL');
-					}
-				}
-			}
-
-			// The result parameter is always an array, holding the relevant information...
-			if ($result['status'] == LOGIN_SUCCESS)
-			{
-			//	$filename = strtolower(basename($_SERVER['SCRIPT_FILENAME']));
-			//	$redirect = request_var('redirect', '');
-
-				if ($redirect == '')
-				{
-					$redirect = request_var('redirect', get_option('home'));
-					$redirect = request_var('redirect_to', $redirect);
-				}
-
-				redirect($redirect);
-			}
-
-			// Something failed, determine what...
-			if ($result['status'] == LOGIN_BREAK)
-			{
-				trigger_error($result['error_msg']);
-			}
-
-			// Special cases... determine
-			switch ($result['status'])
-			{
-				case LOGIN_ERROR_ATTEMPTS:
-
-					$captcha = phpbb_captcha_factory::get_instance(self::$config['captcha_plugin']);
-					$captcha->init(CONFIRM_LOGIN);
-					// $captcha->reset();
-
-					// Parse the captcha template
-					self::reset_template();
-					self::$template->set_filenames(array(
-						'captcha'	=> $captcha->get_template(),
-					));
-
-					// Correct confirm image link
-					self::$template->assign_var('CONFIRM_IMAGE_LINK', self::append_sid('ucp', 'mode=confirm&amp;confirm_id=' . $captcha->confirm_id . '&amp;type=' . $captcha->type));
-
-					self::$template->assign_display('captcha', 'CAPTCHA', false);
-
-				//	titania::set_custom_template();
-
-					$err = self::$user->lang[$result['error_msg']];
-				break;
-
-				case LOGIN_ERROR_PASSWORD_CONVERT:
-					$err = sprintf(
-						self::$user->lang[$result['error_msg']],
-						(self::$config['email_enable']) ? '<a href="' . self::append_sid('ucp', 'mode=sendpassword') . '">' : '',
-						(self::$config['email_enable']) ? '</a>' : '',
-						(self::$config['board_contact']) ? '<a href="mailto:' . htmlspecialchars(self::$config['board_contact']) . '">' : '',
-						(self::$config['board_contact']) ? '</a>' : ''
-					);
-				break;
-
-				// Username, password, etc...
-				default:
-					$err = self::$user->lang[$result['error_msg']];
-
-					// Assign admin contact to some error messages
-					if ($result['error_msg'] == 'LOGIN_ERROR_USERNAME' || $result['error_msg'] == 'LOGIN_ERROR_PASSWORD')
-					{
-						$err = (!self::$config['board_contact']) ? sprintf(self::$user->lang[$result['error_msg']], '', '') : sprintf(self::$user->lang[$result['error_msg']], '<a href="mailto:' . htmlspecialchars(self::$config['board_contact']) . '">', '</a>');
-					}
-
-				break;
-			}
-		}
-
-		// Assign credential for username/password pair
-		$credential = ($admin) ? md5(unique_id()) : false;
-
-		$s_hidden_fields = array(
-			'sid'		=> self::$user->session_id,
-		);
-
-		if ($redirect)
-		{
-			$s_hidden_fields['redirect'] = $redirect;
-		}
-
-		if ($admin)
-		{
-			$s_hidden_fields['credential'] = $credential;
-		}
-
-		$s_hidden_fields = build_hidden_fields($s_hidden_fields);
-
-		self::page_header('LOGIN');
-
-		self::$template->assign_vars(array(
-			'LOGIN_ERROR'		=> $err,
-			'LOGIN_EXPLAIN'		=> $l_explain,
-
-			'U_SEND_PASSWORD' 		=> (self::$config['email_enable']) ? self::append_sid('ucp', 'mode=sendpassword') : '',
-			'U_RESEND_ACTIVATION'	=> (self::$config['require_activation'] == USER_ACTIVATION_SELF && self::$config['email_enable']) ? self::append_sid('ucp', 'mode=resend_act') : '',
-			'U_TERMS_USE'			=> self::append_sid('ucp', 'mode=terms'),
-			'U_PRIVACY'				=> self::append_sid('ucp', 'mode=privacy'),
-
-			'S_DISPLAY_FULL_LOGIN'	=> ($s_display) ? true : false,
-			'S_HIDDEN_FIELDS' 		=> $s_hidden_fields,
-
-			'S_ADMIN_AUTH'			=> $admin,
-			'USERNAME'				=> ($admin) ? self::$user->data['username'] : '',
-
-			'USERNAME_CREDENTIAL'	=> 'username',
-			'PASSWORD_CREDENTIAL'	=> ($admin) ? 'password_' . $credential : 'password',
-		));
-
-		self::page_footer(true, 'login_body.html');
-	}
-
-	/**
-	* Some images to do not modify the imageset
-	* with Fall back to a default the phpbb image
+	* Some images for the 
+	* with fallback to a default the phpbb image
 	*/
 	function wp_imageset($img = 'all', $lang_var = '', $tpl_name = '')
 	{
@@ -1320,67 +1145,46 @@ class phpbb
 		{
 			$imageset = array(
 				'icon_wp_trash' => array(
-					'image_filename_fall_back' 	=> 'icon_post_delete.gif',
-					'image_name_fall_back' 		=> 'icon_post_delete',
-					'image_class_fall_back'		=> 'wp-delete-icon',
-
-					'image_filename' 			=> 'icon_wp_trash.gif',
 					'image_name' 				=> 'icon_wp_trash',
 					'image_class'				=> 'wp-trash-icon',
+					'image_name_fallback' 		=> 'icon_post_delete',
+					'image_class_fallback'		=> 'wp-delete-icon',
 				),
 				'icon_wp_untrash' => array(
-					'image_filename_fall_back' 	=> 'icon_post_delete.gif',
-					'image_name_fall_back' 		=> 'icon_post_delete',
-					'image_class_fall_back'		=> 'wp-undelete-icon',
-
-					'image_filename' 			=> 'icon_wp_trash.gif',
-					'image_name' 				=> 'icon_wp_untrash',
+					'image_name' 				=> 'icon_wp_trash',
 					'image_class'				=> 'wp-untrash-icon',
+					'image_name_fallback' 		=> 'icon_post_delete',
+					'image_class_fallback'		=> 'wp-undelete-icon',
 				),
 				'icon_wp_approve' => array(
-					'image_filename_fall_back' 	=> 'icon_post_report.gif',
-					'image_name_fall_back' 		=> 'icon_post_report',
-					'image_class_fall_back'		=> 'wp-report-icon',
-
-					'image_filename' 			=> 'icon_wp_approve.gif',
 					'image_name' 				=> 'icon_wp_approve',
 					'image_class'				=> 'wp-approve-icon',
+					'image_name_fallback' 		=> 'icon_post_report',
+					'image_class_fallback'		=> 'wp-report-icon',
 				),
 				'icon_wp_unapprove' => array(
-					'image_filename_fall_back' 	=> 'icon_topic_unapproved.gif',
-					'image_name_fall_back' 		=> 'icon_topic_unapproved',
-					'image_class_fall_back'		=> 'wp-noreport-icon',
-
-					'image_filename' 			=> 'icon_wp_unapprove.gif',
 					'image_name' 				=> 'icon_wp_unapprove',
 					'image_class'				=> 'wp-unapprove-icon',
+					'image_name_fallback' 		=> 'icon_topic_unapproved',
+					'image_class_fallback'		=> 'wp-noreport-icon',
 				),
 				'icon_wp_spam' => array(
-					'image_filename_fall_back' 	=> 'icon_post_report.gif',
-					'image_name_fall_back' 		=> 'icon_post_report',
-					'image_class_fall_back'		=> 'wp-info-icon',
-
-					'image_filename' 			=> 'icon_wp_spam.gif',
 					'image_name' 				=> 'icon_wp_spam',
 					'image_class'				=> 'wp-spam-icon',
+					'image_name_fallback' 		=> 'icon_post_report',
+					'image_class_fallback'		=> 'wp-info-icon',
 				),
 				'icon_wp_nospam' => array(
-					'image_filename_fall_back' 	=> 'icon_user_warn.gif',
-					'image_name_fall_back' 		=> 'icon_user_warn',
-					'image_class_fall_back'		=> 'wp-noinfo-icon',
-
-					'image_filename' 			=> 'icon_wp_nospam.gif',
-					'image_name' 				=> 'icon_wp_nospam',
+					'image_name' 				=> 'icon_wp_spam',
 					'image_class'				=> 'wp-nospam-icon',
+					'image_name_fallback' 		=> 'icon_user_warn',
+					'image_class_fallback'		=> 'wp-noinfo-icon',
 				),
 				'button_blogpost_new' => array(
-					'image_filename_fall_back' 	=> 'button_topic_new.gif',
-					'image_name_fall_back'		=> 'button_topic_new',
-					'image_class_fall_back'		=> 'wp-post-icon',
-
-					'image_filename' 			=> 'button_blogpost_new.gif',
 					'image_name' 				=> 'button_blogpost_new',
 					'image_class'				=> 'blogpostnew-icon',
+					'image_name_fallback'		=> 'button_topic_new',
+					'image_class_fallback'		=> 'wp-post-icon',
 				),
 			);
 		}
@@ -1390,16 +1194,15 @@ class phpbb
 			if ($img == $image)
 			{
 				$imagedata = self::$user->img($img_data['image_name'], $lang_var);
-				if ($imagedata != '')
+				if (!$imagedata != '')
 				{
-					self::$template->assign_var($tpl_name, $img_data['image_class']);
-					return $imagedata;
+					$imagedata = self::$user->img($img_data['image_name_fallback'], $lang_var);
+					$img_data['image_class'] = $img_data['image_class_fallback'];
 				}
-				else
-				{
-					self::$template->assign_var($tpl_name, $img_data['image_class_fall_back']);
-					return self::$user->img($img_data['image_name_fall_back'], $lang_var);
-				}
+				self::$template->assign_var($tpl_name, $img_data['image_class']);
+
+				// For Subsilver2
+				return urldecode($imagedata);
 			}
 		}
 	}

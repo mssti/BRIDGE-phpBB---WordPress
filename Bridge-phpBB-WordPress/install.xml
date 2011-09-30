@@ -8,8 +8,16 @@
 		<title lang="en"><![CDATA[BRIDGE phpBB & WordPress]]></title>
 		<title lang="es"><![CDATA[PUENTE phpBB & WordPress]]></title>
 
-		<description lang="en"><![CDATA[Not available yet]]></description>
-		<description lang="es"><![CDATA[No está disponible aún]]></description>
+		<description lang="en"><![CDATA[WordPress - phpBB Integration Mod
+		This Birdge makes possible to integrate your phpBB into your Wordpress Blog, sharing the Board style and users
+		Users Can login at the Blog using the phpBB account or Wordpress account, 
+			If the phpBB users do not exist in WP it will be automatically created as a "Subscriber"
+			If the WP users do not exist in phpBB it will be automatically created as a "Registered users" ( and "Newly registered users" if you have it enabled )]]></description>
+		<description lang="es"><![CDATA[Integración WordPress - phpBB Mod
+		Este Birdge permite integrar el phpBB en tu blog de Wordpress, compartiendo el estilo de el foro y los usuarios
+		Los usuarios pueden ingresar en el Blog con la cuenta de phpBB o una cuenta de Wordpress,
+			Si los usuarios de phpBB no existen en WP, éste se creará automáticamente como un "suscriptor"
+			Si los usuarios de WP no existen en phpBB, éste se creará automáticamente como "usuarios registrados" (y "Nuevos Usuarios Registrados" si lo ha activado)]]></description>
 
 		<author-notes lang="en"><![CDATA[Please keep in mind that this version is still in development, so not everything may be in place or working.
 
@@ -17,6 +25,8 @@
 * Report any bugs or problems you encounter to our issue tracker http://github.com/mssti/BRIDGE-phpBB---WordPress/issues
 * Also, good ideas and bug reports are always welcome.
 * Before adding this MOD to your forum, you should back up all files related to this MOD.
+* This BRIDGE modify the database.
+* Do not try to install with AutoMOD
 ]]></author-notes>
 		<author-notes lang="es"><![CDATA[Por favor, tenga en cuenta que este MOD aún se encuentra en etapa de desarrollo, por lo cual no todo puede estar correcto o funcionar a la perfección.
 
@@ -24,7 +34,8 @@
 * Reporte cualquier error o problema que pueda encontrar en el Rastreador : http://github.com/mssti/BRIDGE-phpBB---WordPress/issues
 * También, buenas ideas y reportes serán siempre bienvenidos.
 * Antes de agregar este MOD a su foro, usted debería realizar una copia de seguridad de todos los archivos relacionados con este MOD.
-* Este MOD modifica la base de datos.
+* Este BRIDGE modifica la base de datos.
+* No intente instalar con AutoMOD
 ]]></author-notes>
 
 		<author-group>
@@ -50,17 +61,23 @@
 
 		<history>
 			<entry>
-				<date>2011-08-25</date>
+				<date>2011-10-01</date>
 				<rev-version>0.0.8</rev-version>
 				<changelog lang="en">
-					<change> [FIX] login/logout </change>
+					<change> [CHANGE] New settings at "wordpress/wp-content/themes/phpBB/includes/wp_phpbb_bridge_constants.php" file, concerning to Administrators</change>
+					<change> [CHANGE] cross site login/logout </change>
+					<change> [FIX] minor bugs </change>
+					<change> [FIX] Moderation actions </change>
 					<change> [FIX] minor html bugs </change>
 					<change> [FIX] Pagination with rewrite </change>
 					<change> [FIX] Comments filters </change>
 					<change> [FIX] Widget style for subsilver2 </change>
 				</changelog>
 				<changelog lang="es">
-					<change> [CORRECCIÓN] Identificarse/Desconectarse </change>
+					<change> [CAMBIO] Nuevas configuraciones en el archivo wordpress/wp-content/themes/phpBB/includes/wp_phpbb_bridge_constants.php relacionado a los Administradores</change>
+					<change> [CAMBIO] Identificarse/Desconectarse entre sitios</change>
+					<change> [CORRECCIÓN] Pequeños errores </change>
+					<change> [CORRECCIÓN] Acciones de Moderación </change>
 					<change> [CORRECCIÓN] Pequeños errores html </change>
 					<change> [CORRECCIÓN] Paginacion con rewrite </change>
 					<change> [CORRECCIÓN] Filtros en comentarios </change>
@@ -222,18 +239,18 @@
 * into relative versions when the server/script path matches the link
 */
 function make_clickable($text, $server_url = false, $class = 'postlink')]]></find>
-				<action type="before-add"><![CDATA[// MOD : WordPress - phpBB Integration Mod - START
+				<action type="before-add"><![CDATA[// BRIDGE phpBB & WordPress - START
 if (!function_exists('make_clickable'))
 {
-// MOD : WordPress - phpBB Integration Mod - END
+// BRIDGE phpBB & WordPress - END
 ]]></action>
 			</edit>
 			<edit>
 				<find><![CDATA[	return preg_replace($magic_url_match, $magic_url_replace, $text);
 }]]></find>
-				<action type="after-add"><![CDATA[// MOD : WordPress - phpBB Integration Mod - START
+				<action type="after-add"><![CDATA[// BRIDGE phpBB & WordPress - START
 }
-// MOD : WordPress - phpBB Integration Mod - END
+// BRIDGE phpBB & WordPress - END
 ]]></action>
 			</edit>
 		</open>
@@ -241,9 +258,9 @@ if (!function_exists('make_clickable'))
 		<open src="styles/prosilver/template/overall_header.html">
 			<edit>
 				<find><![CDATA[</head>]]></find>
-				<action type="before-add"><![CDATA[<!-- MOD : WordPress - phpBB Integration Mod - START //-->
+				<action type="before-add"><![CDATA[<!-- BRIDGE phpBB & WordPress - START //-->
 <!-- IF PHPBB_IN_BLOG -->{BLOG_HEADER}<!-- ENDIF -->
-<!-- MOD : WordPress - phpBB Integration Mod - END //-->
+<!-- BRIDGE phpBB & WordPress - END //-->
 ]]></action>
 				<comment lang="en"><![CDATA[You must do this change to ALL styles you have installed, based off Prosilver. I use "Prosilver" as an example.]]></comment>
 				<comment lang="es"><![CDATA[Usted debe hacer este cambio en TODOS los estilos que tiene instalado, basados de Prosilver. Yo uso "Prosilver" como ejemplo.]]></comment>
@@ -252,20 +269,20 @@ if (!function_exists('make_clickable'))
 			<edit>
 				<find><![CDATA[		<div class="navbar">
 			<div class="inner"><span class="corners-top"><span></span></span>]]></find>
-				<action type="after-add"><![CDATA[<!-- MOD : WordPress - phpBB Integration Mod - START //-->
+				<action type="after-add"><![CDATA[<!-- BRIDGE phpBB & WordPress - START //-->
 		<!-- IF not PHPBB_IN_BLOG -->
-<!-- MOD : WordPress - phpBB Integration Mod - END //-->
+<!-- BRIDGE phpBB & WordPress - END //-->
 ]]></action>
 			</edit>
 
 			<edit>
 				<find><![CDATA[			<span class="corners-bottom"><span></span></span></div>
 		</div>]]></find>
-				<action type="before-add"><![CDATA[<!-- MOD : WordPress - phpBB Integration Mod - START //-->
+				<action type="before-add"><![CDATA[<!-- BRIDGE phpBB & WordPress - START //-->
 		<!-- ELSE -->
 			<!-- INCLUDE wordpress/overall_header.html -->
 		<!-- ENDIF -->
-<!-- MOD : WordPress - phpBB Integration Mod - END //-->
+<!-- BRIDGE phpBB & WordPress - END //-->
 ]]></action>
 			</edit>
 
@@ -275,9 +292,9 @@ if (!function_exists('make_clickable'))
 			<edit>
 				<find><![CDATA[	<div class="navbar">
 		<div class="inner"><span class="corners-top"><span></span></span>]]></find>
-				<action type="after-add"><![CDATA[<!-- MOD : WordPress - phpBB Integration Mod - START //-->
+				<action type="after-add"><![CDATA[<!-- BRIDGE phpBB & WordPress - START //-->
 	<!-- IF not PHPBB_IN_BLOG -->
-<!-- MOD : WordPress - phpBB Integration Mod - END //-->
+<!-- BRIDGE phpBB & WordPress - END //-->
 ]]></action>
 				<comment lang="en"><![CDATA[You must do this change to ALL styles you have installed, based off Prosilver. I use "Prosilver" as an example.]]></comment>
 				<comment lang="es"><![CDATA[Usted debe hacer este cambio en TODOS los estilos que tiene instalado, basados de Prosilver. Yo uso "Prosilver" como ejemplo.]]></comment>
@@ -286,19 +303,19 @@ if (!function_exists('make_clickable'))
 			<edit>
 				<find><![CDATA[		<span class="corners-bottom"><span></span></span></div>
 	</div>]]></find>
-				<action type="before-add"><![CDATA[<!-- MOD : WordPress - phpBB Integration Mod - START //-->
+				<action type="before-add"><![CDATA[<!-- BRIDGE phpBB & WordPress - START //-->
 	<!-- ELSE -->
 			<!-- INCLUDE wordpress/overall_footer.html -->
 	<!-- ENDIF -->
-<!-- MOD : WordPress - phpBB Integration Mod - END //-->
+<!-- BRIDGE phpBB & WordPress - END //-->
 ]]></action>
 			</edit>
 
 			<edit>
 				<find><![CDATA[	<div class="copyright">Powered by <a href="http://www.phpbb.com/">phpBB</a>&reg; Forum Software &copy; phpBB Group]]></find>
-				<action type="after-add"><![CDATA[<!-- MOD : WordPress - phpBB Integration Mod - START //-->
+				<action type="after-add"><![CDATA[<!-- BRIDGE phpBB & WordPress - START //-->
 <!-- IF PHPBB_IN_BLOG -->{BLOG_FOOTER}<!-- ENDIF -->
-<!-- MOD : WordPress - phpBB Integration Mod - END //-->
+<!-- BRIDGE phpBB & WordPress - END //-->
 ]]></action>
 			</edit>
 		</open>
@@ -306,9 +323,9 @@ if (!function_exists('make_clickable'))
 		<open src="styles/prosilver/theme/stylesheet.css">
 			<edit>
 				<find><![CDATA[@import url("colours.css");]]></find>
-				<action type="before-add"><![CDATA[/* MOD : WordPress - phpBB Integration Mod - START */
+				<action type="before-add"><![CDATA[/* BRIDGE phpBB & WordPress - START */
 @import url("wp_phpbb_bridge.css");
-/* MOD : WordPress - phpBB Integration Mod - END */
+/* BRIDGE phpBB & WordPress - END */
 ]]></action>
 				<comment lang="en"><![CDATA[You must do this change to ALL themes you have installed, based off Prosilver. I use "Prosilver" as an example.]]></comment>
 				<comment lang="es"><![CDATA[Usted debe hacer este cambio en TODOS los temas que tiene instalado, basados de Prosilver. Yo uso "Prosilver" como ejemplo.]]></comment>
@@ -320,7 +337,7 @@ if (!function_exists('make_clickable'))
 
 #####################################################################
 OPEN :
-wordpress/wp-content/themes/prosilver/includes/wp_phpbb_bridge_constants.php
+wordpress/wp-content/themes/phpBB/includes/wp_phpbb_bridge_constants.php
 
 EDIT :
 edit settings as required
