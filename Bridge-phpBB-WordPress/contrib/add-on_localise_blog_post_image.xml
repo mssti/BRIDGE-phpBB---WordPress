@@ -75,11 +75,11 @@
 		<open src="includes/acp/acp_styles.php">
 			<edit>
 				<find><![CDATA[		// Execute overall actions]]></find>
-				<action type="before-add"><![CDATA[// BRIDGE : phpBB & WordPress - START
+				<action type="before-add"><![CDATA[// BRIDGE : phpBB & WordPress - Start
 		$this->imageset_keys['buttons'] = array_merge($this->imageset_keys['buttons'], array(
 			'button_blogpost_new', 'icon_wp_approve', 'icon_wp_unapprove', 'icon_wp_spam', 'icon_wp_nospam', 'icon_wp_trash', 'icon_wp_untrash',
 		));
-// BRIDGE : phpBB & WordPress - END
+// BRIDGE : phpBB & WordPress - End
 ]]></action>
 			</edit>
 		</open>
@@ -87,11 +87,11 @@
 		<open src="includes/acp/acp_language.php">
 			<edit>
 				<find><![CDATA[				$sql_ary = array();]]></find>
-				<action type="before-add"><![CDATA[// BRIDGE : phpBB & WordPress - START
+				<action type="before-add"><![CDATA[// BRIDGE : phpBB & WordPress - Start
 				$valid_localized = array_merge($valid_localized, array(
 					'button_blogpost_new', 'icon_wp_approve', 'icon_wp_unapprove', 'icon_wp_spam', 'icon_wp_nospam', 'icon_wp_trash', 'icon_wp_untrash',
 				));
-// BRIDGE : phpBB & WordPress - END
+// BRIDGE : phpBB & WordPress - End
 ]]></action>
 			</edit>
 		</open>
@@ -99,7 +99,7 @@
 		<open src="language/en/acp/styles.php">
 			<edit>
 				<find><![CDATA[	'IMG_USER_ICON1']]></find>
-				<action type="after-add"><![CDATA[// BRIDGE : phpBB & WordPress - START
+				<action type="after-add"><![CDATA[// BRIDGE : phpBB & WordPress - Start
 	'IMG_BUTTON_BLOGPOST_NEW'	=> 'Blog : New Post',
 	'IMG_ICON_WP_APPROVE'		=> 'Blog : Approve a Post',
 	'IMG_ICON_WP_UNAPPROVE'		=> 'Blog : Unapprove a Post',
@@ -107,7 +107,7 @@
 	'IMG_ICON_WP_NOSPAM'		=> 'Blog : Mark a Post as No Spam',
 	'IMG_ICON_WP_TRASH'			=> 'Blog : Move a Post to Trash',
 	'IMG_ICON_WP_UNTRASH'		=> 'Blog : Recover a Post from Trash',
-// BRIDGE : phpBB & WordPress - END
+// BRIDGE : phpBB & WordPress - End
 ]]></action>
 				<comment lang="en"><![CDATA[You will have to make this change to ALL languages you have installed, I use "en" as an example.
 				You can customize the string as you wish.]]></comment>
@@ -120,14 +120,14 @@
 			<edit>
 				<find><![CDATA[# Images]]></find>
 				<action type="after-add"><![CDATA[
-# BRIDGE phpBB & WordPress - START
+# BRIDGE phpBB & WordPress - Start
 img_icon_wp_approve = wordpress/icon_wp_approve.gif*20*20
 img_icon_wp_unapprove = wordpress/icon_wp_unapprove.gif*20*20
 img_icon_wp_spam = wordpress/icon_wp_spam.gif*20*20
 img_icon_wp_nospam = wordpress/icon_wp_spam.gif*20*20
 img_icon_wp_trash = wordpress/icon_wp_trash.gif*20*20
 img_icon_wp_untrash = wordpress/icon_wp_trash.gif*20*20
-# BRIDGE phpBB & WordPress - END
+# BRIDGE phpBB & WordPress - End
 ]]></action>
 				<comment lang="en"><![CDATA[You will have to make this change to ALL themes you have installed, based off Prosilver. I use "Prosilver" as an example.
 				You can add it at the bottom of the imageset.cfg file]]></comment>
@@ -140,9 +140,9 @@ img_icon_wp_untrash = wordpress/icon_wp_trash.gif*20*20
 			<edit>
 				<find><![CDATA[# Images]]></find>
 				<action type="after-add"><![CDATA[
-# BRIDGE phpBB & WordPress - START
+# BRIDGE phpBB & WordPress - Start
 img_button_blogpost_new = button_blogpost_new.gif*25*96
-# BRIDGE phpBB & WordPress - END
+# BRIDGE phpBB & WordPress - End
 ]]></action>
 				<comment lang="en"><![CDATA[You will have to make this change to ALL themes you have installed, based off Prosilver. I use "Prosilver" as an example.
 				You will have to make this change to ALL languages you have installed. I use "en" as an example.
@@ -157,18 +157,18 @@ img_button_blogpost_new = button_blogpost_new.gif*25*96
 			<edit>
 				<find><![CDATA[# Images]]></find>
 				<action type="after-add"><![CDATA[
-# BRIDGE phpBB & WordPress - START
+# BRIDGE phpBB & WordPress - Start
 img_icon_wp_approve = wordpress/icon_wp_approve.gif*20*20
 img_icon_wp_unapprove = wordpress/icon_wp_unapprove.gif*20*20
 img_icon_wp_spam = wordpress/icon_wp_spam.gif*20*20
 img_icon_wp_nospam = wordpress/icon_wp_nospam.gif*20*20
 img_icon_wp_trash = wordpress/icon_wp_trash.gif*20*20
 img_icon_wp_untrash = wordpress/icon_wp_untrash.gif*20*20
-# BRIDGE phpBB & WordPress - END
+# BRIDGE phpBB & WordPress - End
 ]]></action>
-				<comment lang="en"><![CDATA[You will have to make this change to ALL themes you have installed, based off Prosilver. I use "Prosilver" as an example.
+				<comment lang="en"><![CDATA[You will have to make this change to ALL themes you have installed, based off subsilver2. I use "subsilver2" as an example.
 				You can add it at the bottom of the imageset.cfg file]]></comment>
-				<comment lang="es"><![CDATA[Usted debe hacer este cambio en TODOS los temas que tiene instalado, basados de Prosilver. Yo uso "Prosilver" como ejemplo.
+				<comment lang="es"><![CDATA[Usted debe hacer este cambio en TODOS los temas que tiene instalado, basados de subsilver2. Yo uso "subsilver2" como ejemplo.
 				Puede hacer el agregado al final del archivo imageset.cfg]]></comment>
 			</edit>
 		</open>
@@ -177,14 +177,14 @@ img_icon_wp_untrash = wordpress/icon_wp_untrash.gif*20*20
 			<edit>
 				<find><![CDATA[# Images]]></find>
 				<action type="after-add"><![CDATA[
-# BRIDGE phpBB & WordPress - START
+# BRIDGE phpBB & WordPress - Start
 img_button_blogpost_new = button_blogpost_new.gif
-# BRIDGE phpBB & WordPress - END
+# BRIDGE phpBB & WordPress - End
 ]]></action>
-				<comment lang="en"><![CDATA[You will have to make this change to ALL themes you have installed, based off Prosilver. I use "Prosilver" as an example.
+				<comment lang="en"><![CDATA[You will have to make this change to ALL themes you have installed, based off Prosilver. I use "subsilver2" as an example.
 				You will have to make this change to ALL languages you have installed. I use "en" as an example.
 				You can add it at the bottom of the imageset.cfg file]]></comment>
-				<comment lang="es"><![CDATA[Usted debe hacer este cambio en TODOS los temas que tiene instalado, basados de Prosilver. Yo uso "Prosilver" como ejemplo.
+				<comment lang="es"><![CDATA[Usted debe hacer este cambio en TODOS los temas que tiene instalado, basados de Prosilver. Yo uso "subsilver2" como ejemplo.
 				Usted debe realizar este cambio en TODOS los idiomas que tenga instalados, yo uso "en" como un ejemplo.
 				Puede hacer el agregado al final del archivo imageset.cfg]]></comment>
 			</edit>

@@ -20,7 +20,7 @@
 			Si los usuarios de WP no existen en phpBB, éste se creará automáticamente como "usuarios registrados" (y "Nuevos Usuarios Registrados" si lo ha activado)]]></description>
 
 		<author-notes lang="en"><![CDATA[Please keep in mind that this version is still in development, so not everything may be in place or working.
-
+* Works on phpBB version 3.0.9 and WordPress version 3.2.1
 * It is not recommended that you install this version on a live forum.
 * Report any bugs or problems you encounter to our issue tracker http://github.com/mssti/BRIDGE-phpBB---WordPress/issues
 * Also, good ideas and bug reports are always welcome.
@@ -29,7 +29,7 @@
 * Do not try to install with AutoMOD
 ]]></author-notes>
 		<author-notes lang="es"><![CDATA[Por favor, tenga en cuenta que este MOD aún se encuentra en etapa de desarrollo, por lo cual no todo puede estar correcto o funcionar a la perfección.
-
+* Funciona en phpBB versión 3.0.9 y WordPress versión 3.2.1
 * No es recomendable que usted instale esta versión en un foro en vivo.
 * Reporte cualquier error o problema que pueda encontrar en el Rastreador : http://github.com/mssti/BRIDGE-phpBB---WordPress/issues
 * También, buenas ideas y reportes serán siempre bienvenidos.
@@ -51,7 +51,7 @@
 
 		</author-group>
 
-		<mod-version>0.0.8</mod-version>
+		<mod-version>0.0.9</mod-version>
 
 		<installation>
 			<level>easy</level>
@@ -60,6 +60,18 @@
 		</installation>
 
 		<history>
+			<entry>
+				<date>2011-11-01</date>
+				<rev-version>0.0.9</rev-version>
+				<changelog lang="en">
+					<change> [ADD-ON] Modules for phpbb : WP Portal on index and Cross-site Posting </change>
+					<change> [FIX] minor bugs </change>
+				</changelog>
+				<changelog lang="es">
+					<change> [AGREGADO] Módulos para phpBB : Portal del WP y Publicación cruzada </change>
+					<change> [CORRECCIÓN] Pequeños errores </change>
+				</changelog>
+			</entry>
 			<entry>
 				<date>2011-10-01</date>
 				<rev-version>0.0.8</rev-version>
@@ -218,15 +230,23 @@
 
 		<link-group>
 			<link type="template" href="contrib/subsilver2.xml" lang="en">Changes for Subsilver2 based style</link>
+			<link type="template" href="contrib/subsilver2.xml" lang="es">Cambios para estilos basados en Subsilver2</link>
+
 			<link type="contrib" href="contrib/add-on_localise_blog_post_image.xml" lang="en">Add-on : localise button image</link>
+			<link type="contrib" href="contrib/add-on_localise_blog_post_image.xml" lang="es">Agregado : Botones regionalizados</link>
+
+			<link type="contrib" href="contrib/add-on_phpBB_modules.xml" lang="en">Add-on : Modules for phpBB</link>
+			<link type="contrib" href="contrib/add-on_phpBB_modules.xml" lang="es">Agregado : Módulos para phpBB</link>
 		</link-group>
 	</header>
 
 	<action-group>
 
 		<copy>
-			<file from="root/wordpress/*.*" to="wordpress/*.*"/>
-			<file from="root/phpbb3/*.*" to="phpbb3/*.*"/>
+			<file from="root/wordpress/wp-content/plugins/*.*" to="wordpress/wp-content/plugins/*.*"/>
+			<file from="root/wordpress/wp-content/themes/*.*" to="wordpress/wp-content/themes/*.*"/>
+			<file from="root/phpbb3/language/en/mods/*.*" to="phpbb3/language/en/mods/*.*"/>
+			<file from="root/phpbb3/styles/prosilver/*.*" to="phpbb3/styles/prosilver/*.*"/>
 		</copy>
 
 		<open src="includes/functions_content.php">
@@ -239,18 +259,18 @@
 * into relative versions when the server/script path matches the link
 */
 function make_clickable($text, $server_url = false, $class = 'postlink')]]></find>
-				<action type="before-add"><![CDATA[// BRIDGE phpBB & WordPress - START
+				<action type="before-add"><![CDATA[// BRIDGE phpBB & WordPress - Start
 if (!function_exists('make_clickable'))
 {
-// BRIDGE phpBB & WordPress - END
+// BRIDGE phpBB & WordPress - End
 ]]></action>
 			</edit>
 			<edit>
 				<find><![CDATA[	return preg_replace($magic_url_match, $magic_url_replace, $text);
 }]]></find>
-				<action type="after-add"><![CDATA[// BRIDGE phpBB & WordPress - START
+				<action type="after-add"><![CDATA[// BRIDGE phpBB & WordPress - Start
 }
-// BRIDGE phpBB & WordPress - END
+// BRIDGE phpBB & WordPress - End
 ]]></action>
 			</edit>
 		</open>
@@ -258,9 +278,9 @@ if (!function_exists('make_clickable'))
 		<open src="styles/prosilver/template/overall_header.html">
 			<edit>
 				<find><![CDATA[</head>]]></find>
-				<action type="before-add"><![CDATA[<!-- BRIDGE phpBB & WordPress - START //-->
+				<action type="before-add"><![CDATA[<!-- BRIDGE phpBB & WordPress - Start //-->
 <!-- IF PHPBB_IN_BLOG -->{BLOG_HEADER}<!-- ENDIF -->
-<!-- BRIDGE phpBB & WordPress - END //-->
+<!-- BRIDGE phpBB & WordPress - End //-->
 ]]></action>
 				<comment lang="en"><![CDATA[You must do this change to ALL styles you have installed, based off Prosilver. I use "Prosilver" as an example.]]></comment>
 				<comment lang="es"><![CDATA[Usted debe hacer este cambio en TODOS los estilos que tiene instalado, basados de Prosilver. Yo uso "Prosilver" como ejemplo.]]></comment>
@@ -269,20 +289,20 @@ if (!function_exists('make_clickable'))
 			<edit>
 				<find><![CDATA[		<div class="navbar">
 			<div class="inner"><span class="corners-top"><span></span></span>]]></find>
-				<action type="after-add"><![CDATA[<!-- BRIDGE phpBB & WordPress - START //-->
+				<action type="after-add"><![CDATA[<!-- BRIDGE phpBB & WordPress - Start //-->
 		<!-- IF not PHPBB_IN_BLOG -->
-<!-- BRIDGE phpBB & WordPress - END //-->
+<!-- BRIDGE phpBB & WordPress - End //-->
 ]]></action>
 			</edit>
 
 			<edit>
 				<find><![CDATA[			<span class="corners-bottom"><span></span></span></div>
 		</div>]]></find>
-				<action type="before-add"><![CDATA[<!-- BRIDGE phpBB & WordPress - START //-->
+				<action type="before-add"><![CDATA[<!-- BRIDGE phpBB & WordPress - Start //-->
 		<!-- ELSE -->
 			<!-- INCLUDE wordpress/overall_header.html -->
 		<!-- ENDIF -->
-<!-- BRIDGE phpBB & WordPress - END //-->
+<!-- BRIDGE phpBB & WordPress - End //-->
 ]]></action>
 			</edit>
 
@@ -292,9 +312,9 @@ if (!function_exists('make_clickable'))
 			<edit>
 				<find><![CDATA[	<div class="navbar">
 		<div class="inner"><span class="corners-top"><span></span></span>]]></find>
-				<action type="after-add"><![CDATA[<!-- BRIDGE phpBB & WordPress - START //-->
+				<action type="after-add"><![CDATA[<!-- BRIDGE phpBB & WordPress - Start //-->
 	<!-- IF not PHPBB_IN_BLOG -->
-<!-- BRIDGE phpBB & WordPress - END //-->
+<!-- BRIDGE phpBB & WordPress - End //-->
 ]]></action>
 				<comment lang="en"><![CDATA[You must do this change to ALL styles you have installed, based off Prosilver. I use "Prosilver" as an example.]]></comment>
 				<comment lang="es"><![CDATA[Usted debe hacer este cambio en TODOS los estilos que tiene instalado, basados de Prosilver. Yo uso "Prosilver" como ejemplo.]]></comment>
@@ -303,19 +323,19 @@ if (!function_exists('make_clickable'))
 			<edit>
 				<find><![CDATA[		<span class="corners-bottom"><span></span></span></div>
 	</div>]]></find>
-				<action type="before-add"><![CDATA[<!-- BRIDGE phpBB & WordPress - START //-->
+				<action type="before-add"><![CDATA[<!-- BRIDGE phpBB & WordPress - Start //-->
 	<!-- ELSE -->
 			<!-- INCLUDE wordpress/overall_footer.html -->
 	<!-- ENDIF -->
-<!-- BRIDGE phpBB & WordPress - END //-->
+<!-- BRIDGE phpBB & WordPress - End //-->
 ]]></action>
 			</edit>
 
 			<edit>
 				<find><![CDATA[	<div class="copyright">Powered by <a href="http://www.phpbb.com/">phpBB</a>&reg; Forum Software &copy; phpBB Group]]></find>
-				<action type="after-add"><![CDATA[<!-- BRIDGE phpBB & WordPress - START //-->
+				<action type="after-add"><![CDATA[<!-- BRIDGE phpBB & WordPress - Start //-->
 <!-- IF PHPBB_IN_BLOG -->{BLOG_FOOTER}<!-- ENDIF -->
-<!-- BRIDGE phpBB & WordPress - END //-->
+<!-- BRIDGE phpBB & WordPress - End //-->
 ]]></action>
 			</edit>
 		</open>
@@ -323,9 +343,9 @@ if (!function_exists('make_clickable'))
 		<open src="styles/prosilver/theme/stylesheet.css">
 			<edit>
 				<find><![CDATA[@import url("colours.css");]]></find>
-				<action type="before-add"><![CDATA[/* BRIDGE phpBB & WordPress - START */
+				<action type="before-add"><![CDATA[/* BRIDGE phpBB & WordPress - Start */
 @import url("wp_phpbb_bridge.css");
-/* BRIDGE phpBB & WordPress - END */
+/* BRIDGE phpBB & WordPress - End */
 ]]></action>
 				<comment lang="en"><![CDATA[You must do this change to ALL themes you have installed, based off Prosilver. I use "Prosilver" as an example.]]></comment>
 				<comment lang="es"><![CDATA[Usted debe hacer este cambio en TODOS los temas que tiene instalado, basados de Prosilver. Yo uso "Prosilver" como ejemplo.]]></comment>

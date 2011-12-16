@@ -33,15 +33,15 @@
 					messages: {
 					<!-- IF not S_USER_LOGGED_IN -->
 						author: {
-							required: '{LA_USERNAME_REQUIRED_NOTE}',
+							required: '<br />{LA_USERNAME_REQUIRED_NOTE}',
 						},
 						email: {
-							required: '{LA_EMAIL_REQUIRED_NOTE}',
-							minlength: '{LA_EMAIL_REQUIRED_MINLENGTH}'
+							required: '<br />{LA_EMAIL_REQUIRED_NOTE}',
+							minlength: '<br />{LA_EMAIL_REQUIRED_MINLENGTH}'
 						},
 						url: {
-							required: '{LA_WEBSITE_REQUIRED_NOTE}',
-							minlength: '{LA_WEBSITE_REQUIRED_MINLENGTH}'
+							required: '<br />{LA_WEBSITE_REQUIRED_NOTE}',
+							minlength: '<br />{LA_WEBSITE_REQUIRED_MINLENGTH}'
 						},
 					<!-- ENDIF -->
 						comment: {
@@ -80,12 +80,12 @@
 								<dd><input id="author" name="author" type="text" value="{COMMENT_AUTHOR}" size="60" maxlength="255" class="text autowidth" /></dd>
 							</dl>
 							<dl style="clear: left;">
-								<dt><label for="email">{L_EMAIL_ADDRESS}:</label><br />{L_WP_EMAIL_NOTE}</dt>
-								<dd><input id="email" name="email" type="text" value="{COMMENT_AUTHOR_EMAIL}" size="60" maxlength="255" class="text autowidth" /><!-- IF REQUIRED_FIELDS --><span class="required">*</span><!-- ENDIF --></dd>
+								<dt><label for="email">{L_EMAIL_ADDRESS}:</label><!-- IF REQUIRED_FIELDS --><span class="required">*</span><!-- ENDIF --><br />{L_WP_EMAIL_NOTE}</dt>
+								<dd><input id="email" name="email" type="text" value="{COMMENT_AUTHOR_EMAIL}" size="60" maxlength="255" class="text autowidth" /></dd>
 							</dl>
 							<dl style="clear: left;">
-								<dt><label for="url">{L_WEBSITE}:</label></dt>
-								<dd><input id="url" name="url" type="text" value="{COMMENT_AUTHOR_ULR}" size="60" maxlength="255" class="text autowidth" /><!-- IF REQUIRED_FIELDS --><span class="required">*</span><!-- ENDIF --></dd>
+								<dt><label for="url">{L_WEBSITE}:</label><!-- IF REQUIRED_FIELDS --><span class="required">*</span><!-- ENDIF --></dt>
+								<dd><input id="url" name="url" type="text" value="{COMMENT_AUTHOR_ULR}" size="60" maxlength="255" class="text autowidth" /></dd>
 							</dl>
 							<!-- ENDIF -->
 							<dl style="clear: left;">

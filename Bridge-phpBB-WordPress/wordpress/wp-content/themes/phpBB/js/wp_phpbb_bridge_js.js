@@ -56,12 +56,12 @@ var modalWindow = {
 		$jQ_WPphpBB(this.parent).append(modal);
 		$jQ_WPphpBB(".modal-overlay").css({opacity: 0}).animate({opacity: 0.75});
 		$jQ_WPphpBB(".modal-window").hide().fadeIn();
-		$jQ_WPphpBB(".modal-window").append("<a class=\"close-window\">X</a>");
+		$jQ_WPphpBB(".modal-window").append("<div id=\"close-window\"><a class=\"close-window\">X</a></div>");
 		$jQ_WPphpBB(".modal-window").append("<span class=\"copyright\">Bridge by <a href=\"http://www.mssti.com/phpbb3\" title=\"Micro Software &amp; Servicio Técnico Informático\" onclick=\"window.open(this.href);return false;\">.:: MSSTI ::.</a></span>");
 		$jQ_WPphpBB(".close-window").click(function(){modalWindow.close();});
 		$jQ_WPphpBB(".modal-overlay").click(function(){modalWindow.close();});
 
-		if (mode == "login" || mode == "logout")
+		if (mode == "login" || mode == "logout" || mode == "register")
 		{
 			$jQ_WPphpBB("#modal-iframe").load(function(){
 				$jQ_WPphpBB("#modal-iframe").contents().find("head").append('<link rel="stylesheet" type="text/css" media="all" href="' + base_url + '/css/login.css?ver=0.0.8" />');

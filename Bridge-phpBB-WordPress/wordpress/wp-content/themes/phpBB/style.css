@@ -2,7 +2,7 @@
 Theme Name: phpbb (ProSilver or Subsilver2)
 Theme URI: http://www.mssti.com/
 Description: Style based off ProSilver and Subsilver2 <a href="http://www.mssti.com/">leviatan21</a>.
-Version: v0.0.8 2011/08/25 11:08:25
+Version: v0.0.9 2011/12/10 11:12:10
 Author: leviatan21
 Author URI: http://www.mssti.com/
 Tags: phpbb, ProSilver, Subsilver2, full width, two columns
@@ -93,27 +93,29 @@ blockquote {
   background-image: none;
 }
 
-/** Sideber **/
-#sidebar h3 {
-	border-bottom: 1px solid #EEEEEE;
-	margin: 5px 0 0;
+/** Sidebar **/
+#wp-phpbb-bridge-primary h3 {
+/*	border-bottom: 1px solid #EEEEEE;	*/
+/*	margin: 5px 0 0;	*/
 	padding: 0;
+
 }
-#sidebar ul.menu {
-	border-top: 1px solid #FFFFFF;
-	list-style: none outside none;
-	border-top: medium none;
-	list-style-type: none;
+#wp-phpbb-bridge-primary ul.menu {
+	border: none;
+/*	border-top: 1px solid #FFFFFF;	*/
+/*	border-top: medium none;	*/
+	list-style: none;
 	text-align: left;
 }
-ul.menu {
-	list-style: none outside none;
-}
-#sidebar ul.menu li {
-	border-top: 1px solid #CCCCCC;
-	list-style-type: none;
+#wp-phpbb-bridge-primary ul.menu li {
+	border: none;
+/*	border-top: 1px solid #CCCCCC;	*/
+	list-style: none;
 	margin: 0;
 	padding: 5px;
+}
+#wp-phpbb-bridge-primary li.cat-item ul.children {
+	padding-left: 10px;
 }
 
 /** Search form **/
@@ -214,18 +216,32 @@ ul.profile-icons li.wp-comment-icon		{ width: 20px; height: 20px;; margin: 0 0px
 * html .modal-window {
 	position: absolute;
 }
-.modal-window .close-window {
+
+.modal-window #close-window {
+	margin: 0;
+	padding: 0;
 	position: absolute;
+	right: 0;
+	top: 0;
+	width: 100%;
+	height: 20px;
+	background-color: #cccccc;
+	text-align: right;
+}
+.modal-window .close-window {
 	font-size: 1.5em;
 	font-weight: bold;
+	position: relative;
 	right: 5px;
 	top: 1px;
 	cursor: pointer;
 }
 .modal-window .copyright {
+	background-color: #cccccc;
 	position: absolute;
-	bottom: 5px;
-	right: 5px;
+	bottom: 0;
+	right: 0;
+	width: 100%;
 }
 .modal-window img.modal-loading {
 	position: absolute;

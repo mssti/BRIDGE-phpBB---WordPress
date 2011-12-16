@@ -1,7 +1,7 @@
 /**
  *
  * @package: phpBB 3.0.9 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/themes/phpBB/js
- * @version: $Id: wp_phpbb_bridge_login_box.js, v0.0.8 2011/08/25 11:08:25 leviatan21 Exp $
+ * @version: $Id: wp_phpbb_bridge_login_box.js, v0.0.9 2011/12/10 11:12:10 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -17,12 +17,20 @@ var WPphpBBlogin = {
 		// Makes sure we always have a place to put messages
 		if ($jQ_WPphpBB(".message").length == 0)
 		{
-			$jQ_WPphpBB("<p class=\"message\"></p>").insertAfter('#login h1');
+			if ($jQ_WPphpBB('#login h1').length > 0)
+			{
+				$jQ_WPphpBB("<p class=\"message\"></p>").insertAfter('#login h1');
+			}
+			else
+			{
+				$jQ_WPphpBB("<p class=\"message\"></p>").insertAfter('body');
+			}
 		}
 
 		// Makes sure we always close the modal windows
 		$jQ_WPphpBB(".alignright input").click(function(){ WPphpBBlogin.close(home_url); });
 		$jQ_WPphpBB("#backtoblog a").click(function(){ WPphpBBlogin.close(home_url); });
+	//	$jQ_WPphpBB(".button-primary").click(function(){ WPphpBBlogin.close(home_url); });
 
 		// Check user login and password before submit
 		$jQ_WPphpBB("#wp-submit").click(function(){ return WPphpBBlogin.formcheck(); });
@@ -72,11 +80,16 @@ var WPphpBBlogin = {
 				$jQ_WPphpBB(element_id).css("position", "static");
 				$jQ_WPphpBB(element_id).removeClass("input-error");
 				$jQ_WPphpBB(element_id).focus();
-			}catch(e){}
+			}
+			catch (e)
+			{
+				return;
+			}
 		}
 	},
+/**
 	// Send function
-	add:function(user_data, ajax_url, refresh_url)
+	add:function(user_data, ajax_url, refresh_url, ajax_error)
 	{
 		// AJAX function
 		$jQ_WPphpBB.ajax({
@@ -84,6 +97,8 @@ var WPphpBBlogin = {
 			dataType:'text',
 			beforeSend:function()
 			{
+				// successful request; do something with the data
+				$jQ_WPphpBB(".message").html('Please, wait');
 			},
 			success:function(msg)
 			{
@@ -95,32 +110,13 @@ var WPphpBBlogin = {
 			},
 			error:function(XMLHttpRequest, textStatus, errorThrown)
 			{
-				alert("Error=(" + XMLHttpRequest.status + ") textStatus=(" + textStatus + ") errorThrown=(" + errorThrown + ")");
-			/**
-				if (XMLHttpRequest.status==400)
-				{
-					// Flood alert
-					alert("error : 400");
-				}
-				else if(XMLHttpRequest.status==403)
-				{
-					// No access alert
-					alert("error : 403");
-				}
-				else if(XMLHttpRequest.status==501)
-				{
-					// No message alert
-					alert("error : 501");
-				}
-				else
-				{
-					// No message alert
-					alert("Error" + XMLHttpRequest.status);
-				}
-			**/
+				// Numeric code returned by server + String message accompanying the status code
+			//	alert(ajax_error + ' : ' + "\n" + XMLHttpRequest.status + ' => ' + textStatus + "\n" + errorThrown);
+				$jQ_WPphpBB(".message").html(ajax_error + ' : ' + "\n" + XMLHttpRequest.status + ' => ' + textStatus + "\n" + errorThrown);
 			}
 		});
 	},
+**/
 	close:function(refresh_url)
 	{
 		if (refresh_url)

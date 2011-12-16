@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.9 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/themes/phpBB/includes
- * @version: $Id: wp_phpbb_bridge_core.php, v0.0.8 2011/10/01 11:10:01 leviatan21 Exp $
+ * @version: $Id: wp_phpbb_bridge_core.php, v0.0.9 2011/10/01 11:10:01 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -232,7 +232,8 @@ class phpbb
 		}
 
 		$action = request_var('action', '');
-		if ($action != 'logout' || $action != 'log-out')
+		if (($action != 'logout' || $action != 'log-out') && !defined('PHPBB_INAJAX'))
+	//	if ($action != 'logout' || $action != 'log-out')
 		{
 			self::wp_phpbb_sanitize_user();
 		}
@@ -282,24 +283,32 @@ class phpbb
 
 		$wp_user_id = self::wp_phpbb_get_userid();
 
-		if($wp_user_id <= 0 && is_user_logged_in())
+	//	if ($wp_user_id != 0)
+	//	if ($wp_user_id <= 0 && is_user_logged_in())
+		if ($wp_user_id <= 0 && self::wp_phpbb_user_logged())
 		{
 			wp_logout();
 			wp_redirect('http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
 		}
-		else if($wp_user_id > 0 && $wp_user_id != $wp_user->ID)
+		else if ($wp_user_id > 0 && $wp_user_id != $wp_user->ID)
 		{
 			wp_set_current_user($wp_user_id);
 			wp_set_auth_cookie($wp_user_id, true, false);
 		}
 
 		// Get the WP user data
-		$wp_user_data = get_userdata($wp_user->ID);
+		$wp_user_data = get_userdata($wp_user_id);	//$wp_user_data = get_userdata($wp_user->ID);
 
 		if (!isset($wp_user_data->phpbb_userid) || $wp_user_data->phpbb_userid == 0 || $wp_user_data->phpbb_userid != self::$user->data['user_id'])
 		{
 			$wp_user_data->phpbb_userid = self::$user->data['user_id'];
 			update_metadata('user', $wp_user_id, 'phpbb_userid', $wp_user_data->phpbb_userid);
+		}
+
+		// If all went fine, we doesnt' needed this values anymore (added at functions.php -> function wp_phpbb_phpbb_loginbox_head())
+		if (isset($wp_user_data->phpbb_userid) && isset($wp_user_data->WPphpBBlogin))
+		{
+			delete_user_meta($wp_user_id, 'WPphpBBlogin');
 		}
 
 		$default_userdata = array(
@@ -334,15 +343,24 @@ class phpbb
 
 		if (self::$user->data['user_type'] == USER_NORMAL || self::$user->data['user_type'] == USER_FOUNDER)
 		{
-			$id_list = $wpdb->get_col($wpdb->prepare("SELECT user_id FROM $wpdb->usermeta WHERE meta_key = 'phpbb_userid' AND meta_value = %d", self::$user->data['user_id']));
+		//	$id_list = $wpdb->get_col($wpdb->prepare("SELECT user_id FROM $wpdb->usermeta WHERE meta_key = 'phpbb_userid' AND meta_value = %d", self::$user->data['user_id']));
+			$usermeta_id = $wpdb->get_var($wpdb->prepare("SELECT user_id FROM $wpdb->usermeta WHERE meta_key = 'phpbb_userid' AND meta_value = %s", self::$user->data['user_id']));
 
-			if (empty($id_list))
+		//	if (empty($id_list))
+			if (!$usermeta_id)
 			{
-				return (int) $wp_user_id;
+		//		return (int) $wp_user_id;
+				$users_id = $wpdb->get_var($wpdb->prepare("SELECT ID FROM $wpdb->users WHERE user_login = %s", self::$user->data['username']));
+
+				if ($users_id)
+				{
+					return (int) $users_id;
+				}
 			}
 			else
 			{
-				return (int) $id_list[0];
+		//		return (int) $id_list[0];
+				return (int) $usermeta_id;
 			}
 		}
 
@@ -355,7 +373,6 @@ class phpbb
 	 *
 	 * @param (integer)		$wp_user_id
 	 * @return (array)	
-	 */
 	public static function wp_phpbb_get_userdata($wp_user_id)
 	{
 		global $wpdb;
@@ -392,6 +409,7 @@ class phpbb
 
 		return $wpuser;
 	}
+	 */
 
 	/**
 	* Set and Force some variables
@@ -542,8 +560,8 @@ class phpbb
 
 		$redirect = request_var('redirect', get_option('siteurl'));
 		
-		$u_login_logout = site_url('wp-login.php', 'login');
-		$u_login_popup = get_option('siteurl') . '/?action=popup';
+//		$u_login_logout = site_url('wp-login.php', 'login');
+//		$u_login_popup = get_option('siteurl') . '/?action=popup';
 
 		self::$template->assign_vars(array(
 			'PHPBB_IN_FORUM'	=> false,
@@ -565,9 +583,11 @@ class phpbb
 			'S_CLOCK'			=> self::clock(),
 
 			'S_REGISTER_ENABLED'=> (self::$config['require_activation'] != USER_ACTIVATION_DISABLE && get_option('users_can_register')) ? true : false,
-			'U_LOGIN_LOGOUT'	=> (!is_user_logged_in()) ? append_sid(get_option('siteurl') . '/', array('action' => 'login', 'redirect' => $redirect)) : append_sid(get_option('siteurl') . '/', array('action' => 'logout', 'redirect' => $redirect), true, self::$user->session_id),
+	//		'U_REGISTER_POPUP'	=> site_url("wp-login.php?action=register&amp;interim-login=1&amp;sid=" . phpbb::$user->session_id . "&amp;redirect_to=" . $redirect, 'login'),
+			'U_REGISTER_POPUP'	=> site_url("wp-login.php?action=register&amp;interim-login=1&amp;sid=" . phpbb::$user->session_id . "&amp;redirect_to=wp-login.php?checkemail=registered&amp;interim-login=1", 'login'),
+	//		'U_LOGIN_LOGOUT'	=> (!is_user_logged_in()) ? append_sid(get_option('siteurl') . '/', array('action' => 'login', 'redirect' => $redirect)) : append_sid(get_option('siteurl') . '/', array('action' => 'logout', 'redirect' => $redirect), true, self::$user->session_id),
 			'S_LOGIN_REDIRECT'	=> build_hidden_fields(array('redirect' => $redirect)),
-			'U_LOGIN_LOGOUT_POPUP'	=> (!is_user_logged_in()) ? site_url("wp-login.php?action=login&amp;interim-login=1&amp;sid=" . phpbb::$user->session_id . "&amp;redirect_to=" . $redirect, 'login') : site_url("wp-login.php?action=logout&amp;sid=" . phpbb::$user->session_id . "&amp;redirect_to=" . $redirect, 'login'),
+			'U_LOGIN_LOGOUT_POPUP'	=> (!self::wp_phpbb_user_logged()) ? site_url("wp-login.php?action=login&amp;interim-login=1&amp;sid=" . phpbb::$user->session_id . "&amp;redirect_to=" . $redirect, 'login') : site_url("wp-login.php?action=logout&amp;sid=" . phpbb::$user->session_id . "&amp;redirect_to=" . $redirect, 'login'),
 
 			'U_WP_ACP'			=> (self::$user->data['user_type'] == USER_FOUNDER || current_user_can('level_8')) ? admin_url() : '',
 			'U_POST_NEW_TOPIC'	=> (self::$user->data['user_type'] == USER_FOUNDER || current_user_can('level_8')) ? admin_url('post-new.php') : '',
@@ -589,6 +609,17 @@ class phpbb
 		{
 			self::wp_notes();
 		}
+	}
+	
+	public static function wp_phpbb_user_logged()
+	{
+		$is_wp_user_logged_in = $is_phpbb_user_logged_in = (self::$user->data['user_id'] != ANONYMOUS) ? true : false;
+
+		if (function_exists('is_user_logged_in'))
+		{
+			$is_wp_user_logged_in = (is_user_logged_in()) ? true : false;
+		}		
+		return ($is_phpbb_user_logged_in || $is_wp_user_logged_in) ? true : false;
 	}
 
 	public static function wp_location($location = 'index')
@@ -1103,7 +1134,7 @@ class phpbb
 		));
 
 		/**
-		 * If the user is admin, we add a hook to fix the ACP url
+		 * If the user is admin, we add a hook to fix the ACP & DEBUG url
 		 * To works property the function wp_phpbb_u_acp() is located in the WordPress root/wp-content/themes/phpBB/includes/wp_phpbb_bridge.php file
 		 */
 		if (self::$auth->acl_get('a_') && !empty(self::$user->data['is_registered']))

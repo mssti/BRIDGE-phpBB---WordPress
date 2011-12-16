@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.8 :: BRIDGE phpBB & WordPress -> root/language/es/mods :: [es][Spanish]
- * @version: $Id: wp_phpbb_bridge.php, v0.0.8 2011/08/25 11:08:25 leviatan21 Exp $
+ * @version: $Id: wp_phpbb_bridge.php, v0.0.9 2011/10/25 11:10:25 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -72,6 +72,14 @@ $lang = array_merge($lang, array(
 	'WP_TITLE_META'				=> 'Meta',
 	'WP_TITLE_RECENT_TOPICS'	=> 'Temas recientes',
 
+	// Login/Logout
+	'WP_LOGIN_FAILED'			=> 'Intento de conección fallido, la petición no coincide con su sesión. Por favor contacte con el administrador del foro si continúa experimentando problemas.',
+	'WP_LOGIN_WAIT'				=> 'Por favor, esperar',
+	'WP_INVALID_UNSERIALIZE'	=> 'El campo “Wordpress user login” no tiene datos.',
+	'WP_INVALID_ENCRYPT_VALUE'	=> 'El campo “Encriptado” no tiene datos.',
+	'WP_INVALID_LOGIN_VALUE'	=> 'El campo “Wordpress user login” tiene un valor no válido.',
+	'WP_INVALID_USERID_VALUE'	=> 'El campo “Wordpress user id” tiene un valor no válido.',
+
 	// Search
 //	'WP_TITLE_SEARCH'				=> 'Blog Search',
 	'WP_SEARCH_NOT_FOUND'			=> 'No encontrado',
@@ -91,7 +99,7 @@ $lang = array_merge($lang, array(
 	'WP_POST_TOPIC'				=> 'Crear un nuevo artículo',
 	'WP_NO_COMMENTS'			=> 'Sin Comentarioss',
 	'WP_ONE_COMMENT'			=> '1 Comentario',
-	'WP_COMMENTS'				=> '% Comentarios',
+	'WP_COMMENTS'				=> '%s Comentarios',
 	'WP_COMMENTS_ON'			=> 'Comentario en %s',
 	'WP_COMMENTS_OFF'			=> 'Comentarios desactivados',
 	'WP_COMMENTS_PASSWORED'		=> 'Comentarios protegidos: Por favor, escriba su contraseña para ver los comentarios.',
@@ -153,9 +161,14 @@ $lang = array_merge($lang, array(
 	'WP_TITLE_ARCHIVE_SEARCH_EXPLAIN' 	=> 'Ha buscado en el archivo del sitio <a href=\"%1$s/\">%2$s</a> el término <strong>&#8216;%3$s&#8217;</strong>.',
 
 	// pbpbb posting 
-	'WP_SUBJECT_BLOG_PREFIX'			=> '[BLOG]: ',
-	'WP_POST_BLOG_PREFIX'				=> 'Esta es una [b]entrada del Blog[/b]. Para leer el tema original, haga clic » %1$s AQUI %2$s',
-	'WP_POST_BLOG_TAIL'					=> '[b]Detalles de la entrada: [/b]',
+	'WP_BLOG_SUBJECT_PREFIX'			=> '[BLOG]: ',
+	'WP_BLOG_POST_PREFIX'				=> 'Esta es una [b]entrada del Blog[/b]. Para leer el tema original, haga clic » %1$s AQUI %2$s',
+	'WP_BLOG_POST_TAIL'					=> '[b]Detalles de la entrada: [/b]',
+
+	// WordPress posting 
+	'WP_FORUM_SUBJECT_PREFIX'			=> '[FORO]: ',
+	'WP_FORUM_POST_PREFIX'				=> 'Esta es una <strong>Entrada del Foro</strong>. Para leer el tema original, haga clic » %1$s AQUI %2$s',
+	'WP_FORUM_POST_TAIL'				=> '<strong>Detalles de la entrada: </strong>',
 ));
 
 ?>

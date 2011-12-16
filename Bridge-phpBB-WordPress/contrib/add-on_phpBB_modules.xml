@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml-stylesheet type="text/xsl" href="modx.prosilver.en.xsl"?>
+<!--For security purposes, please check: http://www.phpbb.com/mods/ for the latest version of this MOD. Although MODs are checked before being allowed in the MODs Database there is no guarantee that there are no security problems within the MOD. No support will be given for MODs not found within the MODs Database which can be found at http://www.phpbb.com/mods/-->
+<mod xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.phpbb.com/mods/xml/modx-1.2.5.xsd">
+	<header>
+		<license><![CDATA[http://opensource.org/licenses/gpl-license.php GNU General Public License v2]]></license>
+
+		<title lang="en"><![CDATA[BRIDGE phpBB & WordPress - Add-on : Modules for phpBB]]></title>
+		<title lang="es"><![CDATA[BRIDGE phpBB & WordPress - Agregado : Módulos para phpBB]]></title>
+
+		<description lang="en"><![CDATA[Add a module for phpbb to manage 2 add-ons : Recent WordPress entries on phpBB index and the option to post a new phpBB Topic at Wordpress]]></description>
+		<description lang="es"><![CDATA[Agrega un módulo para phpBB con 2 agregados : Entradas recientes de WordPress en el índice de phpBB y la opción de publicar un tema nuevo desde phpBB a WordPress ]]></description>
+
+		<author-notes lang="en"><![CDATA[Please keep in mind that this MOD version is still in development, so not everything may be in place or working.
+* Works on phpBB version 3.0.9 and WordPress version 3.2.1
+* It is not recommended that you install this version on a live forum.
+* Report any bugs or problems you encounter to our issue tracker http://github.com/mssti/BRIDGE-phpBB---WordPress/issues
+* Also, good ideas and bug reports are always welcome.
+* Before adding this MOD to your forum, you should back up all files related to this MOD.
+* This add-on do not modify the database.
+* Do not try to install with AutoMOD
+]]></author-notes>
+		<author-notes lang="es"><![CDATA[Por favor, tenga en cuenta que este MOD aún se encuentra en etapa de desarrollo, por lo cual no todo puede estar correcto o funcionar a la perfección.
+* Funciona en phpBB versión 3.0.9 y WordPress versión 3.2.1
+* No es recomendable que usted instale esta versión en un foro en vivo.
+* Reporte cualquier error o problema que pueda encontrar en el Rastreador : http://github.com/mssti/BRIDGE-phpBB---WordPress/issues
+* También, buenas ideas y reportes serán siempre bienvenidos.
+* Antes de agregar este MOD a su foro, usted debería realizar una copia de seguridad de todos los archivos relacionados con este MOD.
+* Este Agregado no modifica la base de datos.
+* No intente instalar con AutoMOD
+]]></author-notes>
+
+		<author-group>
+			<author>
+				<realname><![CDATA[Gabriel]]></realname>
+				<username><![CDATA[leviatan21]]></username>
+				<homepage><![CDATA[http://www.mssti.com/phpbb3/]]></homepage>
+				<email><![CDATA[info@mssti.com]]></email>
+				<contributions-group>
+					<contributions status="current" from="2011-06-01" position="Developer"/>
+				</contributions-group>
+			</author>
+
+		</author-group>
+
+		<mod-version>0.0.9</mod-version>
+
+		<installation>
+			<level>easy</level>
+			<time>300</time>
+			<target-version>3.0.9</target-version>
+		</installation>
+
+		<history>
+			<entry>
+				<date>2011-11-01</date>
+				<rev-version>0.0.9</rev-version>
+				<changelog lang="en">
+					<change> For a changelog, read the main install file</change>
+				</changelog>
+				<changelog lang="es">
+					<change> Para el listado de cambios, lea el archivo instalador principal</change>
+				</changelog>
+			</entry>
+		</history>
+
+		<link-group>
+			<link type="parent" href="../install.xml" lang="en">Code change</link>
+		</link-group>
+	</header>
+
+	<action-group>
+
+		<copy>
+			<file from="root/wordpress/wp-phpbb-bridge-insert-post.php" to="wordpress/wp-phpbb-bridge-insert-post.php"/>
+			<file from="root/wordpress/wp-phpbb-bridge-portal.php" to="wordpress/wp-phpbb-bridge-portal.php"/>
+
+			<file from="root/phpbb3/wp_phpbb_bridge_insert_post.php" to="phpbb3/wp_phpbb_bridge_insert_post.php"/>
+			<file from="root/phpbb3/wp_phpbb_bridge_portal.php" to="phpbb3/wp_phpbb_bridge_portal.php"/>
+			<file from="root/phpbb3/includes/acp/acp_wp_phpbb_bridge.php" to="phpbb3/includes/acp/acp_wp_phpbb_bridge.php"/>
+			<file from="root/phpbb3/includes/acp/info/acp_wp_phpbb_bridge.php" to="phpbb3/includes/acp/info/acp_wp_phpbb_bridge.php"/>
+			<file from="root/phpbb3/language/en/mods/acp_wp_phpbb_bridge.php" to="phpbb3/language/en/mods/acp_wp_phpbb_bridge.php"/>
+			<file from="root/phpbb3/language/en/mods/info_acp_wp_phpbb_bridge.php" to="phpbb3/language/en/mods/info_acp_wp_phpbb_bridge.php"/>
+		</copy>
+
+		<open src="wordpress/wp-includes/formatting.php">
+			<edit>
+				<find><![CDATA[/**
+ * Convert plaintext URI to HTML links.
+ *
+]]></find>
+				<action type="before-add"><![CDATA[
+//	MOD : WordPress - phpBB Integration Mod cross-site posting add-on - Start
+if (!function_exists('make_clickable'))
+{
+//	MOD : WordPress - phpBB Integration Mod cross-site posting add-on - End
+]]></action>
+			</edit>
+
+			<edit>
+				<find><![CDATA[	$ret = trim($ret);
+	return $ret;
+}]]></find>
+				<action type="after-add"><![CDATA[
+// MOD : WordPress - phpBB Integration Mod - Start
+}
+// MOD : WordPress - phpBB Integration Mod - End
+]]></action>
+				<comment lang="en"><![CDATA[Near the line 634 in a fresch install.]]></comment>
+				<comment lang="es"><![CDATA[Cerca de la linea 634 en una instalación limpia]]></comment>
+			</edit>
+		</open>
+
+		<open src="phpbb3/index.php">
+			<edit>
+				<find><![CDATA[$template->set_filenames(array(
+	'body' => 'index_body.html')
+);]]></find>
+				<action type="before-add"><![CDATA[
+//	MOD : WordPress - phpBB Integration Mod Portal add-on - Start
+if (!defined('WP_PHPBB_BRIDGE_PORTAL'))
+{
+	include($phpbb_root_path . 'wp_phpbb_bridge_portal.' . $phpEx);
+}
+//	MOD : WordPress - phpBB Integration Mod Portal add-on - End
+]]></action>
+				<comment lang="en"><![CDATA[Near the line 142 in a fresch install.]]></comment>
+				<comment lang="es"><![CDATA[Cerca de la linea 142 en una instalación limpia]]></comment>
+			</edit>
+		</open>
+
+		<open src="phpbb3/posting.php">
+			<edit>
+				<find><![CDATA[			// The last parameter tells submit_post if search indexer has to be run]]></find>
+				<action type="before-add"><![CDATA[
+//	MOD : WordPress - phpBB Integration Mod cross-site posting add-on - Start
+			$wp_phpbb_posting = (isset($_POST['wp_phpbb_posting']) && @$config['wp_phpbb_bridge_post_disable'] == 1 && ($mode == 'post' || $mode == 'edit')) ? 1 : 0;
+			if ($wp_phpbb_posting)
+			{
+				$phpbb_mode = $mode;
+				$post_data['topic_type'] = $post_data['topic_type'] + 10;
+			}
+//	MOD : WordPress - phpBB Integration Mod cross-site posting add-on - End
+]]></action>
+				<comment lang="en"><![CDATA[Near the line 1115 in a fresch install.]]></comment>
+				<comment lang="es"><![CDATA[Cerca de la linea 1115 en una instalación limpia]]></comment>
+			</edit>
+
+			<edit>
+				<find><![CDATA[$message .= '<br /><br />' . sprintf($user->lang['RETURN_FORUM'], '<a href="' . append_sid("{$phpbb_root_path}viewforum.$phpEx", 'f=' . $data['forum_id']) . '">', '</a>');]]></find>
+				<action type="after-add"><![CDATA[
+//	MOD : WordPress - phpBB Integration Mod cross-site posting add-on - Start
+			if ($wp_phpbb_posting && !defined('IN_WP_PHPBB_BRIDGE'))
+			{
+				$phpbb_message = $message;
+				include($phpbb_root_path . 'wp_phpbb_bridge_insert_post.' . $phpEx);
+				$message = $phpbb_message;
+			}
+//	MOD : WordPress - phpBB Integration Mod cross-site posting add-on - End
+]]></action>
+				<comment lang="en"><![CDATA[Near the line 1144 in a fresch install.]]></comment>
+				<comment lang="es"><![CDATA[Cerca de la linea 1144 en una instalación limpia]]></comment>
+			</edit>
+
+			<edit>
+				<find><![CDATA[	$topic_type_toggle = posting_gen_topic_types($forum_id, $post_data['topic_type']);]]></find>
+				<action type="before-add"><![CDATA[
+//	MOD : WordPress - phpBB Integration Mod cross-site posting add-on - Start
+	if ($post_data['topic_type'] - 10 >= POST_NORMAL)
+	{
+		$post_data['wp_phpbb_posting'] = true;
+		$post_data['topic_type'] = $post_data['topic_type'] - 10;
+	}
+//	MOD : WordPress - phpBB Integration Mod cross-site posting add-on - End
+]]></action>
+				<comment lang="en"><![CDATA[Near the line 1327 in a fresch install.]]></comment>
+				<comment lang="es"><![CDATA[Cerca de la linea 1327 en una instalación limpia]]></comment>
+			</edit>
+
+			<edit>
+				<find><![CDATA[	'S_MAGIC_URL_CHECKED'		=> ($urls_checked) ? ' checked="checked"' : '',]]></find>
+				<action type="after-add"><![CDATA[
+//	MOD : WordPress - phpBB Integration Mod cross-site posting add-on - Start
+	'S_WP_PHPBB_POSTING_ALLOWED'=> ($auth->acl_get('f_announce', $forum_id)) ? true : false,
+	'S_WP_PHPBB_POSTING_CHECKED'=> (isset($post_data['wp_phpbb_posting']) && $post_data['wp_phpbb_posting']) ? ' checked="checked"' : '',
+//	MOD : WordPress - phpBB Integration Mod cross-site posting add-on - End
+]]></action>
+				<comment lang="en"><![CDATA[Near the line 1464 in a fresch install.]]></comment>
+				<comment lang="es"><![CDATA[Cerca de la linea 1464 en una instalación limpia]]></comment>
+			</edit>
+		</open>
+
+		<open src="phpbb3/language/en/posting.php">
+			<edit>
+				<find><![CDATA[	'PROGRESS_BAR']]></find>
+				<action type="before-add"><![CDATA[
+//	MOD : WordPress - phpBB Integration Mod cross-site posting add-on - Start
+	'WP_PHPBB_POSTING'			=> 'Post also in WordPress',
+//	MOD : WordPress - phpBB Integration Mod cross-site posting add-on - End
+]]></action>
+				<comment lang="en"><![CDATA[Near the end of the file in a fresch install.
+
+You will have to make this change to ALL languages you have installed, I use "en" as an example.
+You can customize the string as you wish.]]></comment>
+				<comment lang="es"><![CDATA[Cerca del final del archivo en una instalación limpia
+
+Usted debe realizar este cambio en TODOS los idiomas que tenga instalados, yo uso "en" como un ejemplo.
+Usted puede personalizar el texto como desee.]]></comment>
+			</edit>
+		</open>
+
+		<open src="phpbb3/styles/prosilver/template/index_body.html">
+			<edit>
+				<find><![CDATA[<!-- INCLUDE forumlist_body.html -->]]></find>
+				<action type="after-add"><![CDATA[
+<!-- MOD : WordPress - phpBB Integration Mod Portal add-on - Start //-->
+<!-- IF S_DISPLAY_WORDPRESS --><!-- INCLUDE wordpress/portal_wordpress.html --><!-- ENDIF -->
+<!-- MOD : WordPress - phpBB Integration Mod Portal add-on - End //-->
+]]></action>
+				<comment lang="en"><![CDATA[Near the line 15 in a fresch install.
+
+You will have to make this change to ALL themes you have installed, based off Prosilver. I use "Prosilver" as an example.]]></comment>
+				<comment lang="es"><![CDATA[Cerca de la linea 15 en una instalación limpia
+
+Usted debe hacer este cambio en TODOS los temas que tiene instalado, basados de Prosilver. Yo uso "Prosilver" como ejemplo.]]></comment>
+			</edit>
+		</open>
+
+		<open src="phpbb3/styles/prosilver/template/posting_editor.html">
+			<edit>
+				<find><![CDATA[			<!-- IF S_TYPE_TOGGLE or S_TOPIC_TYPE_ANNOUNCE or S_TOPIC_TYPE_STICKY -->]]></find>
+				<action type="before-add"><![CDATA[
+<!-- //	MOD : WordPress - phpBB Integration Mod cross-site posting add-on - Start //-->
+			<!-- IF S_WP_PHPBB_POSTING_ALLOWED -->
+				<div><label for="wp_phpbb_posting"><input type="checkbox" name="wp_phpbb_posting" id="wp_phpbb_posting"{S_WP_PHPBB_POSTING_CHECKED} /> {L_WP_PHPBB_POSTING}</label></div>
+			<!-- ENDIF -->
+<!-- //	MOD : WordPress - phpBB Integration Mod cross-site posting add-on - End //-->
+]]></action>
+				<comment lang="en"><![CDATA[Near the line 238 in a fresch install.
+
+You will have to make this change to ALL themes you have installed, based off Prosilver. I use "Prosilver" as an example.]]></comment>
+				<comment lang="es"><![CDATA[Cerca de la linea 238 en una instalación limpia
+
+Usted debe hacer este cambio en TODOS los temas que tiene instalado, basados de Prosilver. Yo uso "Prosilver" como ejemplo.]]></comment>
+			</edit>
+		</open>
+
+		<open src="phpbb3/styles/subsilver2/template/index_body.html">
+			<edit>
+				<find><![CDATA[<!-- INCLUDE forumlist_body.html -->]]></find>
+				<action type="after-add"><![CDATA[
+<!-- MOD : WordPress - phpBB Integration Mod Portal add-on - Start //-->
+<!-- IF S_DISPLAY_WORDPRESS --><!-- INCLUDE wordpress/portal_wordpress.html --><!-- ENDIF -->
+<!-- MOD : WordPress - phpBB Integration Mod Portal add-on - End //-->
+]]></action>
+				<comment lang="en"><![CDATA[Near the line 11 in a fresch install.
+
+You will have to make this change to ALL themes you have installed, based off Prosilver. I use "Prosilver" as an example.]]></comment>
+				<comment lang="es"><![CDATA[Cerca de la linea 11 en una instalación limpia
+
+Usted debe hacer este cambio en TODOS los temas que tiene instalado, basados de Prosilver. Yo uso "Prosilver" como ejemplo.]]></comment>
+			</edit>
+		</open>
+
+		<open src="phpbb3/styles/subsilver2/template/posting_body.html">
+			<edit>
+				<find><![CDATA[			<!-- IF S_TYPE_TOGGLE -->]]></find>
+				<action type="before-add"><![CDATA[
+<!-- //	MOD : WordPress - phpBB Integration Mod cross-site posting add-on - Start //-->
+			<!-- IF S_WP_PHPBB_POSTING_ALLOWED -->
+				<tr>
+					<td><input type="checkbox" class="radio" name="wp_phpbb_posting"{S_WP_PHPBB_POSTING_CHECKED} /></td>
+					<td class="gen">{L_WP_PHPBB_POSTING}</td>
+				</tr>
+			<!-- ENDIF -->
+<!-- //	MOD : WordPress - phpBB Integration Mod cross-site posting add-on - End //-->
+]]></action>
+				<comment lang="en"><![CDATA[Near the line 310 in a fresch install.
+
+You will have to make this change to ALL themes you have installed, based off Subsilver2. I use "Subsilver2" as an example.]]></comment>
+				<comment lang="es"><![CDATA[Cerca de la linea 310 en una instalación limpia
+
+Usted debe hacer este cambio en TODOS los temas que tiene instalado, basados de Subsilver2. Yo uso "Subsilver2" como ejemplo.]]></comment>
+			</edit>
+		</open>
+
+		<diy-instructions lang="en"><![CDATA[IMPORTANT ! 
+
+#####################################################################
+Log on into the phpBB Administration Control Panel
+
+A) Add ACP module :
+	A.1) Navigate to "SYSTEM" Tab.
+	A.2) Under "Module management" click on "Administration Control Panel".
+	A.3) Click on "General".
+	A.4) Click on "Quick access".
+	A.5) Under "add module" search for "BRIDGE phpBB & WordPress[acp_wp_phpbb_bridge] " select "BRIDGE phpBB & WordPress" and click on "add module"
+	A.6) in the next screen click on "yes"
+	A.7) After the screen refresh, click on "Back to previous page"
+	A.9) After the screen refresh, at the bottom you will see "BRIDGE phpBB & WordPress" search for "enable" and click on it
+	A.10) Now you will able to see "BRIDGE phpBB & WordPress" down the "QUICK ACCESS" menu at "GENERAL" Tab.
+	A.11) Set up the path to your WP Blog and adjust modules settings to your liking, 
+
+B) Refresh the style :
+
+	B.1) Navigate to "STYLES" Tab.
+	B.2) Under "Style components " click on "Theme".
+	B.3) Under "Actions" click on "Refresh".
+	B.4) in the next screen, click on "Yes" ( Repeat last 2 steps to each instaled style ).
+	B.5) Under "Style components " click on "Imageset".
+	B.6) Under "Actions" click on "Refresh".
+	B.7) in the next screen, click on "Yes" ( Repeat last 2 steps to each instaled style ).
+
+#####################################################################
+B) Enjoy it !.]]>
+		</diy-instructions>
+				<diy-instructions lang="es"><![CDATA[IMPORTANTE ! 
+
+#####################################################################
+Identificarse en el Panel de control del Administrador de phpBB
+
+A) Agregar el módulo al PCA :
+	A.1) Navegue hasta la solapa "SISTEMA"
+	A.2) En "ADMINISTRACIÓN DE MÓDULOS" hacer click en "Ir al Panel de Administración (ACP)".
+	A.3) Hacer click en "General".
+	A.4) Hacer click en "Acceso rápido".
+	A.5) En el selector "Añadir módulo" buscar "PUENTE phpBB & WordPress[acp_wp_phpbb_bridge] " seleccione "PUENTE phpBB & WordPress" y hacer click en "Añadir módulo"
+	A.6) En la siguiente pantalla hacer click en "si"
+	A.7) Luego de que la pantalla se actualice, haga click en "Regrese a la página anterior"
+	A.9) Luego de que la pantalla se actualice, al final podrá ver "PUENTE phpBB & WordPress" busque el enlace "Habilitar" y haga click el el
+	A.10) Ahora podrá ver "PUENTE phpBB & WordPress" en la sección de "ACCESO RÁPIDO" del menu izquierdo en la solapa "GENERAL"
+	A.11) Configure la Ruta a WordPress y ajuste los módulos según sus gustos y necesidades
+
+B) Refrescar el estilo :
+
+	B.1) Navegue hasta la solapa "ESTILOS"
+	B.2) Debajo de "COMPONENTES DE ESTILO" hacer click en "Tema".
+	B.3) En "Acciones" hacer click en "Actualizar".
+	B.4) En la siguente pantalla, haga click en "SI" ( Repita los 2 últimos pasos para cada estilo Instalado ).
+	B.5) Debajo de "COMPONENTES DE ESTILO" hacer click en "Galerías de imagenes
+	B.6) En "Acciones" hacer click en "Actualizar".
+	B.7) En la siguente pantalla, haga click en "SI" ( Repita los 2 últimos pasos para cada estilo Instalado ).
+
+#####################################################################
+B) Disfruten !.]]></diy-instructions>
+	</action-group>
+</mod>

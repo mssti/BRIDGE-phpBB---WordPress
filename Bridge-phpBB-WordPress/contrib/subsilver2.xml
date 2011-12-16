@@ -54,7 +54,7 @@
 
 		</author-group>
 
-		<mod-version>0.0.8</mod-version>
+		<mod-version>0.0.9</mod-version>
 
 		<installation>
 			<level>easy</level>
@@ -83,27 +83,32 @@
 	<action-group>
 
 		<copy>
-			<file from="root/styles/subsilver2/template/*.*" to="styles/subsilver2/template/*.*" />
+			<file from="root/styles/subsilver2/*.*" to="styles/subsilver2/*.*" />
 		</copy>
 
 		<open src="styles/subsilver2/template/overall_header.html">
 			<edit>
 				<find><![CDATA[</head>]]></find>
-				<action type="before-add"><![CDATA[<!-- BRIDGE phpBB & WordPress - START //-->
-<!-- IF PHPBB_IN_BLOG -->{BLOG_HEADER}
-<link rel="stylesheet" href="{T_THEME_PATH}/wp_phpbb_bridge.css" type="text/css" />
-<!-- ENDIF -->
-<!-- BRIDGE phpBB & WordPress - END //-->
-]]></action>
+				<action type="before-add">&lt;!-- BRIDGE phpBB &amp; WordPress - Start //--&gt;
+&lt;!-- IF PHPBB_IN_BLOG -->{BLOG_HEADER}
+&lt;link rel="stylesheet" href="{T_THEME_PATH}/wp_phpbb_bridge.css" type="text/css" /&gt;
+&lt;script type="text/javascript"&gt;
+// &lt;![CDATA[
+	var base_url = '{A_BASE_URL}';
+// ]]&gt;
+&lt;/script&gt;
+&lt;!-- ENDIF --&gt;
+&lt;!-- BRIDGE phpBB &amp; WordPress - End //--&gt;
+</action>
 				<comment lang="en"><![CDATA[You must do this change to ALL styles you have installed, based off Prosilver. I use "Prosilver" as an example.]]></comment>
 				<comment lang="es"><![CDATA[Usted debe hacer este cambio en TODOS los estilos que tiene instalado, basados de Prosilver. Yo uso "Prosilver" como ejemplo.]]></comment>
 			</edit>
 
 			<edit>
 				<find><![CDATA[	<div id="menubar">]]></find>
-				<action type="before-add"><![CDATA[<!-- BRIDGE phpBB & WordPress - START //-->
+				<action type="before-add"><![CDATA[<!-- BRIDGE phpBB & WordPress - Start //-->
 	<!-- IF not PHPBB_IN_BLOG -->
-<!-- BRIDGE phpBB & WordPress - END //-->
+<!-- BRIDGE phpBB & WordPress - End //-->
 ]]></action>
 			</edit>
 
@@ -111,23 +116,23 @@
 				<find><![CDATA[</div>
 
 <div id="wrapcentre">]]></find>
-				<action type="before-add"><![CDATA[<!-- BRIDGE phpBB & WordPress - START //-->
+				<action type="before-add"><![CDATA[<!-- BRIDGE phpBB & WordPress - Start //-->
 	<!-- ELSE -->
 		<!-- INCLUDE wordpress/overall_header.html -->
 	<!-- ENDIF -->
-<!-- BRIDGE phpBB & WordPress - END //-->
+<!-- BRIDGE phpBB & WordPress - End //-->
 ]]></action>
-				<action type="after-add"><![CDATA[<!-- BRIDGE phpBB & WordPress - START //-->
+				<action type="after-add"><![CDATA[<!-- BRIDGE phpBB & WordPress - Start //-->
 	<!-- IF not PHPBB_IN_BLOG -->
-<!-- BRIDGE phpBB & WordPress - END //-->
+<!-- BRIDGE phpBB & WordPress - End //-->
 ]]></action>
 			</edit>
 
 			<edit>
 				<find><![CDATA[	<!-- INCLUDE breadcrumbs.html -->]]></find>
-				<action type="after-add"><![CDATA[<!-- BRIDGE phpBB & WordPress - START //-->
+				<action type="after-add"><![CDATA[<!-- BRIDGE phpBB & WordPress - Start //-->
 	<!-- ENDIF -->
-<!-- BRIDGE phpBB & WordPress - END //-->
+<!-- BRIDGE phpBB & WordPress - End //-->
 ]]></action>
 			</edit>
 		</open>
@@ -135,9 +140,9 @@
 		<open src="styles/subsilver2/template/overall_footer.html">
 			<edit>
 				<find><![CDATA[	<span class="copyright">Powered by <a href="http://www.phpbb.com/">phpBB</a>&reg; Forum Software &copy; phpBB Group]]></find>
-				<action type="after-add"><![CDATA[<!-- BRIDGE phpBB & WordPress - START //-->
+				<action type="after-add"><![CDATA[<!-- BRIDGE phpBB & WordPress - Start //-->
 <!-- IF PHPBB_IN_BLOG -->{BLOG_FOOTER}<!-- ENDIF -->
-<!-- BRIDGE phpBB & WordPress - END //-->
+<!-- BRIDGE phpBB & WordPress - End //-->
 ]]></action>
 				<comment lang="en"><![CDATA[You must do this change to ALL styles you have installed, based off Prosilver. I use "Prosilver" as an example.]]></comment>
 				<comment lang="es"><![CDATA[Usted debe hacer este cambio en TODOS los estilos que tiene instalado, basados de Prosilver. Yo uso "Prosilver" como ejemplo.]]></comment>

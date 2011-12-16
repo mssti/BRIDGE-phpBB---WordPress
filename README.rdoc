@@ -1,6 +1,6 @@
 = BRIDGE phpBB & WordPress
 * Release Version none
-* Developer Version [ALPHA] 0.0.8
+* Developer Version [BETA] 0.0.9
 
 The source code, issue tracker and wiki can be found at:
 
@@ -8,7 +8,11 @@ The source code, issue tracker and wiki can be found at:
 
 == DESCRIPTION:
 
-Not available yet
+WordPress - phpBB Integration Mod
+	This Birdge makes possible to integrate your phpBB into your Wordpress Blog, sharing the Board style and users
+	Users Can login at the Blog using the phpBB account or Wordpress account, 
+		If the phpBB users do not exist in WP it will be automatically created as a "Subscriber"
+		If the WP users do not exist in phpBB it will be automatically created as a "Registered users" ( and "Newly registered users" if you have it enabled )
 
 == FEATURES/PROBLEMS:
 
@@ -26,11 +30,13 @@ Not available yet
 == DEPLOYMENT:
 
 Please keep in mind that this version is still in development, so not everything may be in place or working.
-* Topic at phpbb : http://www.phpbb.com/community/viewtopic.php?f=70&t=2133699
-* It is not recommended that you install this version on a live forum.
-* Report any bugs or problems you encounter to our issue tracker : http://github.com/mssti/BRIDGE-phpBB---WordPress/issues
-* Also, good ideas and bug reports are always welcome.
-* Before adding this MOD to your forum, you should back up all files related to this MOD.
+	Works on phpBB version 3.0.9 and WordPress version 3.2.1
+	It is not recommended that you install this version on a live forum.
+	Report any bugs or problems you encounter to our issue tracker http://github.com/mssti/BRIDGE-phpBB---WordPress/issues
+	Also, good ideas and bug reports are always welcome.
+	Before adding this MOD to your forum, you should back up all files related to this MOD.
+	This BRIDGE modify the database.
+	Do not try to install with AutoMOD
 
 == LICENSE:
 

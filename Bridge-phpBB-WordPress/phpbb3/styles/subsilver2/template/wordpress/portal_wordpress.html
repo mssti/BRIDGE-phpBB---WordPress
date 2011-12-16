@@ -1,0 +1,128 @@
+<!-- $Id: portal_wordpress.html, v0.0.8 2011/10/01 11:10:01 leviatan21 Exp $ //-->
+
+<style type="text/css">
+<!-- IF S_WORDPRESS_STYLE eq 'style' -->
+<!-- ELSEIF S_WORDPRESS_STYLE eq 'compact' -->
+#wordpress-portal ul.nav {
+	border-top: 1px solid #FFFFFF;
+	list-style: none;
+	margin-left: 0;
+}
+#wordpress-portal ul.nav li {
+	padding: 5px 0 4px 0;
+	border-bottom: 1px solid #CCCCCC;
+}
+#wordpress-portal ul.nav li.last {
+	border-bottom: none;
+}
+#wordpress-portal ul.nav {
+	border-top: none;
+}
+#wordpress-portal ul.nav li {
+	padding: 0 0 4px 0;
+	margin-bottom: 5px;
+	margin-left: 0;
+/*	border-bottom-color: #E0E0E0;	*/
+}
+<!-- ENDIF -->
+</style>
+
+<br />
+<div id="wordpress-portal">
+
+<!-- IF S_WORDPRESS_STYLE eq 'style' -->
+<!-- BEGIN wordpress_row -->
+
+	<!-- IF wordpress_row.S_FIRST_ROW -->
+	<table class="tablebg" cellspacing="1" width="100%">
+		<tr>
+			<td class="cat" colspan="2"><h4><a href="{U_WORDPRESS}" title="{S_WORDPRESS_TITLE}">{L_LATEST_WORDPRESS}</a></h4></td>
+			<td class="catdiv" colspan="3">&nbsp;</td>
+		</tr>
+		<tr>
+			<th colspan="2">&nbsp;{L_WP_BLOG_POSTS}&nbsp;</th>
+			<th width="50">&nbsp;{L_REPLIES}&nbsp;</th>
+			<th width="50">&nbsp;{L_AUTHOR}&nbsp;</th>
+			<th>&nbsp;{L_POST_TIME}&nbsp;</th>
+		</tr>
+	<!-- ENDIF -->
+		<tr>
+			<td class="row1" width="50" align="center">{wordpress_row.WP_FOLDER_IMG}</td>
+			<td class="row1" width="100%">
+				<a class="forumlink" href="{wordpress_row.U_WP_VIEW_POST}">{wordpress_row.WP_POST_SUBJECT}</a>
+				<!-- <!-- IF wordpress_row.U_WP_POST_REPLY --><p class="forumdesc"><a href="{wordpress_row.U_WP_POST_REPLY}" title="{L_POST_REPLY}">{L_POST_REPLY}</a></p><!-- ENDIF --> -->
+			</td>
+			<td class="row2" align="center"><p class="topicdetails">{wordpress_row.WP_REPLIES}</p></td>
+			<td class="row2" align="center"><p class="topicdetails"><a href="{wordpress_row.U_WP_POST_AUTHOR}">{wordpress_row.WP_POST_AUTHOR}</a></p></td>
+			<td class="row2" align="center" nowrap="nowrap"><p class="topicdetails">{wordpress_row.WP_POST_DATE}</p></td>
+		</tr>
+	<!-- IF wordpress_row.S_LAST_ROW -->
+	</table>
+	<!-- ENDIF -->
+<!-- END wordpress_row -->
+
+<!-- ELSEIF S_WORDPRESS_STYLE eq 'compact' -->
+	<table class="tablebg" width="100%" cellspacing="1">
+		<tr>
+			<th><a href="{U_WORDPRESS}" title="{S_WORDPRESS_TITLE}">{L_LATEST_WORDPRESS}</a></th>
+		</tr>
+		<tr>
+			<td class="row1">
+				<ul class="nav" style="margin: 0; padding: 0; list-style-type: none; line-height: 175%; font-weight: normal;">
+				<!-- BEGIN wordpress_row -->
+					<li<!-- IF wordpress_row.S_LAST_ROW --> class="last"<!-- ENDIF -->>
+						&#187; <a href="{wordpress_row.U_WP_VIEW_POST}" class="topictitle"><strong>{wordpress_row.WP_POST_SUBJECT}</strong></a>
+						<br style="clear:both" />
+						<span class="date">{wordpress_row.WP_POST_DATE}</span>
+						<span class="comments">{L_POST_BY_AUTHOR} <a href="{wordpress_row.U_WP_POST_AUTHOR}">{wordpress_row.WP_POST_AUTHOR}</a>&nbsp;&bull;&nbsp;{wordpress_row.L_WP_COMMENTS}<!-- IF wordpress_row.U_WP_POST_REPLY -->&nbsp;&bull;&nbsp;<a href="{wordpress_row.U_WP_POST_REPLY}">{L_POST_REPLY}</a><!-- ENDIF --></span>
+					</li>
+				<!-- END wordpress_row -->
+				</ul>
+			</td>
+		</tr>
+	</table>
+	<br style="clear:both" />
+
+<!-- ELSE -->
+
+	<table class="tablebg" width="100%" cellspacing="1">
+	<tr>
+		<td class="cat">
+			<table width="100%" cellspacing="0">
+			<tr>
+				<td class="nav" nowrap="nowrap"><a href="{U_WORDPRESS}" title="{S_WORDPRESS_TITLE}">{L_LATEST_WORDPRESS}</a></td>
+			</tr>
+			</table>
+		</td>
+	</tr>
+	</table>
+	<table class="tablebg" width="100%" cellspacing="1">
+	<!-- BEGIN wordpress_row -->
+		<!-- IF wordpress_row.S_ROW_COUNT is even --><tr class="row1"><!-- ELSE --><tr class="row2"><!-- ENDIF -->
+			<td align="center" valign="middle" width="150" >
+				<b class="postauthor"<!-- IF wordpress_row.POST_AUTHOR_COLOUR --> style="color: {wordpress_row.POST_AUTHOR_COLOUR}"<!-- ENDIF -->>{L_POST_BY_AUTHOR} <a href="{wordpress_row.U_WP_POST_AUTHOR}">{wordpress_row.WP_POST_AUTHOR}</a></b>
+			</td>
+			<td height="25">
+				<table width="100%" cellspacing="0">
+				<tr>
+					<td class="gensmall" width="100%"><div style="float: {S_CONTENT_FLOW_BEGIN};">&nbsp;<a href="{wordpress_row.U_WP_VIEW_POST}">{wordpress_row.WP_MINI_POST_IMG}</a><b>{L_POST_SUBJECT}:</b> {wordpress_row.WP_POST_SUBJECT}</div><div style="float: {S_CONTENT_FLOW_END};"><b>{L_POSTED}:</b> {wordpress_row.WP_POST_DATE}&nbsp;</div></td>
+				</tr>
+				</table>
+			</td>
+		</tr>
+	<!-- IF wordpress_row.S_ROW_COUNT is even --><tr class="row1"><!-- ELSE --><tr class="row2"><!-- ENDIF -->
+			<td colspan="2"><div class="postbody">{wordpress_row.WP_MESSAGE}</div></td>
+		</tr>
+	<!-- IF wordpress_row.S_ROW_COUNT is even --><tr class="row1"><!-- ELSE --><tr class="row2"><!-- ENDIF -->
+			<td colspan="2"><span class="comments">{wordpress_row.L_WP_COMMENTS}<!-- IF wordpress_row.U_WP_POST_REPLY -->&nbsp;&bull;&nbsp;<a href="{wordpress_row.U_WP_POST_REPLY}">{L_POST_REPLY}</a><!-- ENDIF --></td>
+		</tr>
+		<tr>
+			<td class="spacer" colspan="2" height="1"><img src="images/spacer.gif" alt="" width="1" height="1" /></td>
+		</tr>
+	<!-- END wordpress_row -->
+	</table>
+
+<!-- ENDIF -->
+
+</div>
+<br />

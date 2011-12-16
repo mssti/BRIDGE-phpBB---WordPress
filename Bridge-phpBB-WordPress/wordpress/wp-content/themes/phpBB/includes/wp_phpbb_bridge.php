@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.9 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/themes/phpBB/includes
- * @version: $Id: wp_phpbb_bridge.php, v0.0.8 2011/10/01 11:10:01 leviatan21 Exp $
+ * @version: $Id: wp_phpbb_bridge.php, v0.0.9 2011/10/01 11:10:01 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -36,7 +36,7 @@ if (function_exists('wp_get_current_user'))
 }
 
 // Version number (only used for the installer)
-@define('WP_PHPBB_BRIDGE_VERSION', '0.0.8');
+@define('WP_PHPBB_BRIDGE_VERSION', '0.0.9');
 
 // Without this we cannot include phpBB 3.0.x scripts.
 if (!defined('IN_PHPBB'))
@@ -81,7 +81,7 @@ phpbb::$user->add_lang(array('viewtopic', 'posting', 'ucp', 'mods/wp_phpbb_bridg
 @define('PHPBB_INCLUDED', true);
 
 /**
- * a hook function to fix the ACP url
+ * a hook function to fix the ACP & DEBUG url
  * 
  * The hook is called in the WordPress root/wp-content/themes/phpBB/includes/wp_phpbb_bridge_core.php file at the page_footer() function
  */
@@ -90,6 +90,12 @@ function wp_phpbb_u_acp()
 	phpbb::$template->assign_vars(array(
 		'U_ACP'	=> phpbb::append_sid("adm/index", false, true, phpbb::$user->session_id),
 	));
+
+	if (isset(phpbb::$template->_tpldata['.'][0]['DEBUG_OUTPUT']))
+	{
+		phpbb::$template->_tpldata['.'][0]['DEBUG_OUTPUT'] = str_replace(' | <a href="' . build_url() . '&amp;explain=1">Explain</a>', '', phpbb::$template->_tpldata['.'][0]['DEBUG_OUTPUT']);
+	//	phpbb::$template->_tpldata['.'][0]['DEBUG_OUTPUT'] = str_replace(build_url(), phpbb::$absolute_phpbb_script_path, phpbb::$template->_tpldata['.'][0]['DEBUG_OUTPUT']);
+	}
 }
 
 /**
@@ -153,8 +159,10 @@ function wp_phpbb_encrypt($string = '', $key = SECURE_AUTH_SALT)
 	}
 
 	$result = '';
+//	$key = "Secret Key";
+//	$key = phpbb::$user->session_id;
 	$key = wp_salt($key);
-	$key = utf8_normalize_nfc(request_var('key', $key, true));
+//	$key = utf8_normalize_nfc(request_var('key', $key, true));
 
 	for ($i = 0; $i < strlen($string); $i++)
 	{
@@ -186,8 +194,10 @@ function wp_phpbb_decrypt($string = '', $key = SECURE_AUTH_SALT)
 	}
 
 	$result = '';
+//	$key = "Secret Key";
+//	$key = phpbb::$user->session_id;
 	$key = wp_salt($key);
-	$key = utf8_normalize_nfc(request_var('key', $key, true));
+//	$key = utf8_normalize_nfc(request_var('key', $key, true));
 	$string = base64_decode($string);
 
 	for ($i = 0; $i < strlen($string); $i++)

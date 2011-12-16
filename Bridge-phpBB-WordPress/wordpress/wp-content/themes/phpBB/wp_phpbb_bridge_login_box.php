@@ -2,7 +2,7 @@
 /**
  * 
  * @package: phpBB 3.0.9 :: BRIDGE phpBB & WordPress -> WordPress root/wp-content/themes/phpBB/
- * @version: $Id: wp_phpbb_bridge_login_box.php, v0.0.8 2011/08/25 11:08:25 leviatan21 Exp $
+ * @version: $Id: wp_phpbb_bridge_login_box.php, v0.0.9 2011/12/10 11:12:10 leviatan21 Exp $
  * @copyright: leviatan21 < info@mssti.com > (Gabriel) http://www.mssti.com/phpbb3/
  * @license: http://opensource.org/licenses/gpl-license.php GNU Public License 
  * @author: leviatan21 - http://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=345763
@@ -23,7 +23,7 @@ require_once(ABSPATH . 'wp-config.php');
 if (!defined('IN_WP_PHPBB_BRIDGE'))
 {
 	@define('PHPBB_INAJAX', true);
-	@define('PHPBB_INCLUDED', true);
+//	@define('PHPBB_INCLUDED', true);
 	global $wp_phpbb_bridge_config, $phpbb_root_path, $phpEx;
 	global $auth, $config, $db, $template, $user, $cache;
 
@@ -37,103 +37,87 @@ phpbb::$auth->acl(phpbb::$user->data);
 phpbb::$user->setup();
 
 phpbb::$user->add_lang(array('common', 'ucp', 'mods/wp_phpbb_bridge'));
+
 $error = array();
 
-$data = request_var('data', '');
-if ($data != '')
-{
-	$data_decrypt = wp_phpbb_decrypt($data);
-	if ($data_decrypt != '')
-	{
-		$data_unserialize = unserialize($data_decrypt);
+$wp_user_id = request_var('wp_user_id', 0);
+$phpbb_session_id = request_var('sid', '');
 
-		if (is_array($data_unserialize))
+if ($wp_user_id != 0)
+{
+	// Get the WP user data, Do not use get_userdata() here because we will have a name function conflict
+	$wp_user_data = wp_phpbb_get_userdata($wp_user_id);
+//	print_r("wp_phpbb_get_userdata=(");print_r($wp_user_data);print_r(")<br />");
+
+	if (is_array($wp_user_data) && isset($wp_user_data['WPphpBBlogin']) && $wp_user_data['WPphpBBlogin'] != '')
+	{
+		$data_decrypt = wp_phpbb_decrypt($wp_user_data['WPphpBBlogin']);
+
+		if ($data_decrypt != '')
 		{
-			$mode			= isset($data_unserialize['mode'])			? $data_unserialize['mode'] : '';
-			$autologin		= isset($data_unserialize['rememberme'])	? $data_unserialize['rememberme'] : 0;
-			$sid			= isset($data_unserialize['sid'])			? $data_unserialize['sid'] : '';
-			$wp_user_id		= isset($data_unserialize['WPuser_id'])		? $data_unserialize['WPuser_id'] : 0;
-			$wp_user_login	= isset($data_unserialize['WPuser_login'])	? utf8_normalize_nfc($data_unserialize['WPuser_login']) : '';
-			$wp_user_pass	= isset($data_unserialize['WPuser_pass'])	? $data_unserialize['WPuser_pass'] : '';
-			$wp_user_email	= isset($data_unserialize['WPuser_email'])	? strtolower($data_unserialize['WPuser_email']) : '';
+			$data_unserialize = unserialize($data_decrypt);
+			if (is_array($data_unserialize))
+			{
+				$mode			= isset($data_unserialize['mode'])			? $data_unserialize['mode'] : '';
+				$autologin		= isset($data_unserialize['rememberme'])	? $data_unserialize['rememberme'] : 0;
+			//	$sid			= isset($data_unserialize['sid'])			? $data_unserialize['sid'] : '';
+			//	$wp_user_id		= isset($data_unserialize['WPuser_id'])		? $data_unserialize['WPuser_id'] : 0;
+				$wp_user_login	= isset($data_unserialize['WPuser_login'])	? utf8_normalize_nfc($data_unserialize['WPuser_login']) : '';
+				$wp_user_pass	= isset($data_unserialize['WPuser_pass'])	? $data_unserialize['WPuser_pass'] : '';
+				$wp_user_email	= isset($data_unserialize['WPuser_email'])	? strtolower($data_unserialize['WPuser_email']) : '';
+
+			// Check if we have all needed values - Start
+
+				// Are we in the ajax login ?
+				if ($mode != 'loginajax')
+				{
+					$error[] =  phpbb::$user->lang['FORM_INVALID'];
+				}
+
+				// Exist the user login name and is valid ?
+				if ($wp_user_login == '' || $wp_user_login != $wp_user_data['user_login'])
+				{
+					$error[] = phpbb::$user->lang['ERR_UNABLE_TO_LOGIN'];
+				}
+
+				// Exist the user password and is valid ?
+				if ($wp_user_pass == '' || !wp_check_password($wp_user_pass, $wp_user_data['user_pass'], $wp_user_data['ID']))
+				{
+					$error[] = phpbb::$user->lang['ERR_UNABLE_TO_LOGIN'];
+				}
+
+				// Is there any user email and is valid ?
+				if ($wp_user_email == '' || $wp_user_email != $wp_user_data['user_email'])
+				{
+					$error[] = phpbb::$user->lang['EMAIL_INVALID_EMAIL'];
+				}
+			// Check if we have all needed values - End
+			}
+			else
+			{
+				$error[] = phpbb::$user->lang['WP_INVALID_UNSERIALIZE_VALUE'];
+			}
 		}
 		else
 		{
-			$error[] = '(is_array($data_unserialize))';
+			$error[] = phpbb::$user->lang['WP_INVALID_ENCRYPT_VALUE'];
 		}
 	}
 	else
 	{
-		$error[] = '$data_decrypt';
+		$error[] = phpbb::$user->lang['WP_INVALID_LOGIN_VALUE'];
 	}
 }
 else
 {
-	$error[] = "request_var('data', '')";
+	$error[] = phpbb::$user->lang['WP_INVALID_USERID_VALUE'];
 }
 
 // return and display messages if there is an error
 if (sizeof($error))
 {
-	echo addslashes(implode('<br />', $error));
+	echo addslashes(implode('<br />', $error));	// print_r(addslashes(implode('<br />', $error)));
 	exit_handler(); 
-}
-// Check if we have all needed values
-else
-{
-	// Are we in the ajax login ?
-	if ($mode != 'loginajax')
-	{
-		$error[] = 'loginajax';
-	}
-
-	// the passed sid is equal to the real user session id ?
-	if (phpbb::$user->data['user_id'] != ANONYMOUS || $sid == '' || $sid != phpbb::$user->session_id)
-	{
-		$error[] = '1) ' . phpbb::$user->lang['ERR_UNABLE_TO_LOGIN'] . ' $sid=(' . $sid . ') phpbb::$user->session_id=('.phpbb::$user->session_id.') phpbb::$user->data[user_id]=('.phpbb::$user->data['user_id'].')';
-	}
-
-	// Exist the user identifier ?
-	if ($wp_user_id == 0)
-	{
-		$error[] = __('Invalid user ID.');
-	}
-
-	/**
-	 * Get the WP user data
-	 * Do not use get_userdata() here because we will have a name function conflict
-	 */
-	$wp_user_data = (object) phpbb::wp_phpbb_get_userdata($wp_user_id);
-
-	if (!$wp_user_data)
-	{
-		$error[] = __('Invalid user ID.');
-	}
-
-	// Exist the user login name and is valid ?
-	if ($wp_user_login == '' || $wp_user_login != $wp_user_data->user_login)
-	{
-		$error[] = phpbb::$user->lang['ERR_UNABLE_TO_LOGIN'];
-	}
-
-	// Exist the user password and is valid ?
-	if ($wp_user_pass == '' || !wp_check_password($wp_user_pass, $wp_user_data->user_pass, $wp_user_data->ID))
-	{
-		$error[] = phpbb::$user->lang['ERR_UNABLE_TO_LOGIN'];
-	}
-
-	// Is there any user email and is valid ?
-	if ($wp_user_email == '' || $wp_user_email != $wp_user_data->user_email)
-	{
-		$error[] = phpbb::$user->lang['EMAIL_INVALID_EMAIL'];
-	}
-}
-
-// return and display messages if there is an error
-if (sizeof($error))
-{
-	echo addslashes(implode('<br />', $error));
-	exit_handler();
 }
 
 /**
@@ -162,7 +146,7 @@ else
 if ($phpbb_user_id)
 {
 	$message = phpbb::$user->lang['LOGIN_REDIRECT'];
-/**
+
 	// If authentication is successful we redirect user to previous page
 	$result = phpbb::$auth->login($wp_user_login, $wp_user_pass, $autologin, true, false);
 
@@ -170,11 +154,6 @@ if ($phpbb_user_id)
 	if ($result['status'] == LOGIN_SUCCESS)
 	{
 		$message = phpbb::$user->lang['LOGIN_REDIRECT'];
-
-		if (!isset($wp_user_data->phpbb_userid) || $wp_user_data->phpbb_userid == 0 || $wp_user_data->phpbb_userid != phpbb::$user->data['user_id'])
-		{
-			update_metadata('user', $wp_user_id, 'phpbb_userid', phpbb::$user->data['user_id']);
-		}
 	}
 	// Something failed, determine what...
 	else
@@ -208,15 +187,71 @@ if ($phpbb_user_id)
 			break;
 		}
 	}
-**/
 }
 else
 {
 	$message = phpbb::$user->lang['WP_LOGIN_FAILED'];
 }
 
-echo addslashes($message);
+echo addslashes($message);	// print_r(addslashes($message));
 exit_handler();
+
+function wp_phpbb_get_userdata($wp_user_id)
+{
+	global $wpdb;
+
+	$wp_user_data = array();
+
+	$data_users = $wpdb->get_row( "SELECT * FROM {$wpdb->users} WHERE ID = '{$wp_user_id}'" );
+//	print_r("wpuser_data1=(");print_r($data_users);print_r(")<br />");
+	if (!empty($data_users))
+	{
+		foreach($data_users as $id => $value)
+		{
+			$wp_user_data[$id] = $value;
+		}
+	}
+	else
+	{
+		$wp_user_data = array(
+			'user_nicename'	=>  '',
+			'ID'			=> 0,
+		);
+	}
+
+	$data_usermeta = $wpdb->get_results( "SELECT * FROM {$wpdb->usermeta} WHERE user_id = '{$wp_user_id}'" );
+//	print_r("wpuser_data2=(");print_r($data_usermeta);print_r(")<br />");
+	if (!empty($data_usermeta))
+	{
+		foreach($data_usermeta as $key => $value)
+		{
+		//	$wp_user_data[$key] = $value;
+			$wp_user_data[$value->meta_key] = $value->meta_value;
+		}
+	}
+
+//	print_r("<hr />wp_user=(");print_r($wp_user_data);print_r(")<br />");
+	return $wp_user_data;
+}
+
+/**
+ * Clean all user caches
+ *
+ * @since 3.0.0
+ *
+ * @param int $id User ID
+ */
+function clean_user_cache($id) {
+/**
+	$user = new WP_User($id);
+
+	wp_cache_delete($id, 'users');
+	wp_cache_delete($user->user_login, 'userlogins');
+	wp_cache_delete($user->user_email, 'useremail');
+	wp_cache_delete($user->user_nicename, 'userslugs');
+	wp_cache_delete('blogs_of_user-' . $id, 'users');
+**/
+}
 
 /**
 * Add a WP user to phpbb

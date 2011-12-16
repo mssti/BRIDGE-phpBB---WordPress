@@ -1,9 +1,5 @@
 <!-- INCLUDE overall_header.html -->
 
-<!-- IF not DYNAMIC_SIDEBAR and IN_HOME and not S_USER_LOGGED_IN and not S_IS_BOT -->
-	<!-- INCLUDE wordpress/login_body.html -->
-<!-- ENDIF -->
-
 <table width="100%" cellspacing="0" cellpadding="0" border="0">
 <tr>
 	<td valign="top">
@@ -43,10 +39,6 @@
 <!-- IF DYNAMIC_SIDEBAR or (IN_HOME and S_RECENT_TOPICS) -->
 	<td><img src="{WPT_TEMPLATE_PATH}/images/spacer.gif" width="4" alt="" /></td>
 	<td style="width: {DYNAMIC_SIDEBAR_W}px;" valign="top">
-
-	<!-- IF IN_HOME and not S_USER_LOGGED_IN and not S_IS_BOT -->
-	<!-- INCLUDE wordpress/login_body.html -->
-	<!-- ENDIF -->
 
 	<!-- INCLUDE wordpress/left_sidebar_body.html -->
 	</td>

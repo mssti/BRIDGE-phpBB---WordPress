@@ -2,7 +2,7 @@
 Theme Name: phpbb (ProSilver or Subsilver2)
 Theme URI: http://www.mssti.com/
 Description: Style based off ProSilver and Subsilver2 <a href="http://www.mssti.com/">leviatan21</a>.
-Version: v0.0.8 2011/08/25 11:08:25
+Version: v0.0.9 2011/12/10 11:12:10
 Author: leviatan21
 Author URI: http://www.mssti.com/
 Tags: phpbb, ProSilver, Subsilver2, full width, two columns
@@ -31,23 +31,30 @@ Tags: phpbb, ProSilver, Subsilver2, full width, two columns
 	padding: 0;
 }
 body, label {
-	padding-top: 0px !important;
+/*	padding-top: 0px !important;	*/
 	font-size: 12px !important;
 }
-html 		{
+/**
+html {
 	background-color: #cccccc !important;
 	height: 100%;
 }
-
-body.login {
-	background-color: #fff;
+**/
+/**
+body {
+	background-color: #ffffff !important;
 	height: 100%;
 }
-
+**/
 body#error-page {
 	width: 80% !important;
 }
-
+body#error-page {
+	width: 80% !important;
+}
+#login {
+	margin: 1.5em auto 0 auto;
+}
 .input-error {
 	border: 1px solid #ff0000 !important;
 	background-color : #ff0000 !important;

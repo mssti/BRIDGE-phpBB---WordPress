@@ -1,0 +1,132 @@
+<!-- $Id: portal_wordpress.html, v0.0.8 2011/10/01 11:10:01 leviatan21 Exp $ //-->
+
+<style type="text/css">
+#wordpress-portal .postbody {
+	width:100%;
+}
+#wordpress-portal .date {
+/*	float: right;	*/
+}
+#wordpress-portal .content {
+	min-height: 1em;
+	border-bottom: 1px dashed #d8d8d8;
+	padding-bottom: 0.5em;
+/*	clear: both;	*/
+}
+#wordpress-portal .comments { }
+
+<!-- IF S_WORDPRESS_STYLE eq 'style' -->
+#wordpress-portal dd.posts,
+#wordpress-portal dd.topics,
+#wordpress-portal dd.views {
+	line-height: 100%;
+}
+<!-- ELSEIF S_WORDPRESS_STYLE eq 'compact' -->
+#wordpress-portal ul.news {
+	border-top: 1px solid #FFFFFF;
+	list-style: none;
+	margin-left: 0;
+}
+#wordpress-portal ul.news li {
+	padding: 5px 0 4px 0;
+	border-bottom: 1px solid #CCCCCC;
+}
+#wordpress-portal ul.news li.last {
+	border-bottom: none;
+}
+#wordpress-portal ul.news {
+	border-top: none;
+}
+#wordpress-portal ul.news li {
+	padding: 0 0 4px 0;
+	margin-bottom: 5px;
+	margin-left: 0;
+/*	border-bottom-color: #E0E0E0;	*/
+}
+<!-- ENDIF -->
+</style>
+
+<div id="wordpress-portal">
+
+<!-- IF S_WORDPRESS_STYLE eq 'style' -->
+<!-- BEGIN wordpress_row -->
+
+	<!-- IF wordpress_row.S_FIRST_ROW -->
+	<div class="forabg">
+		<div class="inner"><span class="corners-top"><span></span></span>
+			<ul class="topiclist">
+				<li class="header">
+					<dl class="icon">
+						<dt><a href="{U_WORDPRESS}" title="{S_WORDPRESS_TITLE}">{L_LATEST_WORDPRESS}</a></dt>
+						<dd class="posts">{L_REPLIES}</dd>
+						<dd class="views">{L_AUTHOR}</dd>
+						<dd class="lastpost"><span>{L_POST_TIME}</span></dd>
+					</dl>
+				</li>
+			</ul>
+			<ul class="topiclist topics">
+	<!-- ENDIF -->
+
+				<li class="row<!-- IF wordpress_row.S_ROW_COUNT is even --> bg1<!-- ELSE --> bg2<!-- ENDIF -->">
+					<dl class="icon" style="background-image: url({wordpress_row.WP_FOLDER_IMG_SRC}); background-repeat: no-repeat;">
+						<dt title="{L_WP_READ_MORE}">
+							<a href="{wordpress_row.U_WP_VIEW_POST}" class="topictitle">{wordpress_row.WP_POST_SUBJECT}</a>
+							<!-- <!-- IF wordpress_row.U_WP_POST_REPLY --><br /><a href="{wordpress_row.U_WP_POST_REPLY}" title="{L_POST_REPLY}">{L_POST_REPLY}</a><!-- ENDIF --> -->
+						</dt>
+						<dd class="posts">{wordpress_row.WP_REPLIES} <dfn>{L_REPLIES}</dfn></dd>
+						<dd class="views"><a href="{wordpress_row.U_WP_POST_AUTHOR}">{wordpress_row.WP_POST_AUTHOR}</a> <dfn>{L_AUTHOR}</dfn></dd>
+						<dd class="lastpost"><span> <dfn>{L_TIME} </dfn>{wordpress_row.WP_POST_DATE}</span>
+						</dd>
+					</dl>
+				</li>
+
+	<!-- IF wordpress_row.S_LAST_ROW -->
+			</ul>
+		<span class="corners-bottom"><span></span></span></div>
+	</div>
+	<!-- ENDIF -->
+<!-- END wordpress_row -->
+
+<!-- ELSEIF S_WORDPRESS_STYLE eq 'compact' -->
+
+	<div class="panel">
+		<div class="inner"><span class="corners-top"><span></span></span>
+			<h3><a href="{U_WORDPRESS}" title="{S_WORDPRESS_TITLE}">{L_LATEST_WORDPRESS}</a></h3>
+			<ul class="news">
+			<!-- BEGIN wordpress_row -->
+				<li <!-- IF wordpress_row.S_LAST_ROW --> class="last"<!-- ENDIF -->>
+					<img src="{T_THEME_PATH}/images/arrow_right.gif" />&nbsp;<a href="{wordpress_row.U_WP_VIEW_POST}" class="topictitle"><strong>{wordpress_row.WP_POST_SUBJECT}</strong></a>
+					<br style="clear:both" />
+					<span class="date">{wordpress_row.WP_POST_DATE}</span>
+					<span class="comments">{L_POST_BY_AUTHOR} <a href="{wordpress_row.U_WP_POST_AUTHOR}">{wordpress_row.WP_POST_AUTHOR}</a>&nbsp;&bull;&nbsp;{wordpress_row.L_WP_COMMENTS}<!-- IF wordpress_row.U_WP_POST_REPLY -->&nbsp;&bull;&nbsp;<a href="{wordpress_row.U_WP_POST_REPLY}">{L_POST_REPLY}</a><!-- ENDIF --></span>
+				</li>
+				<!-- END wordpress_row -->
+			</ul>
+		<span class="corners-bottom"><span></span></span></div>
+	</div>
+	<br style="clear:both" />
+
+<!-- ELSE -->
+
+	<h3><a href="{U_WORDPRESS}" title="{S_WORDPRESS_TITLE}">{L_LATEST_WORDPRESS}</a></h3>
+	<!-- BEGIN wordpress_row -->
+	<div class="post bg2">
+		<div class="inner"><span class="corners-top"><span></span></span>
+			<div class="postbody">
+				<div class="content">
+					<a href="{wordpress_row.U_WP_VIEW_POST}">{wordpress_row.WP_MINI_POST_IMG}</a> <strong>{wordpress_row.WP_POST_SUBJECT}</strong><br /><br />{wordpress_row.WP_MESSAGE}
+					<!-- IF wordpress_row.U_WP_READ_FULL -->&nbsp;&nbsp;<span>[ <a href="{wordpress_row.U_WP_READ_FULL}">{L_WP_READ_MORE}</a> ]</span><!-- ENDIF -->
+				</div>
+				<span class="comments">{L_POST_BY_AUTHOR} <a href="{wordpress_row.U_WP_POST_AUTHOR}">{wordpress_row.WP_POST_AUTHOR}</a>&nbsp;&bull;&nbsp;{wordpress_row.L_WP_COMMENTS}<!-- IF wordpress_row.U_WP_POST_REPLY -->&nbsp;&bull;&nbsp;<a href="{wordpress_row.U_WP_POST_REPLY}">{L_POST_REPLY}</a><!-- ENDIF --></span>
+				<span class="date">&nbsp;&bull;&nbsp;{L_POST_TIME}: {wordpress_row.WP_POST_DATE}</span>
+			</div>
+		<span class="corners-bottom"><span></span></span></div>
+	</div>
+	<hr class="divider" />
+	<!-- IF wordpress_row.S_NOT_LAST --><!--<br />--><!-- ENDIF -->
+	<!-- END wordpress_row -->
+
+<!-- ENDIF -->
+
+</div>
+<hr />
